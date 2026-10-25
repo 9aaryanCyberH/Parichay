@@ -70,24 +70,106 @@
   border-color: #203630;
 }
 
-[data-theme="dark"] .creator-profile-card,
-[data-theme="dark"] .creator-brand-block,
 [data-theme="dark"] .privacy-pledge-card,
 [data-theme="dark"] .how-it-works-cta-box {
   background: #14221F;
   border-color: #203630;
 }
 
-[data-theme="dark"] .creator-desc,
-[data-theme="dark"] .creator-brand-note,
 [data-theme="dark"] .section-subtext {
   color: #94A3B8;
 }
 
+/* Polished Creator Footer Dark Theme Overrides (Fix for patchy boxes & low contrast) */
+[data-theme="dark"] .landing-creator-footer {
+  background-color: #0A1210 !important;
+  border-top-color: #1A2E28 !important;
+}
+
+[data-theme="dark"] .creator-profile-card,
+[data-theme="dark"] .creator-brand-block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+[data-theme="dark"] .creator-avatar-wrap {
+  border-color: #B8F2D0 !important;
+  box-shadow: 0 0 20px rgba(184, 242, 208, 0.22) !important;
+  background-color: #14221F !important;
+}
+
+[data-theme="dark"] .creator-eyebrow {
+  color: #B8F2D0 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+}
+
+[data-theme="dark"] .creator-name {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .creator-desc {
+  color: #94A3B8 !important;
+}
+
 [data-theme="dark"] .creator-link-pill {
-  background: #172A25;
-  border-color: #203630;
-  color: #ECFDF5;
+  background: #14221F !important;
+  border: 1px solid #203630 !important;
+  color: #ECFDF5 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .creator-link-pill:hover {
+  background: #1A2E28 !important;
+  border-color: #B8F2D0 !important;
+  color: #B8F2D0 !important;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .creator-link-pill.resume {
+  background: rgba(184, 242, 208, 0.14) !important;
+  border-color: rgba(184, 242, 208, 0.35) !important;
+  color: #B8F2D0 !important;
+}
+
+[data-theme="dark"] .creator-link-pill.resume:hover {
+  background: #B8F2D0 !important;
+  color: #0C2824 !important;
+  border-color: #B8F2D0 !important;
+}
+
+[data-theme="dark"] .creator-brand-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .creator-tagline-text {
+  color: #B8F2D0 !important;
+}
+
+[data-theme="dark"] .creator-brand-note {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .creator-footer-divider {
+  background-color: #1A2E28 !important;
+}
+
+[data-theme="dark"] .creator-copyright {
+  color: #64748B !important;
+}
+
+[data-theme="dark"] .creator-legal-link {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .creator-legal-link:hover {
+  color: #B8F2D0 !important;
+}
+
+[data-theme="dark"] .legal-separator {
+  color: #203630 !important;
 }
 
 [data-theme="dark"] .btn-pill-primary,
