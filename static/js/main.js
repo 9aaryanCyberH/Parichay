@@ -1,11 +1,11 @@
 /**
- * Parichay — Editorial Career Intelligence Web Application
- * Handles file uploads, sample dataset injection, live backend analysis,
- * interactive Chart.js visualizations, and report exports.
+ * Parichay — Resume Intelligence & Role Alignment Application
+ * UI Reference: Figma Community Template (Dashboard Applicant Screens UI)
+ * Manages file uploads, presets, live backend analysis, Chart.js radar, and reports.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements - Workspace
+  // DOM Elements - Workspace & Studio
   const dropzone = document.getElementById("dropzone");
   const resumeInput = document.getElementById("resumeInput");
   const fileSelectedBox = document.getElementById("fileSelectedBox");
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const alertBanner = document.getElementById("alertBanner");
   const alertMessage = document.getElementById("alertMessage");
 
-  // DOM Elements - Report Dashboard
+  // DOM Elements - Results Dashboard
   const dashboardSection = document.getElementById("dashboardSection");
   const btnResetAnalysis = document.getElementById("btnResetAnalysis");
   const btnPrintReport = document.getElementById("btnPrintReport");
@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize Sample JDs from API
   fetchSampleJDs();
+  initSidebarNav();
 
   // 1. Drag & Drop and File Input Handling
   if (dropzone && resumeInput) {
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // "Use Sample Resume" Helper
+  // "Use Sample Resume" Trigger
   if (btnSampleResume) {
     btnSampleResume.addEventListener("click", async (e) => {
       e.preventDefault();
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const blob = await response.blob();
         const sampleFile = new File([blob], "sample_resume_swe.pdf", { type: "application/pdf" });
         handleFileSelection(sampleFile);
-        showAlert("Loaded sample candidate profile (Aarav Sharma — Software Engineer).", "info");
+        showAlert("Loaded verified candidate profile (Aarav Sharma — Software Engineer).", "info");
       } catch (err) {
         showAlert("Unable to auto-load sample PDF. Please select a PDF resume manually.", "error");
       }
@@ -147,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   }
 
-  // 2. Fetch Sample Job Descriptions
+  // 2. Fetch Sample Job Descriptions (Presets)
   async function fetchSampleJDs() {
     try {
       const res = await fetch("/api/sample-jds");
@@ -157,13 +158,13 @@ document.addEventListener("DOMContentLoaded", () => {
         data.sample_jds.forEach((jd) => {
           const chip = document.createElement("button");
           chip.type = "button";
-          chip.className = "preset-chip";
+          chip.className = "preset-chip-btn";
           chip.textContent = jd.title;
           chip.title = `${jd.company_type} • ${jd.experience}`;
           chip.addEventListener("click", () => {
             if (jdTextarea) {
               jdTextarea.value = jd.description;
-              showAlert(`Loaded role description for "${jd.title}".`, "info");
+              showAlert(`Loaded role preset: "${jd.title}".`, "info");
             }
           });
           sampleChipsRow.appendChild(chip);
@@ -174,6 +175,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Sidebar navigation active state handler
+  function initSidebarNav() {
+    const navItems = document.querySelectorAll(".sidebar-nav-item");
+    navItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        navItems.forEach((n) => n.classList.remove("active"));
+        item.classList.add("active");
+      });
+    });
+  }
+
   // 3. Form Submission & Analysis
   if (btnAnalyze) {
     btnAnalyze.addEventListener("click", async () => {
@@ -181,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const jdText = jdTextarea ? jdTextarea.value.trim() : "";
       if (!currentFile) {
-        showAlert("Please attach a PDF resume to analyze alignment.", "error");
+        showAlert("Please upload or attach a PDF resume to analyze alignment.", "error");
         return;
       }
 
@@ -224,24 +236,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isLoading) {
       if (btnAnalyze) btnAnalyze.disabled = true;
       if (btnSpinner) btnSpinner.style.display = "inline-block";
-      if (btnText) btnText.textContent = "Analyzing Qualifications...";
+      if (btnText) btnText.textContent = "ANALYZING...";
       if (systemStatusText) systemStatusText.textContent = "Processing";
     } else {
       if (btnAnalyze) btnAnalyze.disabled = false;
       if (btnSpinner) btnSpinner.style.display = "none";
-      if (btnText) btnText.textContent = "Analyze Alignment";
+      if (btnText) btnText.textContent = "ANALYZE ALIGNMENT";
       if (systemStatusText) systemStatusText.textContent = "Ready";
     }
   }
 
-  // 4. Render Analytical Dashboard Report
+  // 4. Render Analysis Dashboard (Figma Template Applicant Screens)
   function renderDashboard(data) {
     if (!dashboardSection) return;
 
     dashboardSection.style.display = "block";
     dashboardSection.scrollIntoView({ behavior: "smooth" });
 
-    // Candidate Identity & Meta
+    // Candidate Summary Header
     const candidateNameEl = document.getElementById("dashCandidateName");
     const candidateLinksEl = document.getElementById("dashCandidateLinks");
     if (candidateNameEl) {
@@ -253,8 +265,8 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (data.candidate.email) {
         candidateLinksEl.innerHTML += `
-          <span class="meta-link-item">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <span class="applicant-link-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
               <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
@@ -265,8 +277,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (data.candidate.phone) {
         candidateLinksEl.innerHTML += `
-          <span class="meta-link-item">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <span class="applicant-link-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
             </svg>
             ${escapeHtml(data.candidate.phone)}
@@ -277,8 +289,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.candidate.linkedin) {
         const url = data.candidate.linkedin.startsWith("http") ? data.candidate.linkedin : "https://" + data.candidate.linkedin;
         candidateLinksEl.innerHTML += `
-          <span class="meta-link-item">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <span class="applicant-link-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
               <rect x="2" y="9" width="4" height="12"></rect>
               <circle cx="4" cy="4" r="2"></circle>
@@ -291,8 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.candidate.github) {
         const url = data.candidate.github.startsWith("http") ? data.candidate.github : "https://" + data.candidate.github;
         candidateLinksEl.innerHTML += `
-          <span class="meta-link-item">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <span class="applicant-link-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
             </svg>
             <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -301,8 +313,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       candidateLinksEl.innerHTML += `
-        <span class="meta-link-item">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <span class="applicant-link-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
@@ -311,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    // Score & Tier
+    // Circular Score Badge
     const scoreValEl = document.getElementById("dashScoreVal");
     const tierBadgeEl = document.getElementById("dashTierBadge");
     const interpretationEl = document.getElementById("dashScoreInterpretation");
@@ -319,8 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     animateNumber(scoreValEl, 0, data.alignment.score, 600);
 
     if (tierBadgeEl) {
-      tierBadgeEl.textContent = data.alignment.fit_tier;
-      tierBadgeEl.className = `tier-badge-indicator tier-${data.alignment.tier_badge}`;
+      tierBadgeEl.textContent = data.alignment.fit_tier.toUpperCase();
     }
 
     if (interpretationEl) {
@@ -333,10 +344,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 4-Component Score Breakdown
+    // 4-Pillar Score Cards
     renderBreakdownCards(data.alignment.score_breakdown.components);
 
-    // Chart.js Radar Chart
+    // Radar Chart
     renderRadarChart(data.alignment.score_breakdown.components);
 
     // Skills Matrix
@@ -358,16 +369,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     components.forEach((comp) => {
       const card = document.createElement("div");
-      card.className = "breakdown-pillar";
+      card.className = "pillar-box";
       card.innerHTML = `
-        <div class="pillar-top-row">
-          <span class="pillar-name">${escapeHtml(comp.name)}</span>
-          <span class="pillar-points">${comp.contribution_points} pts</span>
+        <div class="pillar-top">
+          <span class="pillar-title">${escapeHtml(comp.name)}</span>
+          <span class="pillar-score">${comp.contribution_points} pts</span>
         </div>
-        <div class="pillar-bar-track">
-          <div class="pillar-bar-fill" style="width: ${Math.min(100, comp.achieved_percent)}%;"></div>
+        <div class="pillar-meter">
+          <div class="pillar-fill" style="width: ${Math.min(100, comp.achieved_percent)}%;"></div>
         </div>
-        <p class="pillar-summary">${escapeHtml(comp.description)}</p>
+        <p class="pillar-text">${escapeHtml(comp.description)}</p>
       `;
       listEl.appendChild(card);
     });
@@ -394,18 +405,18 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Candidate Evidence",
             data: achievedData,
-            backgroundColor: "rgba(24, 72, 160, 0.16)",
-            borderColor: "#1848A0",
+            backgroundColor: "rgba(0, 123, 255, 0.16)",
+            borderColor: "#007BFF",
             borderWidth: 2,
-            pointBackgroundColor: "#1848A0",
+            pointBackgroundColor: "#007BFF",
             pointBorderColor: "#FFFFFF",
             pointRadius: 4
           },
           {
             label: "Target Role Baseline",
             data: targetData,
-            backgroundColor: "rgba(220, 213, 201, 0.12)",
-            borderColor: "#DCD5C9",
+            backgroundColor: "rgba(176, 184, 196, 0.12)",
+            borderColor: "#B0B8C4",
             borderWidth: 1.5,
             borderDash: [3, 3],
             pointRadius: 0
@@ -417,8 +428,8 @@ document.addEventListener("DOMContentLoaded", () => {
         maintainAspectRatio: false,
         scales: {
           r: {
-            angleLines: { color: "#E8E3DA" },
-            grid: { color: "#E8E3DA" },
+            angleLines: { color: "#E2E6ED" },
+            grid: { color: "#E2E6ED" },
             suggestedMin: 0,
             suggestedMax: 100,
             ticks: {
@@ -427,11 +438,11 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             pointLabels: {
               font: {
-                family: "'Plus Jakarta Sans', sans-serif",
+                family: "'Inter', sans-serif",
                 size: 11,
                 weight: "500"
               },
-              color: "#4A4A52"
+              color: "#4A5160"
             }
           }
         },
@@ -440,17 +451,17 @@ document.addEventListener("DOMContentLoaded", () => {
             position: "bottom",
             labels: {
               font: {
-                family: "'Plus Jakarta Sans', sans-serif",
+                family: "'Inter', sans-serif",
                 size: 11
               },
               boxWidth: 10,
-              color: "#4A4A52"
+              color: "#4A5160"
             }
           },
           tooltip: {
-            backgroundColor: "#18181B",
-            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
-            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+            backgroundColor: "#1E242E",
+            titleFont: { family: "'Inter', sans-serif", size: 12 },
+            bodyFont: { family: "'Inter', sans-serif", size: 12 },
             padding: 8,
             cornerRadius: 4
           }
@@ -468,7 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tabMissingCount) tabMissingCount.textContent = skills.missing_technical.length;
     if (tabUniqueCount) tabUniqueCount.textContent = skills.candidate_unique.length;
 
-    const filterBtns = document.querySelectorAll(".skill-filter-btn");
+    const filterBtns = document.querySelectorAll(".figma-tab-btn");
     filterBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         filterBtns.forEach((b) => b.classList.remove("active"));
@@ -516,14 +527,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (items.length === 0) {
-      container.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted); font-style:italic;">No skills found under this filter.</span>`;
+      container.innerHTML = `<span style="font-size:0.82rem; color:var(--text-muted); font-style:italic;">No skills found under this filter.</span>`;
       return;
     }
 
     items.forEach((item) => {
       const pill = document.createElement("span");
-      pill.className = `skill-pill skill-pill-${item.type}`;
-      pill.innerHTML = `<strong>${escapeHtml(item.name)}</strong> <span class="pill-type-label">(${escapeHtml(item.label)})</span>`;
+      pill.className = `skill-tag-pill tag-${item.type}`;
+      pill.innerHTML = `<strong>${escapeHtml(item.name)}</strong> <span class="pill-subtext">(${escapeHtml(item.label)})</span>`;
       container.appendChild(pill);
     });
   }
@@ -537,9 +548,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (audit.strengths && audit.strengths.length > 0) {
         audit.strengths.forEach((str) => {
           const item = document.createElement("div");
-          item.className = "audit-entry-item";
+          item.className = "audit-row-item";
           item.innerHTML = `
-            <svg class="audit-check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="audit-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>${escapeHtml(str)}</span>
@@ -547,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
           strengthsList.appendChild(item);
         });
       } else {
-        strengthsList.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted);">Standard profile coverage detected.</span>`;
+        strengthsList.innerHTML = `<span style="font-size:0.82rem; color:var(--text-muted);">Standard profile coverage detected.</span>`;
       }
     }
 
@@ -556,19 +567,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (audit.improvement_priorities && audit.improvement_priorities.length > 0) {
         audit.improvement_priorities.forEach((imp) => {
           const item = document.createElement("div");
-          item.className = "priority-item-card";
+          item.className = "priority-card";
           const pClass = imp.priority.toLowerCase();
           item.innerHTML = `
-            <div class="priority-tag-row">
-              <span class="priority-badge-label priority-${pClass}-tag">${escapeHtml(imp.priority)} Priority</span>
+            <div class="priority-card-top">
+              <span class="priority-badge p-${pClass}">${escapeHtml(imp.priority)} Priority</span>
             </div>
-            <div class="priority-area-title">${escapeHtml(imp.area)}</div>
-            <p class="priority-desc">${escapeHtml(imp.details)}</p>
+            <div class="priority-title">${escapeHtml(imp.area)}</div>
+            <p class="priority-text">${escapeHtml(imp.details)}</p>
           `;
           prioritiesList.appendChild(item);
         });
       } else {
-        prioritiesList.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted);">No critical structural gaps identified.</span>`;
+        prioritiesList.innerHTML = `<span style="font-size:0.82rem; color:var(--text-muted);">No critical structural gaps identified.</span>`;
       }
     }
   }
@@ -593,12 +604,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (recommendations.bullet_enhancements && recommendations.bullet_enhancements.length > 0) {
         recommendations.bullet_enhancements.forEach((enh) => {
           const entry = document.createElement("div");
-          entry.className = "enhancement-entry";
+          entry.className = "enhancement-card-entry";
           entry.innerHTML = `
-            <div class="enhancement-head">${escapeHtml(enh.focus_area)}</div>
-            <div class="enhancement-context">${escapeHtml(enh.critique)}</div>
-            <div class="enhancement-rewrite-box">
-              <strong>Actionable Formula:</strong> ${escapeHtml(enh.recommended_action)}
+            <div class="enhancement-head-text">${escapeHtml(enh.focus_area)}</div>
+            <div class="enhancement-critique-text">${escapeHtml(enh.critique)}</div>
+            <div class="enhancement-formula-box">
+              <strong>Formula Action:</strong> ${escapeHtml(enh.recommended_action)}
             </div>
           `;
           bulletContainer.appendChild(entry);
@@ -611,7 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (recommendations.gap_mitigation_plan && recommendations.gap_mitigation_plan.length > 0) {
         recommendations.gap_mitigation_plan.forEach((gap) => {
           const card = document.createElement("div");
-          card.className = "gap-action-card";
+          card.className = "gap-box-item";
           card.innerHTML = `
             <div class="gap-skill-header">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -621,7 +632,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </svg>
               ${escapeHtml(gap.missing_skill)}
             </div>
-            <p class="gap-action-body">${escapeHtml(gap.concrete_action)}</p>
+            <p class="gap-action-text">${escapeHtml(gap.concrete_action)}</p>
           `;
           gapGrid.appendChild(card);
         });
@@ -633,9 +644,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (recommendations.interview_preparation_topics && recommendations.interview_preparation_topics.length > 0) {
         recommendations.interview_preparation_topics.forEach((topic, idx) => {
           const li = document.createElement("li");
-          li.className = "interview-prep-item";
+          li.className = "interview-item";
           li.innerHTML = `
-            <span class="interview-q-badge">0${idx + 1}</span>
+            <span class="interview-index-pill">0${idx + 1}</span>
             <span>${escapeHtml(topic)}</span>
           `;
           interviewList.appendChild(li);
@@ -668,13 +679,13 @@ document.addEventListener("DOMContentLoaded", () => {
     alertMessage.textContent = message;
     alertBanner.style.display = "flex";
     if (type === "error") {
-      alertBanner.style.backgroundColor = "var(--state-missing-bg)";
-      alertBanner.style.borderColor = "var(--state-missing-border)";
-      alertBanner.style.color = "var(--state-missing-text)";
+      alertBanner.style.backgroundColor = "var(--missing-red-bg)";
+      alertBanner.style.borderColor = "var(--missing-red-border)";
+      alertBanner.style.color = "var(--missing-red)";
     } else {
-      alertBanner.style.backgroundColor = "var(--cobalt-subtle)";
-      alertBanner.style.borderColor = "var(--cobalt-border)";
-      alertBanner.style.color = "var(--cobalt)";
+      alertBanner.style.backgroundColor = "var(--figma-blue-subtle)";
+      alertBanner.style.borderColor = "var(--figma-blue-border)";
+      alertBanner.style.color = "var(--figma-blue)";
     }
   }
 

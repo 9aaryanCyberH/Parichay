@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parichay — Resume Intelligence & Role Alignment Analysis</title>
-  <meta name="description" content="A professional resume intelligence platform providing explainable candidate-role alignment analysis, grounded skill gap audits, and contextual engineering recommendations.">
+  <title>Parichay — Resume Intelligence & Role Alignment Dashboard</title>
+  <meta name="description" content="A modern dashboard application for AI-powered resume intelligence, candidate-role alignment analysis, and grounded skill gap audits.">
   
   <!-- Favicon SVG inline -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231848A0'><path d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007BFF'><path d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/></svg>">
   
-  <!-- Google Fonts: Plus Jakarta Sans & Newsreader & JetBrains Mono -->
+  <!-- Google Fonts: Inter & Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
   
   <!-- Chart.js for Analytical Visualizations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
@@ -20,358 +20,440 @@
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body class="dashboard-body">
 
-  <!-- Top App Navigation & Brand Header -->
-  <header class="app-header">
-    <div class="header-container">
-      <div class="brand-group">
-        <a href="/" class="brand-wordmark" aria-label="Parichay Home">
-          Parichay
-        </a>
-        <span class="brand-divider">/</span>
-        <span class="brand-descriptor">Resume Intelligence</span>
+  <!-- Top App Navigation Bar (Matches Figma Top Header) -->
+  <header class="app-topbar">
+    <div class="topbar-left">
+      <a href="/" class="brand-logo" aria-label="Parichay Home">
+        <!-- Logo glyph modeled after the clean geometric mark in Figma -->
+        <svg class="brand-glyph" width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="3" fill="#007BFF"/>
+          <rect x="18" y="2" width="12" height="12" rx="3" fill="#0056B3"/>
+          <rect x="2" y="18" width="12" height="12" rx="3" fill="#38BDF8"/>
+          <rect x="18" y="18" width="12" height="12" rx="3" fill="#0284C7"/>
+        </svg>
+        <span class="brand-text">Parichay</span>
+      </a>
+      <span class="brand-tag">Resume Intelligence</span>
+    </div>
+
+    <!-- Center Status / Search Pill (Figma-inspired search box) -->
+    <div class="topbar-center">
+      <div class="search-status-bar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="search-placeholder">In-memory analysis engine &bull; Client-side session</span>
       </div>
-      
-      <div class="header-actions">
-        <div class="status-indicator" title="System operational and ready for analysis">
-          <span class="status-dot"></span>
-          <span id="systemStatusText" class="status-text">Ready</span>
-        </div>
-        <button type="button" id="btnResetWorkspace" class="btn-header-action" title="Clear inputs and start fresh">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10"></polyline>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-          </svg>
-          Reset
-        </button>
+    </div>
+
+    <!-- Topbar Right Actions -->
+    <div class="topbar-right">
+      <div class="user-profile-badge">
+        <div class="avatar-circle">P</div>
+        <span class="user-profile-name">Workspace Active</span>
       </div>
+      <button type="button" id="btnResetWorkspace" class="btn-topbar-action" title="Reset workspace">
+        RESET
+      </button>
     </div>
   </header>
 
-  <!-- Main Application Body -->
-  <main class="main-wrapper">
+  <!-- App Shell: Sidebar Navigation + Main Content Stage -->
+  <div class="app-shell">
+    
+    <!-- Left Sidebar (Figma Reference Navigation) -->
+    <aside class="app-sidebar" aria-label="Primary Navigation">
+      <nav class="sidebar-nav">
+        <a href="#workspaceSection" class="sidebar-nav-item active" id="navWorkspace">
+          <div class="nav-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <span class="nav-label">Resume Studio</span>
+        </a>
 
-    <!-- Workspace Lead Introduction -->
-    <section class="workspace-hero">
-      <h1 class="workspace-headline">Understand your fit for the role.</h1>
-      <p class="workspace-subhead">
-        Evaluate how your resume aligns with specific job requirements through transparent semantic modeling, structured skill extraction, and grounded gap analysis.
-      </p>
-    </section>
+        <a href="#scoreSection" class="sidebar-nav-item" id="navScore">
+          <div class="nav-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+          </div>
+          <span class="nav-label">Alignment Score</span>
+        </a>
 
-    <!-- Error & Feedback Banner -->
-    <div id="alertBanner" class="alert-banner" role="alert" style="display: none;">
-      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-      <div id="alertMessage" class="alert-content">Please provide the necessary inputs.</div>
-    </div>
+        <a href="#matrixSection" class="sidebar-nav-item" id="navMatrix">
+          <div class="nav-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+          <span class="nav-label">Skills Matrix</span>
+        </a>
 
-    <!-- Integrated Document & Role Workspace -->
-    <section class="workspace-studio" aria-label="Analysis Studio">
-      
-      <!-- Input Grid -->
-      <div class="studio-grid">
+        <a href="#recommendationsSection" class="sidebar-nav-item" id="navAdvisor">
+          <div class="nav-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+          <span class="nav-label">AI Advisor</span>
+        </a>
+
+        <a href="#auditSection" class="sidebar-nav-item" id="navAudit">
+          <div class="nav-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <span class="nav-label">Document Audit</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer-box">
+        <div class="status-indicator-badge">
+          <span class="status-dot-pulse"></span>
+          <span id="systemStatusText">Ready</span>
+        </div>
+        <div class="sidebar-tagline">Where Your Potential Meets Opportunity.</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main-canvas">
+
+      <!-- Alert Banner -->
+      <div id="alertBanner" class="app-alert-banner" role="alert" style="display: none;">
+        <svg class="alert-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="alertMessage">Please provide the necessary inputs.</span>
+      </div>
+
+      <!-- Main Stage White Container (Modeled after Figma White Canvas Card) -->
+      <div class="dashboard-stage-card" id="workspaceSection">
         
-        <!-- Left: Candidate Document -->
-        <div class="studio-col">
-          <div class="studio-col-header">
-            <div class="step-kicker">
-              <span class="step-num">01</span>
-              <span class="step-title">Candidate Document</span>
-            </div>
-            <span class="step-spec">PDF • Up to 5 MB</span>
-          </div>
-
-          <!-- Document Upload Dropzone -->
-          <div id="dropzone" class="document-dropzone" tabindex="0" role="button" aria-label="Upload PDF Resume">
-            <div class="dropzone-body">
-              <div class="dropzone-icon-ring">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="12" y1="18" x2="12" y2="12"></line>
-                  <line x1="9" y1="15" x2="12" y2="12"></line>
-                  <line x1="15" y1="15" x2="12" y2="12"></line>
-                </svg>
-              </div>
-              <div class="dropzone-text">
-                <span class="dropzone-title">Select or drag PDF resume</span>
-                <span class="dropzone-subtitle">Text-based PDF exported from Docs, Word, LaTeX, or Canva</span>
-              </div>
-            </div>
-            <input type="file" id="resumeInput" class="hidden-file-input" accept=".pdf" aria-label="Select resume PDF file">
-          </div>
-
-          <!-- Selected File State Box -->
-          <div id="fileSelectedBox" class="file-card-preview" style="display: none;">
-            <div class="file-card-left">
-              <div class="file-type-badge">PDF</div>
-              <div class="file-meta">
-                <div id="selectedFileName" class="file-name-label">resume.pdf</div>
-                <div id="selectedFileSize" class="file-size-label">0 KB</div>
-              </div>
-            </div>
-            <div class="file-card-actions">
-              <button type="button" id="btnReplaceFile" class="btn-text-muted">Replace</button>
-              <span class="action-divider">|</span>
-              <button type="button" id="btnRemoveFile" class="btn-text-danger">Remove</button>
-            </div>
-          </div>
-
-          <!-- Quick Sample Resume Trigger -->
-          <div class="sample-resume-bar">
-            <button type="button" id="btnSampleResume" class="sample-resume-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-              Load verified sample candidate (Aarav Sharma — Software Engineer)
-            </button>
-          </div>
+        <!-- Blue Hero Heading (Figma Reference "Lorem ispum" in bright blue) -->
+        <div class="stage-header">
+          <h1 class="stage-primary-title">Resume Intelligence & Role Alignment</h1>
+          <p class="stage-subtitle">
+            Upload your candidate resume and specify target role criteria to generate an explainable, data-grounded alignment audit.
+          </p>
         </div>
 
-        <!-- Right: Target Role Description -->
-        <div class="studio-col">
-          <div class="studio-col-header">
-            <div class="step-kicker">
-              <span class="step-num">02</span>
-              <span class="step-title">Target Role Description</span>
+        <!-- Studio Input Area (Figma Form Screens & Upload Layout) -->
+        <div class="studio-two-col">
+          
+          <!-- Column 1: Document Upload Screen -->
+          <div class="studio-form-card">
+            <div class="form-card-title-row">
+              <h2 class="form-card-heading">Candidate Resume</h2>
+              <span class="form-card-badge">PDF &bull; Up to 5 MB</span>
             </div>
-            <span class="step-spec">Paste description or select preset</span>
+
+            <!-- Upload Area (Styled like Figma's "Upload a File" box) -->
+            <div id="dropzone" class="figma-upload-zone" tabindex="0" role="button" aria-label="Upload PDF Resume">
+              <div class="upload-accent-bar"></div>
+              <div class="upload-zone-content">
+                <div class="upload-icon-circle">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                <div class="upload-text-block">
+                  <span class="upload-primary-text">Drag & drop your PDF resume here</span>
+                  <span class="upload-secondary-text">or click to browse from your computer</span>
+                </div>
+                <button type="button" class="btn-figma-outlined-sm">CHOOSE FILE</button>
+              </div>
+              <input type="file" id="resumeInput" class="hidden-file-input" accept=".pdf" aria-label="Select resume PDF file">
+            </div>
+
+            <!-- Selected File State Box -->
+            <div id="fileSelectedBox" class="figma-file-preview-card" style="display: none;">
+              <div class="file-preview-left">
+                <div class="file-doc-icon">PDF</div>
+                <div class="file-details">
+                  <div id="selectedFileName" class="file-title-text">resume.pdf</div>
+                  <div id="selectedFileSize" class="file-meta-text">0 KB</div>
+                </div>
+              </div>
+              <div class="file-preview-actions">
+                <button type="button" id="btnReplaceFile" class="btn-figma-link">Replace</button>
+                <span class="action-pipe">|</span>
+                <button type="button" id="btnRemoveFile" class="btn-figma-link text-danger">Remove</button>
+              </div>
+            </div>
+
+            <!-- Sample Resume Shortcut Trigger -->
+            <div class="sample-loader-row">
+              <button type="button" id="btnSampleResume" class="btn-sample-trigger">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Load sample profile (Aarav Sharma &mdash; Software Engineer)
+              </button>
+            </div>
           </div>
 
-          <div class="jd-input-box">
-            <textarea id="jdTextarea" class="jd-input-control" placeholder="Paste the full job description, required technical competencies, responsibilities, and qualifications..." aria-label="Job description text"></textarea>
-            
-            <div class="role-presets-bar">
-              <span class="presets-label">Role presets:</span>
-              <div id="sampleChipsRow" class="presets-row">
+          <!-- Column 2: Job Description Screen -->
+          <div class="studio-form-card">
+            <div class="form-card-title-row">
+              <h2 class="form-card-heading">Target Role Description</h2>
+              <span class="form-card-badge">Paste JD or select preset</span>
+            </div>
+
+            <div class="textarea-container">
+              <textarea id="jdTextarea" class="figma-textarea" placeholder="Paste the job requirements, responsibilities, technical proficiencies, and qualifications here..." aria-label="Job description"></textarea>
+            </div>
+
+            <div class="presets-toolbar">
+              <span class="presets-title">Role presets:</span>
+              <div id="sampleChipsRow" class="presets-chip-container">
                 <!-- Dynamically populated from /api/sample-jds -->
               </div>
             </div>
           </div>
+
         </div>
 
-      </div>
+        <!-- Action Bar (Figma Primary Blue Solid Action Button) -->
+        <div class="stage-action-bar">
+          <div class="action-bar-left">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Safe in-memory document parsing. No candidate documents are permanently stored.</span>
+          </div>
 
-      <!-- Action Strip -->
-      <div class="studio-action-strip">
-        <div class="privacy-note">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          <span>Client-side session. Document parsed in-memory, never stored on disk.</span>
-        </div>
-        
-        <button type="button" id="btnAnalyze" class="btn-analyze-action">
-          <span id="btnSpinner" class="spinner" style="display: none;"></span>
-          <span id="btnText">Analyze Alignment</span>
-          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-        </button>
-      </div>
-
-    </section>
-
-    <!-- ======================================================================
-         ANALYSIS REPORT (Appears dynamically upon analysis completion)
-         ====================================================================== -->
-    <section id="dashboardSection" class="analysis-report" aria-label="Alignment Analysis Report" style="display: none;">
-
-      <!-- Report Metadata Header -->
-      <div class="report-meta-header">
-        <div class="candidate-summary">
-          <div class="candidate-meta-kicker">Candidate Profile</div>
-          <h2 id="dashCandidateName" class="candidate-display-name">Candidate Name</h2>
-          <div id="dashCandidateLinks" class="candidate-meta-links">
-            <!-- Populated via main.js with clean SVG vectors -->
+          <div class="action-bar-buttons">
+            <button type="button" id="btnAnalyze" class="btn-figma-primary">
+              <span id="btnSpinner" class="spinner" style="display: none;"></span>
+              <span id="btnText">ANALYZE ALIGNMENT</span>
+            </button>
           </div>
         </div>
-        
-        <div class="report-actions">
-          <button type="button" id="btnResetAnalysis" class="btn-report-action">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+      </div>
+
+      <!-- ====================================================================
+           ANALYSIS DASHBOARD SCREENS (Appears dynamically upon analysis completion)
+           Modeled after the Figma Applicant Screens with Circular Score Badge
+           ==================================================================== -->
+      <div id="dashboardSection" class="dashboard-stage-card results-stage" style="display: none;">
+
+        <!-- Applicant Summary Bar with Circular Badge (Figma "Not selected" circle adapted to Match Score) -->
+        <div class="applicant-hero-card" id="scoreSection">
+          <div class="applicant-info-block">
+            <div class="applicant-kicker">CANDIDATE PROFILE</div>
+            <h2 id="dashCandidateName" class="applicant-name">Candidate Name</h2>
+            <div id="dashCandidateLinks" class="applicant-links-row">
+              <!-- Dynamically populated with clean SVG icons -->
+            </div>
+          </div>
+
+          <!-- Circular Score Badge (Modeled after the circular indicator in the Figma applicant header) -->
+          <div class="figma-circular-score-badge">
+            <div class="score-number-display">
+              <span id="dashScoreVal">0</span>%
+            </div>
+            <div id="dashTierBadge" class="score-tier-label">EVALUATION COMPLETE</div>
+          </div>
+        </div>
+
+        <!-- Methodology Interpretation Note -->
+        <div class="methodology-banner">
+          <div class="methodology-title">Alignment Interpretation</div>
+          <p id="dashScoreInterpretation" class="methodology-text">
+            This score reflects calculated lexical, semantic, and skill alignment with the target job posting. It provides an objective assessment of requirement coverage across technical competencies, domain vocabulary, and structural completeness.
+          </p>
+          <div class="methodology-notice">
+            <strong>Methodology Notice:</strong> Parichay describes this score as an <em>alignment measure</em>, not a predictive hiring probability or candidate competence ranking.
+          </div>
+        </div>
+
+        <!-- 4-Pillar Metric Breakdown (Matches the 3-column / 4-column cards in Figma screens) -->
+        <div class="figma-cards-grid">
+          <div class="section-title-stripe">
+            <h3>Score Calculation Breakdown</h3>
+            <span class="stripe-sub">Weighted Formula: 45% Tech + 35% TF-IDF + 10% Soft + 10% Structure</span>
+          </div>
+          <div id="breakdownCardsList" class="pillars-row">
+            <!-- Dynamically populated from data.alignment.score_breakdown.components -->
+          </div>
+        </div>
+
+        <!-- Split Section: Radar Visualization & Document Audit -->
+        <div class="figma-split-row" id="auditSection">
+          
+          <!-- Column 1: Radar Footprint -->
+          <div class="split-col-card">
+            <div class="card-inner-header">
+              <h3 class="card-inner-title">Alignment Dimension Radar</h3>
+              <span class="card-inner-badge">Evidence vs Target Baseline</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="radarChart" aria-label="Alignment Radar Chart" role="img"></canvas>
+            </div>
+          </div>
+
+          <!-- Column 2: Document Structure Health -->
+          <div class="split-col-card">
+            <div class="card-inner-header">
+              <h3 class="card-inner-title">Document Structure & Evidence Audit</h3>
+              <span class="card-inner-badge">Verified Resume Sections</span>
+            </div>
+            <div id="resumeStrengthsList" class="audit-list-box">
+              <!-- Dynamically populated from data.audit.strengths -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Skills Matrix (Figma Tab Navigation & Pills) -->
+        <div class="skills-matrix-section" id="matrixSection">
+          <div class="card-inner-header">
+            <h3 class="card-inner-title">Competency & Skills Matrix</h3>
+            <span class="card-inner-badge">Standard Technical Taxonomy Engine</span>
+          </div>
+
+          <!-- Figma-style Tabs -->
+          <div class="figma-tabs-bar">
+            <button type="button" class="figma-tab-btn active" data-tab="all">
+              All Extracted
+            </button>
+            <button type="button" class="figma-tab-btn" data-tab="matched">
+              Matched In Role <span id="tabCountMatched" class="tab-count-pill">0</span>
+            </button>
+            <button type="button" class="figma-tab-btn" data-tab="missing">
+              Missing in Resume <span id="tabCountMissing" class="tab-count-pill">0</span>
+            </button>
+            <button type="button" class="figma-tab-btn" data-tab="unique">
+              Candidate Bonus Skills <span id="tabCountUnique" class="tab-count-pill">0</span>
+            </button>
+            <button type="button" class="figma-tab-btn" data-tab="unverified">
+              Contextual Mentions
+            </button>
+          </div>
+
+          <!-- Skills Badges Cluster -->
+          <div id="skillsClusterContainer" class="skills-pill-cluster">
+            <!-- Dynamically populated via main.js -->
+          </div>
+        </div>
+
+        <!-- Prioritized Improvements Grid -->
+        <div class="priorities-section">
+          <div class="card-inner-header">
+            <h3 class="card-inner-title">Prioritized Improvement Opportunities</h3>
+            <span class="card-inner-badge">Ranked by Alignment Impact</span>
+          </div>
+          <div id="improvementPrioritiesList" class="priorities-cards-row">
+            <!-- Dynamically populated from data.audit.improvement_priorities -->
+          </div>
+        </div>
+
+        <!-- Grounded AI Advisor Recommendations (Figma Form/Dialog styled) -->
+        <div class="advisor-stage-section" id="recommendationsSection">
+          <div class="advisor-top-bar">
+            <div>
+              <h3 class="advisor-heading">Contextual Recommendations</h3>
+              <div class="advisor-subheading">Grounded strictly in candidate inputs and target role requirements</div>
+            </div>
+            <span id="advisorEngineBadge" class="figma-source-badge">Parichay Advisor Engine</span>
+          </div>
+
+          <!-- Executive Summary Box -->
+          <div class="executive-quote-box">
+            <p id="advisorExecutiveSummary" class="executive-quote-text">
+              “Evaluating alignment details...”
+            </p>
+          </div>
+
+          <!-- Bullet Point Enhancements (Google X-Y-Z formula) -->
+          <div class="advisor-block">
+            <h4 class="block-title">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
+            <div id="bulletEnhancementsList" class="enhancements-column">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Gap Mitigation Plan -->
+          <div class="advisor-block">
+            <h4 class="block-title">Targeted Skill Gap Mitigation Plan</h4>
+            <div id="gapMitigationGrid" class="gap-grid-box">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Interview Prep Topics -->
+          <div class="advisor-block">
+            <h4 class="block-title">Likely Technical Interview Focus Areas</h4>
+            <ul id="interviewPrepList" class="interview-list-box">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dashboard Footer Controls -->
+        <div class="results-action-row">
+          <button type="button" id="btnResetAnalysis" class="btn-figma-outlined">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="1 4 1 10 7 10"></polyline>
               <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
-            Analyze Another Role
+            ANALYZE ANOTHER ROLE
           </button>
-          <button type="button" id="btnPrintReport" class="btn-report-action">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          <button type="button" id="btnPrintReport" class="btn-figma-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 6 2 18 2 18 9"></polyline>
               <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
               <rect x="6" y="14" width="12" height="8"></rect>
             </svg>
-            Export Report
-          </button>
-        </div>
-      </div>
-
-      <!-- Section 1: Estimated Alignment Score & Interpretation -->
-      <div class="report-score-section">
-        <div class="score-primary-stat">
-          <div class="stat-kicker">Estimated Alignment Measure</div>
-          <div class="stat-num-row">
-            <span id="dashScoreVal" class="stat-number">0</span>
-            <span class="stat-unit">%</span>
-          </div>
-          <div id="dashTierBadge" class="tier-badge-indicator tier-high">Evaluation Complete</div>
-        </div>
-        
-        <div class="score-interpretation-copy">
-          <h3 class="interpretation-title">Alignment Interpretation</h3>
-          <p id="dashScoreInterpretation" class="interpretation-text">
-            This metric reflects calculated lexical, semantic, and skill alignment with the target job posting. It provides an objective assessment of requirement coverage across technical competencies, domain vocabulary, and structural completeness.
-          </p>
-          <div class="methodology-disclaimer">
-            <strong>Methodology Notice:</strong> Parichay describes this score as an <em>alignment measure</em>, not a predictive hiring probability or candidate competence ranking.
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 2: Four-Component Calculation Breakdown -->
-      <div class="report-section">
-        <div class="section-heading-bar">
-          <h3 class="section-title">Score Calculation Breakdown</h3>
-          <span class="section-subtext">Weighted Algorithm: 45% Tech + 35% TF-IDF + 10% Soft + 10% Structure</span>
-        </div>
-        <div id="breakdownCardsList" class="breakdown-grid">
-          <!-- Dynamically populated from data.alignment.score_breakdown.components -->
-        </div>
-      </div>
-
-      <!-- Section 3: Dimensional Radar & Document Completeness -->
-      <div class="report-section-split">
-        
-        <!-- Radar Visualization -->
-        <div class="report-split-card">
-          <div class="split-card-header">
-            <h3 class="split-card-title">Alignment Footprint Radar</h3>
-            <span class="split-card-sub">Candidate Evidence vs Target Baseline</span>
-          </div>
-          <div class="chart-canvas-box">
-            <canvas id="radarChart" aria-label="Alignment Dimension Radar Chart" role="img"></canvas>
-          </div>
-        </div>
-
-        <!-- Document Structural Health -->
-        <div class="report-split-card">
-          <div class="split-card-header">
-            <h3 class="split-card-title">Document Structure & Evidence Audit</h3>
-            <span class="split-card-sub">Verified Resume Sections</span>
-          </div>
-          <div id="resumeStrengthsList" class="audit-entries-list">
-            <!-- Dynamically populated from data.audit.strengths -->
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Section 4: Competency & Skills Matrix -->
-      <div class="report-section">
-        <div class="section-heading-bar">
-          <h3 class="section-title">Competency & Skills Matrix</h3>
-          <span class="section-subtext">Extracted via curated technical and domain taxonomy</span>
-        </div>
-
-        <!-- Filter Navigation -->
-        <div class="skills-filter-toolbar">
-          <button type="button" class="skill-filter-btn active" data-tab="all">
-            All Extracted
-          </button>
-          <button type="button" class="skill-filter-btn" data-tab="matched">
-            Matched In Role <span id="tabCountMatched" class="filter-count">0</span>
-          </button>
-          <button type="button" class="skill-filter-btn" data-tab="missing">
-            Missing in Resume <span id="tabCountMissing" class="filter-count">0</span>
-          </button>
-          <button type="button" class="skill-filter-btn" data-tab="unique">
-            Candidate Bonus Skills <span id="tabCountUnique" class="filter-count">0</span>
-          </button>
-          <button type="button" class="skill-filter-btn" data-tab="unverified">
-            Contextual Mentions
+            EXPORT REPORT
           </button>
         </div>
 
-        <!-- Tag Badges Container -->
-        <div id="skillsClusterContainer" class="skills-cluster-box">
-          <!-- Dynamically populated via main.js -->
-        </div>
       </div>
 
-      <!-- Section 5: Prioritized Resume Improvements -->
-      <div class="report-section">
-        <div class="section-heading-bar">
-          <h3 class="section-title">Prioritized Improvement Opportunities</h3>
-          <span class="section-subtext">Ranked by potential alignment impact</span>
-        </div>
-        <div id="improvementPrioritiesList" class="priorities-grid">
-          <!-- Dynamically populated from data.audit.improvement_priorities -->
-        </div>
-      </div>
+    </main>
 
-      <!-- Section 6: Contextual AI Recommendations -->
-      <div class="report-advisor-panel">
-        <div class="advisor-header-row">
-          <div class="advisor-title-group">
-            <h3 class="advisor-main-title">Contextual Recommendations</h3>
-            <span class="advisor-subtitle">Grounded in candidate inputs and target role requirements</span>
-          </div>
-          <span id="advisorEngineBadge" class="advisor-source-tag">Parichay Advisor Engine</span>
-        </div>
+  </div>
 
-        <!-- Executive Summary Callout -->
-        <div class="advisor-quote-card">
-          <p id="advisorExecutiveSummary" class="advisor-quote-text">
-            “Evaluating alignment details...”
-          </p>
-        </div>
-
-        <!-- Bullet Point Impact Enhancements (Google X-Y-Z formula) -->
-        <div class="advisor-subblock">
-          <h4 class="subblock-title">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
-          <div id="bulletEnhancementsList" class="enhancements-list">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- Targeted Skill Gap Mitigation Plan -->
-        <div class="advisor-subblock">
-          <h4 class="subblock-title">Targeted Skill Gap Mitigation Plan</h4>
-          <div id="gapMitigationGrid" class="gap-cards-grid">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- Likely Technical Interview Prep Topics -->
-        <div class="advisor-subblock">
-          <h4 class="subblock-title">Likely Technical Interview Focus Areas</h4>
-          <ul id="interviewPrepList" class="interview-prep-list">
-            <!-- Dynamically populated -->
-          </ul>
-        </div>
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- Editorial Product Footer -->
-  <footer class="app-footer">
-    <div class="footer-container">
-      <div class="footer-left">
-        <strong>Parichay</strong> — Where Your Potential Meets Opportunity.
-      </div>
-      <div class="footer-right">
-        AI-Powered Resume Intelligence &bull; Standard Technical Taxonomy Engine &bull; 2026
-      </div>
+  <!-- Deep Slate-Gray Footer Banner (Directly matches the footer in all Figma screens) -->
+  <footer class="figma-footer-banner">
+    <div class="footer-links-row">
+      <a href="#workspaceSection">Resume Studio</a>
+      <span class="footer-pipe">|</span>
+      <a href="#scoreSection">Alignment Overview</a>
+      <span class="footer-pipe">|</span>
+      <a href="#matrixSection">Skills Matrix</a>
+      <span class="footer-pipe">|</span>
+      <a href="#recommendationsSection">AI Recommendations</a>
+      <span class="footer-pipe">|</span>
+      <a href="#auditSection">Document Audit</a>
+    </div>
+    <div class="footer-subtext-line">
+      Parichay &bull; Where Your Potential Meets Opportunity &bull; Independent AI-Powered Resume Intelligence Platform
     </div>
   </footer>
 
