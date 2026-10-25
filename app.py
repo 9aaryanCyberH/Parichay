@@ -555,24 +555,25 @@ def update_gemini_key():
             Config.GEMINI_API_KEY = new_key
             os.environ["GEMINI_API_KEY"] = new_key
 
-            # Persist to local .env if it exists
-            env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-            if os.path.exists(env_file):
-                try:
-                    with open(env_file, "r", encoding="utf-8") as f:
-                        lines = f.readlines()
-                    updated = False
-                    for idx, line in enumerate(lines):
-                        if line.startswith("GEMINI_API_KEY="):
-                            lines[idx] = f"GEMINI_API_KEY={new_key}\n"
-                            updated = True
-                            break
-                    if not updated:
-                        lines.append(f"GEMINI_API_KEY={new_key}\n")
-                    with open(env_file, "w", encoding="utf-8") as f:
-                        f.writelines(lines)
-                except Exception as env_err:
-                    logger.warning(f"Could not update .env on disk: {env_err}")
+            # Persist to local .env if it exists and not in testing mode
+            if not app.config.get("TESTING"):
+                env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+                if os.path.exists(env_file):
+                    try:
+                        with open(env_file, "r", encoding="utf-8") as f:
+                            lines = f.readlines()
+                        updated = False
+                        for idx, line in enumerate(lines):
+                            if line.startswith("GEMINI_API_KEY="):
+                                lines[idx] = f"GEMINI_API_KEY={new_key}\n"
+                                updated = True
+                                break
+                        if not updated:
+                            lines.append(f"GEMINI_API_KEY={new_key}\n")
+                        with open(env_file, "w", encoding="utf-8") as f:
+                            f.writelines(lines)
+                    except Exception as env_err:
+                        logger.warning(f"Could not update .env on disk: {env_err}")
 
             return jsonify({
                 "success": True,

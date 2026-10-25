@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_bullet_fix">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_clean_chat">
   
   <!-- Chart.js for Skill Match Visualization (Assignment Section 4) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -675,23 +675,6 @@
         </div>
 
         <div class="chat-wrapper-card">
-          <!-- Chat AI Connection Toolbar -->
-          <div class="chat-header-status-strip" id="chatHeaderStatusStrip">
-            <div class="chat-status-left">
-              <span class="status-indicator-dot offline" id="chatStatusDot"></span>
-              <span class="chat-status-label" id="chatStatusLabel">Checking AI connection...</span>
-              <span class="chat-model-badge" id="chatModelBadge" style="display: none;"></span>
-            </div>
-            <div class="chat-status-right">
-              <button type="button" class="btn-api-key-pill" id="btnOpenGeminiModal" title="Configure or update your Google Gemini API key">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M21 2l-2 2m-1-1l-3 3m5 5l-2 2m-1-1l-3 3M3 21l9-9m0 0l3-3m-3 3l-3 3"></path>
-                </svg>
-                <span id="btnApiKeyLabel">Connect Gemini API Key</span>
-              </button>
-            </div>
-          </div>
-
           <!-- Chat Feed -->
           <div id="chatMessagesFeed" class="chat-history-box">
             <div class="chat-bubble-row assistant">
@@ -786,6 +769,16 @@
                 <span class="plan-name-text">{{ current_user.account_type if current_user else 'Free Plan' }}</span>
                 <span style="font-size: 0.82rem; color: var(--muted-slate);">Active workspace</span>
               </div>
+            </div>
+
+            <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="settings-label" style="margin: 0;">AI Intelligence (Google Gemini)</label>
+                <button type="button" class="btn-topbar-outline" id="btnOpenGeminiModal" style="padding: 4px 12px; font-size: 0.78rem;">Configure API Key</button>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0;">
+                Connect your Google Gemini API key to enable live conversational intelligence in the AI Assistant. If unset, Parichay seamlessly runs the built-in grounded career advisor.
+              </p>
             </div>
 
             <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
@@ -886,6 +879,6 @@
 
   <!-- Shared Theme Controller & Main Studio Logic -->
   <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_bullet_fix"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_clean_chat"></script>
 </body>
 </html>
