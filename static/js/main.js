@@ -101,25 +101,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const auditVerbsIcon = document.getElementById("auditVerbsIcon");
   const auditReadabilitySub = document.getElementById("auditReadabilitySub");
 
-  // DOM Elements - AI Assistant (Screen 8) & Gemini Key Modal
+  // DOM Elements - AI Assistant (Screen 8)
   const chatMessagesFeed = document.getElementById("chatMessagesFeed");
   const chatForm = document.getElementById("chatForm");
   const chatInputField = document.getElementById("chatInputField");
   const chatChips = document.querySelectorAll(".btn-chat-chip");
-  const chatStatusDot = document.getElementById("chatStatusDot");
-  const chatStatusLabel = document.getElementById("chatStatusLabel");
-  const chatModelBadge = document.getElementById("chatModelBadge");
-  const btnOpenGeminiModal = document.getElementById("btnOpenGeminiModal");
-  const btnApiKeyLabel = document.getElementById("btnApiKeyLabel");
-  const geminiKeyModal = document.getElementById("geminiKeyModal");
-  const btnGeminiModalClose = document.getElementById("btnGeminiModalClose");
-  const geminiApiKeyInput = document.getElementById("geminiApiKeyInput");
-  const btnToggleApiKeyVisibility = document.getElementById("btnToggleApiKeyVisibility");
-  const btnSaveGeminiKey = document.getElementById("btnSaveGeminiKey");
-  const btnClearGeminiKey = document.getElementById("btnClearGeminiKey");
-  const geminiModalAlert = document.getElementById("geminiModalAlert");
-  const geminiModalStatusText = document.getElementById("geminiModalStatusText");
-  const geminiModalModelTag = document.getElementById("geminiModalModelTag");
 
   // DOM Elements - History & Settings
   const historyListContainer = document.getElementById("historyListContainer");
@@ -203,7 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (viewName === "assistant") {
-      checkGeminiStatus();
       if (chatInputField) chatInputField.focus();
     }
 
@@ -1198,10 +1183,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // 6. AI ASSISTANT CHATBOT (Screen 8) & GEMINI AI INTEGRATION
+  // 6. AI ASSISTANT CHATBOT (Screen 8)
   // ==========================================================================
-  let isGeminiLive = false;
-
   function initChatbot() {
     if (chatForm) {
       chatForm.addEventListener("submit", (e) => {
@@ -1219,175 +1202,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
-
-    // Initial status check
-    checkGeminiStatus();
-
-    // Wire Gemini Key Modal listeners
-    if (btnOpenGeminiModal) {
-      btnOpenGeminiModal.addEventListener("click", () => {
-        openGeminiModal();
-      });
-    }
-
-    if (btnGeminiModalClose) {
-      btnGeminiModalClose.addEventListener("click", () => {
-        closeGeminiModal();
-      });
-    }
-
-    if (geminiKeyModal) {
-      geminiKeyModal.addEventListener("click", (e) => {
-        if (e.target === geminiKeyModal) {
-          closeGeminiModal();
-        }
-      });
-    }
-
-    if (btnToggleApiKeyVisibility && geminiApiKeyInput) {
-      btnToggleApiKeyVisibility.addEventListener("click", () => {
-        const isPassword = geminiApiKeyInput.type === "password";
-        geminiApiKeyInput.type = isPassword ? "text" : "password";
-        btnToggleApiKeyVisibility.textContent = isPassword ? "🙈" : "👁️";
-      });
-    }
-
-    if (btnSaveGeminiKey) {
-      btnSaveGeminiKey.addEventListener("click", async () => {
-        await saveGeminiKey();
-      });
-    }
-
-    if (btnClearGeminiKey) {
-      btnClearGeminiKey.addEventListener("click", async () => {
-        await clearGeminiKey();
-      });
-    }
-  }
-
-  async function checkGeminiStatus() {
-    try {
-      const storedKey = (localStorage.getItem("parichay_gemini_key") || "").trim();
-      const resp = await fetch("/api/config/gemini-status");
-      const data = await resp.json();
-
-      const serverIsLive = Boolean(data.success && data.is_live);
-      isGeminiLive = serverIsLive || Boolean(storedKey && storedKey.length > 10 && !storedKey.startsWith("your_"));
-      const modelName = data.model || "gemini-1.5-flash";
-
-      if (chatStatusDot) {
-        chatStatusDot.className = `status-indicator-dot ${isGeminiLive ? "live" : "offline"}`;
-      }
-      if (chatStatusLabel) {
-        chatStatusLabel.textContent = isGeminiLive ? "Google Gemini AI Live" : "Parichay AI Copilot (Offline Mode)";
-      }
-      if (chatModelBadge) {
-        chatModelBadge.textContent = modelName;
-        chatModelBadge.style.display = isGeminiLive ? "inline-block" : "none";
-      }
-      if (btnApiKeyLabel) {
-        btnApiKeyLabel.textContent = isGeminiLive ? "Configure Key" : "Connect Gemini Key";
-      }
-      if (geminiModalStatusText) {
-        geminiModalStatusText.textContent = isGeminiLive
-          ? `Connected (${data.masked_key || (storedKey ? `${storedKey.slice(0, 6)}...${storedKey.slice(-4)}` : "Active")})`
-          : "Offline (using grounded career intelligence fallback)";
-        geminiModalStatusText.style.color = isGeminiLive ? "#10B981" : "var(--muted-slate)";
-      }
-      if (geminiModalModelTag) {
-        geminiModalModelTag.textContent = modelName;
-      }
-      if (btnClearGeminiKey) {
-        btnClearGeminiKey.style.display = isGeminiLive ? "inline-block" : "none";
-      }
-    } catch (e) {
-      console.warn("Could not retrieve Gemini status:", e);
-    }
-  }
-
-  function openGeminiModal() {
-    if (!geminiKeyModal) return;
-    geminiKeyModal.style.display = "flex";
-    if (geminiModalAlert) {
-      geminiModalAlert.style.display = "none";
-      geminiModalAlert.className = "app-alert-banner";
-    }
-    const storedKey = localStorage.getItem("parichay_gemini_key") || "";
-    if (geminiApiKeyInput && !geminiApiKeyInput.value) {
-      geminiApiKeyInput.value = storedKey;
-    }
-    checkGeminiStatus();
-    setTimeout(() => {
-      if (geminiApiKeyInput) geminiApiKeyInput.focus();
-    }, 100);
-  }
-
-  function closeGeminiModal() {
-    if (geminiKeyModal) {
-      geminiKeyModal.style.display = "none";
-    }
-  }
-
-  async function saveGeminiKey() {
-    if (!geminiApiKeyInput || !btnSaveGeminiKey) return;
-    const key = geminiApiKeyInput.value.trim();
-    if (!key) {
-      showModalAlert("Please enter a valid Google Gemini API key.", "error");
-      return;
-    }
-
-    const origText = btnSaveGeminiKey.textContent;
-    btnSaveGeminiKey.disabled = true;
-    btnSaveGeminiKey.textContent = "Verifying with Google...";
-
-    try {
-      const resp = await fetch("/api/config/gemini-key", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: key })
-      });
-      const data = await resp.json();
-
-      if (data.success && data.is_live) {
-        localStorage.setItem("parichay_gemini_key", key);
-        showModalAlert(data.message || "Connected to Google Gemini successfully!", "success");
-        await checkGeminiStatus();
-        setTimeout(() => {
-          closeGeminiModal();
-        }, 1200);
-      } else {
-        showModalAlert(data.message || "Failed to verify Gemini API key. Please check that the key is valid and has Gemini API enabled in Google AI Studio.", "error");
-      }
-    } catch (err) {
-      showModalAlert(`Connection check failed: ${err.message}`, "error");
-    } finally {
-      btnSaveGeminiKey.disabled = false;
-      btnSaveGeminiKey.textContent = origText;
-    }
-  }
-
-  async function clearGeminiKey() {
-    if (!btnClearGeminiKey) return;
-    localStorage.removeItem("parichay_gemini_key");
-    if (geminiApiKeyInput) geminiApiKeyInput.value = "";
-    try {
-      await fetch("/api/config/gemini-key", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: "" })
-      });
-    } catch (e) {
-      // ignore
-    }
-    showModalAlert("Gemini API key disconnected. Chat will use deterministic grounded fallback.", "info");
-    await checkGeminiStatus();
-  }
-
-  function showModalAlert(msg, type = "info") {
-    if (!geminiModalAlert) return;
-    geminiModalAlert.className = `app-alert-banner ${type}`;
-    geminiModalAlert.textContent = msg;
-    geminiModalAlert.style.display = "flex";
   }
 
   async function sendChatMessage() {
@@ -1412,11 +1226,9 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMessagesFeed.scrollTop = chatMessagesFeed.scrollHeight;
 
     try {
-      const storedKey = (localStorage.getItem("parichay_gemini_key") || "").trim();
       const payload = {
         message: msg,
         history: chatConversationHistory,
-        api_key: storedKey,
         candidate: latestAnalysisData ? {
           ...latestAnalysisData.candidate,
           matched_skills: (latestAnalysisData.skills && latestAnalysisData.skills.matched_technical) || [],
@@ -1439,7 +1251,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await resp.json();
       if (result.success && result.reply) {
-        appendBubble("assistant", result.reply, result.engine, result.is_ai_live);
+        appendBubble("assistant", result.reply);
         chatConversationHistory.push({ role: "assistant", content: result.reply });
       } else {
         appendBubble("assistant", result.message || "I encountered an issue processing your question. Please try again.");
@@ -1451,21 +1263,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function appendBubble(role, content, engine = "", isAiLive = false) {
+  function appendBubble(role, content) {
     if (!chatMessagesFeed) return;
     const row = document.createElement("div");
     row.className = `chat-bubble-row ${role}`;
 
     const formatted = renderMarkdown(content);
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const engineTag = (role === "assistant" && engine)
-      ? `<span class="chat-engine-badge">&bull; ${escapeHtml(engine)}</span>`
-      : "";
 
     row.innerHTML = `
       <div class="chat-bubble">
         <div>${formatted}</div>
-        <div class="chat-time-tag">${timeStr}${engineTag}</div>
+        <div class="chat-time-tag">${timeStr}</div>
       </div>
     `;
 

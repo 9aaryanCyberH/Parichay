@@ -772,16 +772,6 @@
             </div>
 
             <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="settings-label" style="margin: 0;">AI Intelligence (Google Gemini)</label>
-                <button type="button" class="btn-topbar-outline" id="btnOpenGeminiModal" style="padding: 4px 12px; font-size: 0.78rem;">Configure API Key</button>
-              </div>
-              <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0;">
-                Connect your Google Gemini API key to enable live conversational intelligence in the AI Assistant. If unset, Parichay seamlessly runs the built-in grounded career advisor.
-              </p>
-            </div>
-
-            <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
               <label class="settings-label">Data &amp; privacy controls</label>
               <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0 0 10px 0;">
                 All documents are parsed strictly in memory. You can clear your saved historical records at any time from My analyses.
@@ -813,72 +803,8 @@
     </div>
   </div>
 
-  <!-- Google Gemini API Key Configuration Modal -->
-  <div id="geminiKeyModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content-card" style="max-width: 520px;">
-      <div class="modal-header-row">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="modal-gemini-icon" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(184, 242, 208, 0.25); display: flex; align-items: center; justify-content: center; color: var(--primary-teal); flex-shrink: 0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="modal-title" style="margin: 0; font-size: 1.15rem;">Google Gemini AI Integration</h3>
-            <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: var(--muted-slate);">Live career copilot powered by Google Gemini</p>
-          </div>
-        </div>
-        <button type="button" id="btnGeminiModalClose" class="btn-modal-close" aria-label="Close modal">&times;</button>
-      </div>
-
-      <div class="modal-body-content" style="margin-top: 16px;">
-        <div id="geminiModalAlert" class="app-alert-banner" style="display: none; margin-bottom: 14px;"></div>
-
-        <p style="font-size: 0.88rem; line-height: 1.5; color: var(--text-dark); margin: 0 0 14px 0;">
-          Connect your <strong>Google Gemini API key</strong> to unlock live conversational intelligence, customized interview simulations, and bespoke resume rewrite recommendations.
-        </p>
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label for="geminiApiKeyInput" style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--text-dark);">
-            Google Gemini API Key
-          </label>
-          <div style="position: relative;">
-            <input
-              type="password"
-              id="geminiApiKeyInput"
-              class="form-control"
-              placeholder="Paste AIzaSy... key here"
-              style="width: 100%; padding: 10px 42px 10px 12px; font-family: monospace; font-size: 0.88rem; border-radius: 8px; border: 1.5px solid var(--border-neutral); background: var(--bg-card); color: var(--text-dark);"
-              autocomplete="off"
-              spellcheck="false"
-            >
-            <button type="button" id="btnToggleApiKeyVisibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted-slate); font-size: 0.95rem; padding: 4px;" title="Toggle key visibility">
-              👁️
-            </button>
-          </div>
-          <p style="font-size: 0.76rem; color: var(--muted-slate); margin: 6px 0 0 0;">
-            Free API key available in 30 seconds at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color: var(--primary-teal); font-weight: 600; text-decoration: underline;">Google AI Studio</a>.
-          </p>
-        </div>
-
-        <div id="geminiCurrentStatusBox" style="padding: 10px 14px; border-radius: 8px; background: rgba(0, 0, 0, 0.03); border: 1px solid var(--border-neutral); margin-bottom: 16px; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <span style="font-weight: 600; color: var(--text-dark);">Current Status:</span>
-            <span id="geminiModalStatusText" style="color: var(--muted-slate); margin-left: 6px;">Checking connection...</span>
-          </div>
-          <span id="geminiModalModelTag" style="font-size: 0.75rem; color: var(--muted-slate); font-family: monospace;"></span>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
-          <button type="button" id="btnClearGeminiKey" class="btn-topbar-outline" style="padding: 8px 16px; font-size: 0.82rem; display: none;">Disconnect Key</button>
-          <button type="button" id="btnSaveGeminiKey" class="btn-topbar-solid" style="padding: 9px 20px; font-size: 0.85rem; font-weight: 600;">Test & Save Key</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Shared Theme Controller & Main Studio Logic -->
   <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_clean_chat"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_native_chat"></script>
 </body>
 </html>
