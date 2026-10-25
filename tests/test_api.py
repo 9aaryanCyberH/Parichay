@@ -243,6 +243,18 @@ class TestParichayAPI(unittest.TestCase):
         self.assertEqual(resp_signup.status_code, 200)
         self.assertIn("Create your Parichay account to access your workspace", resp_signup.get_data(as_text=True))
 
+    def test_login_and_signup_pages_always_ask_credentials(self):
+        """Verifies GET /login and GET /signup always render forms to prompt credentials rather than skipping directly to studio."""
+        self.login_test_user()
+
+        login_resp = self.client.get("/login")
+        self.assertEqual(login_resp.status_code, 200)
+        self.assertIn("Sign in to continue your resume journey", login_resp.get_data(as_text=True))
+
+        signup_resp = self.client.get("/signup")
+        self.assertEqual(signup_resp.status_code, 200)
+        self.assertIn("Create your Parichay account to access your workspace", signup_resp.get_data(as_text=True))
+
     def test_topbar_button_classes_harmonized(self):
         """Test topbar auth buttons in index.html use matching btn-topbar-pill without color clash."""
         user = self.login_test_user()

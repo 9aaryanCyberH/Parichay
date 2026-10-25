@@ -149,12 +149,6 @@ def login():
     if not is_safe_url(next_url):
         next_url = url_for("studio")
 
-    user_id = session.get("user_id")
-    if user_id:
-        if AuthManager.get_user_by_id(user_id):
-            return redirect(next_url)
-        session.clear()
-
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
@@ -183,12 +177,6 @@ def signup():
     next_url = request.args.get("next") or request.form.get("next") or url_for("studio")
     if not is_safe_url(next_url):
         next_url = url_for("studio")
-
-    user_id = session.get("user_id")
-    if user_id:
-        if AuthManager.get_user_by_id(user_id):
-            return redirect(next_url)
-        session.clear()
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
