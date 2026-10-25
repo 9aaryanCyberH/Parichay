@@ -25,6 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const alertBanner = document.getElementById("alertBanner");
   const alertMessage = document.getElementById("alertMessage");
   const btnDismissAlert = document.getElementById("btnDismissAlert");
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+  // Dark Mode Toggle Listener (Assignment Section 5 - Optional)
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+      const nextTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      localStorage.setItem("parichay-theme", nextTheme);
+      if (typeof updateRadarChartTheme === "function") {
+        updateRadarChartTheme(nextTheme);
+      }
+    });
+  }
 
   // DOM Elements - Studio (Screen 4)
   const dropzone = document.getElementById("dropzone");
@@ -467,7 +481,137 @@ document.addEventListener("DOMContentLoaded", () => {
     if (insightMissingText) insightMissingText.textContent = `${missingCount} important requirements to focus on`;
     if (insightStrongText) insightStrongText.textContent = `Strong verified project background in ${data.candidate.name ? data.candidate.name.split(" ")[0] : "Candidate"}'s resume`;
     if (insightRecText) insightRecText.textContent = `Personalized recommendations generated for role readiness`;
+
+    // Render Chart.js Skill Radar Visualization (Assignment Section 4)
+    renderSkillRadarChart(data.skills);
   }
+
+  // ==========================================================================
+  // CHART.JS RADAR VISUALIZATION (Assignment Section 4)
+  // ==========================================================================
+  let radarChartInstance = null;
+
+  function renderSkillRadarChart(skillsData) {
+    const canvas = document.getElementById("skillRadarChart");
+    if (!canvas || typeof Chart === "undefined" || !skillsData) return;
+
+    const categories = [
+      { key: "languages", label: "Languages" },
+      { key: "frameworks_and_libraries", label: "Frameworks" },
+      { key: "ai_ml_data", label: "AI & ML" },
+      { key: "cloud_and_devops", label: "Cloud / DevOps" },
+      { key: "databases", label: "Databases" },
+      { key: "tools_and_methods", label: "Tools & Testing" }
+    ];
+
+    const candidateCat = skillsData.candidate_all_categorized || {};
+    const jdCat = skillsData.jd_categorized || {};
+
+    const candidateCounts = categories.map((c) => (candidateCat[c.key] ? candidateCat[c.key].length : 0));
+    const jdCounts = categories.map((c) => {
+      if (jdCat[c.key] && jdCat[c.key].length > 0) return jdCat[c.key].length;
+      const candCount = candidateCat[c.key] ? candidateCat[c.key].length : 0;
+      return Math.max(candCount, 2);
+    });
+
+    if (radarChartInstance) {
+      radarChartInstance.destroy();
+      radarChartInstance = null;
+    }
+
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const gridColor = isDark ? "rgba(184, 242, 208, 0.16)" : "rgba(18, 59, 53, 0.14)";
+    const labelColor = isDark ? "#ECFDF5" : "#202622";
+    const radarBg = isDark ? "rgba(184, 242, 208, 0.32)" : "rgba(184, 242, 208, 0.38)";
+
+    radarChartInstance = new Chart(canvas, {
+      type: "radar",
+      data: {
+        labels: categories.map((c) => c.label),
+        datasets: [
+          {
+            label: "Your Resume Skills",
+            data: candidateCounts,
+            fill: true,
+            backgroundColor: radarBg,
+            borderColor: isDark ? "#B8F2D0" : "#123B35",
+            pointBackgroundColor: isDark ? "#B8F2D0" : "#123B35",
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: isDark ? "#B8F2D0" : "#123B35",
+            borderWidth: 2
+          },
+          {
+            label: "Target Role Demands",
+            data: jdCounts,
+            fill: true,
+            backgroundColor: "rgba(194, 94, 64, 0.18)",
+            borderColor: "#C25E40",
+            pointBackgroundColor: "#C25E40",
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: "#C25E40",
+            borderWidth: 2,
+            borderDash: [4, 4]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "top",
+            labels: {
+              color: labelColor,
+              font: { family: "'Inter', sans-serif", size: 12, weight: "600" },
+              boxWidth: 14,
+              padding: 14
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                return `${ctx.dataset.label}: ${ctx.raw} skill(s)`;
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            angleLines: { color: gridColor },
+            grid: { color: gridColor },
+            pointLabels: {
+              color: labelColor,
+              font: { family: "'Inter', sans-serif", size: 11, weight: "600" }
+            },
+            ticks: {
+              display: false,
+              stepSize: 1
+            },
+            suggestedMin: 0,
+            suggestedMax: Math.max(...candidateCounts, ...jdCounts, 3)
+          }
+        }
+      }
+    });
+  }
+
+  function updateRadarChartTheme(theme) {
+    if (!radarChartInstance) return;
+    const isDark = theme === "dark";
+    const gridColor = isDark ? "rgba(184, 242, 208, 0.16)" : "rgba(18, 59, 53, 0.14)";
+    const labelColor = isDark ? "#ECFDF5" : "#202622";
+    
+    radarChartInstance.options.plugins.legend.labels.color = labelColor;
+    radarChartInstance.options.scales.r.angleLines.color = gridColor;
+    radarChartInstance.options.scales.r.grid.color = gridColor;
+    radarChartInstance.options.scales.r.pointLabels.color = labelColor;
+    radarChartInstance.data.datasets[0].borderColor = isDark ? "#B8F2D0" : "#123B35";
+    radarChartInstance.data.datasets[0].pointBackgroundColor = isDark ? "#B8F2D0" : "#123B35";
+    radarChartInstance.update();
+  }
+
 
   // Populates Screen 6: Skills Matrix
   function initSkillsMatrixTabs() {

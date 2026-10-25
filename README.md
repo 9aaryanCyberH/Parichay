@@ -25,11 +25,14 @@
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Flask 3.1](https://img.shields.io/badge/Framework-Flask%203.1-000000.svg?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![scikit-learn](https://img.shields.io/badge/ML-scikit--learn%20TF--IDF-F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Chart.js](https://img.shields.io/badge/Visualization-Chart.js%20Radar-FF6384.svg?logo=chartdotjs&logoColor=white)](https://www.chartjs.org/)
 [![PyMuPDF](https://img.shields.io/badge/PDF%20Engine-PyMuPDF%20v2-228B22.svg)](https://pymupdf.readthedocs.io/)
 [![Google Gemini API](https://img.shields.io/badge/AI%20Advisor-Gemini%201.5%20Flash-4285F4.svg?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Dark Mode](https://img.shields.io/badge/UI-Light%20%26%20Dark%20Mode-123B35.svg)](#brand-system--design-tokens)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org/)
 [![Tests Passing](https://img.shields.io/badge/Tests-31%2F31%20Passing-brightgreen.svg)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F1C40F.svg)](LICENSE)
+
 
 ---
 
@@ -94,10 +97,10 @@ Parichay strictly satisfies every mandatory requirement and optional advanced fe
        ▼                                 ▼
  [ Structured Analysis Dashboard ] [ Grounded AI Recommendations & Chatbot ]
   • Animated SVG circular gauge     • Google Gemini 1.5 Flash REST integration
-  • Interactive Skills Matrix       • Deterministic grounded fallback engine
-  • Strengths & Improvement areas   • Google X-Y-Z formula bullet diffs
-  • ATS Document Quality Audit      • Context-aware conversational AI Copilot
-  • One-click Print/PDF report      • User-isolated SQLite persistent history
+  • Chart.js Radar Visualization    • Deterministic grounded fallback engine
+  • Dark & Light Theme Toggle       • Google X-Y-Z formula bullet diffs
+  • Interactive Skills Matrix       • Context-aware conversational AI Copilot
+  • ATS Document Quality Audit      • User-isolated SQLite persistent history
 ```
 
 ### Detailed Requirement Breakdown

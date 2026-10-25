@@ -410,7 +410,8 @@ def analyze_resume():
             "missing_soft": match_data["skills_analysis"]["missing_soft"],
             "unverified_skills": match_data["skills_analysis"]["unverified_skills"],
             "counts": match_data["skills_analysis"]["counts"],
-            "candidate_all_categorized": resume_skills.get("categorized", {})
+            "candidate_all_categorized": resume_skills.get("categorized", {}),
+            "jd_categorized": jd_data.get("skills", {}).get("categorized", {})
         },
         "sections_detected": {
             "available_sections": list(sections.keys()),

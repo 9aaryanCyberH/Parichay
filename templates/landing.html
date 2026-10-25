@@ -15,7 +15,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Base Style & Landing Page Styles -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v=20261025_dark">
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('parichay-theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 <body class="landing-body">
 
@@ -34,6 +46,12 @@
     </div>
 
     <div class="landing-nav-right">
+      <!-- Dark Mode Toggle Button (Assignment Section 5) -->
+      <button type="button" id="themeToggleBtn" class="btn-theme-toggle" aria-label="Toggle dark and light theme" title="Toggle theme">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+
       {% if current_user %}
         <a href="/studio" class="btn-nav-outline">
           <span>{{ current_user.name.split()[0] }}'s Workspace</span>
@@ -42,6 +60,7 @@
       {% else %}
         <a href="/login" class="btn-nav-outline">Sign in</a>
       {% endif %}
+
 
       <a href="{% if current_user %}/studio{% else %}/auth?next=/studio{% endif %}" class="btn-nav-solid">
         <span>Launch Studio</span>
@@ -406,5 +425,19 @@
     </div>
   </footer>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const themeBtn = document.getElementById("themeToggleBtn");
+      if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+          const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+          const nextTheme = currentTheme === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", nextTheme);
+          localStorage.setItem("parichay-theme", nextTheme);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
+

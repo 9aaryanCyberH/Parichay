@@ -15,7 +15,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_xyz">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_darkchart">
+  
+  <!-- Chart.js for Skill Match Visualization (Assignment Section 4) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <!-- Immediate Theme Initializer -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('parichay-theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 <body class="dashboard-body">
 
@@ -28,6 +43,12 @@
     </div>
 
     <div class="topbar-right">
+      <!-- Dark Mode Toggle Button (Assignment Section 5) -->
+      <button type="button" id="themeToggleBtn" class="btn-theme-toggle" aria-label="Toggle dark and light theme" title="Toggle theme">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+
       <a href="/" class="btn-topbar-pill" title="Return to landing page">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -35,6 +56,7 @@
         </svg>
         <span>Landing page</span>
       </a>
+
 
       {% if current_user %}
         <span class="btn-topbar-pill" style="cursor: default; font-weight: 500;">
@@ -398,11 +420,25 @@
               </tbody>
             </table>
           </div>
+        </div>
 
+        <!-- Chart.js Domain Competency Radar Analysis Card (Assignment Section 4) -->
+        <div class="radar-analysis-card">
+          <div class="radar-card-header">
+            <div>
+              <h3 class="breakdown-table-title" style="margin-bottom: 4px;">Domain Competency Distribution (Chart.js)</h3>
+              <p style="font-size: 0.82rem; color: var(--muted-slate); margin: 0;">Multivariate comparison of verified resume qualifications vs. job requirements across 6 key technical domains.</p>
+            </div>
+            <span class="studio-badge-subtle" style="align-self: flex-start;">Interactive Radar Analysis</span>
+          </div>
+          <div class="radar-chart-wrapper" style="position: relative; height: 320px; width: 100%; max-width: 580px; margin: 16px auto 8px auto;">
+            <canvas id="skillRadarChart"></canvas>
+          </div>
         </div>
 
         <!-- Key Insights (4 Cards) -->
         <h3 class="insights-row-header">Key insights</h3>
+
         <div class="key-insights-grid">
           <div class="insight-card">
             <div class="insight-icon-box matched">✓</div>
