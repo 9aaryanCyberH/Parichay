@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ml-engineer",
+    "title": "Machine Learning Engineer",
+    "company_type": "AI Platform & Analytics",
+    "experience": "1-3 years / Entry to Mid",
+    "description": "We are seeking a Machine Learning Engineer to design, train, and deploy production ML models. In this role, you will collaborate with data scientists and backend engineers to build scalable intelligence pipelines.\n\nKey Responsibilities:\n- Develop predictive models, classification systems, and NLP pipelines using Python, PyTorch, and Scikit-Learn.\n- Clean, preprocess, and analyze complex unstructured datasets using Pandas and NumPy.\n- Build and maintain inference microservices using FastAPI, Flask, or Docker.\n- Experiment with transformer models, LLMs, and prompt engineering / RAG architectures.\n- Implement unit testing and continuous integration (CI/CD) for model deployment on Google Cloud (GCP) or AWS.\n\nRequirements:\n- Bachelor's or Master's degree in Computer Science, Data Science, or related STEM field.\n- Proficiency in Python, SQL, and modern machine learning libraries (Scikit-Learn, PyTorch, or TensorFlow).\n- Hands-on experience with Git, Docker, and REST APIs.\n- Strong problem solving, analytical thinking, and team collaboration skills."
+  },
+  {
+    "id": "fullstack-dev",
+    "title": "Full-Stack Software Engineer",
+    "company_type": "Product Engineering",
+    "experience": "1-3 years / Mid Level",
+    "description": "We are looking for a Full-Stack Software Engineer to build resilient web applications and microservices for our core platform.\n\nResponsibilities:\n- Design responsive, accessible user interfaces using React, TypeScript, and modern CSS/Tailwind.\n- Architect robust backend services and REST APIs utilizing Node.js, Express, or Python (Flask/Django).\n- Design relational schemas and query optimizations with PostgreSQL or MySQL, using Redis for caching.\n- Write reliable unit tests (Jest, Pytest) and participate in code reviews.\n- Deploy containerized services with Docker and manage deployment workflows using GitHub Actions on AWS.\n\nRequirements:\n- B.Tech/B.E. in Computer Science or equivalent practical experience.\n- Demonstrated proficiency in JavaScript/TypeScript, React, Node.js, and SQL.\n- Experience with Git, Docker, and agile sprint workflows.\n- Good communication skills and a passion for clean, maintainable architecture."
+  },
+  {
+    "id": "data-analyst",
+    "title": "Data Analyst & Analytics Engineer",
+    "company_type": "Business Intelligence & FinTech",
+    "experience": "0-2 years / Entry Level",
+    "description": "We are hiring a Data Analyst to translate raw operational data into actionable business intelligence.\n\nKey Responsibilities:\n- Write complex SQL queries, window functions, and aggregations across PostgreSQL and BigQuery data warehouses.\n- Perform exploratory data analysis (EDA) using Python (Pandas, NumPy) to discover trends and anomalies.\n- Design executive dashboards in Tableau or Power BI with clear statistical visualizations.\n- Collaborate cross-functionally with product and engineering teams to define core KPIs.\n- Automate recurring reporting pipelines using Python and scheduled jobs.\n\nRequirements:\n- Degree in Mathematics, Statistics, Computer Science, or Economics.\n- Strong expertise in SQL and Python for data manipulation.\n- Experience with data visualization tools (Matplotlib, Seaborn, Tableau, or Power BI).\n- Rigorous attention to detail and strong written/verbal communication."
+  },
+  {
+    "id": "devops-engineer",
+    "title": "Cloud & DevOps Engineer",
+    "company_type": "Infrastructure & Systems",
+    "experience": "1-3 years / Junior to Mid",
+    "description": "Join our infrastructure engineering team to maintain reliable cloud environments and automated CI/CD pipelines.\n\nResponsibilities:\n- Manage and monitor containerized workloads using Docker and Kubernetes.\n- Build and maintain continuous integration and deployment (CI/CD) pipelines using GitHub Actions.\n- Provision infrastructure as code using Terraform on AWS or Google Cloud (GCP).\n- Maintain Linux servers, Nginx reverse proxies, and system security configurations.\n- Monitor system health, latency, and log aggregation using Prometheus or CloudWatch.\n\nRequirements:\n- Hands-on experience with Linux administration, Bash scripting, and Git.\n- Working knowledge of Docker, Kubernetes, and Cloud platforms (AWS or GCP).\n- Familiarity with Python or Go for infrastructure automation.\n- Excellent troubleshooting and problem solving capabilities under incident scenarios."
+  }
+]
