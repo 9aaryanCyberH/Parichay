@@ -23,7 +23,7 @@ Results-driven Software Engineer with practical expertise in Python, PyTorch, Re
 
 EDUCATION
 B.Tech in Computer Science & Engineering | 2021 - 2025
-B.P. Poddar Institute of Management and Technology, Kolkata
+Institute of Engineering & Technology, Kolkata
 CGPA: 8.85 / 10.0
 
 TECHNICAL SKILLS

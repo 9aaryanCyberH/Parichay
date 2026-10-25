@@ -6,8 +6,8 @@
 [![PyMuPDF](https://img.shields.io/badge/PDF-PyMuPDF-green.svg)](https://pymupdf.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> Built for the **GDG BPPIMT AI/ML Team Selection Assignment**.  
-> **Tagline:** *Where Your Potential Meets Opportunity.*
+> **Tagline:** *Where Your Potential Meets Opportunity.*  
+> **Product Category:** AI-Powered Resume Intelligence
 
 ---
 
@@ -219,4 +219,4 @@ docker run -p 5000:5000 parichay
 
 ## 9. License
 
-Developed for the GDG BPPIMT AI/ML Team Selection Assignment &bull; 2026. Distributed under the MIT License.
+Parichay Career Intelligence &bull; 2026. Distributed under the MIT License.

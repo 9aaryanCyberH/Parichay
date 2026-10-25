@@ -5,14 +5,16 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements
+  // DOM Elements - Workspace
   const dropzone = document.getElementById("dropzone");
   const resumeInput = document.getElementById("resumeInput");
   const fileSelectedBox = document.getElementById("fileSelectedBox");
   const selectedFileName = document.getElementById("selectedFileName");
   const selectedFileSize = document.getElementById("selectedFileSize");
+  const btnReplaceFile = document.getElementById("btnReplaceFile");
   const btnRemoveFile = document.getElementById("btnRemoveFile");
   const btnSampleResume = document.getElementById("btnSampleResume");
+  const btnResetWorkspace = document.getElementById("btnResetWorkspace");
 
   const jdTextarea = document.getElementById("jdTextarea");
   const sampleChipsRow = document.getElementById("sampleChipsRow");
@@ -20,10 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnAnalyze = document.getElementById("btnAnalyze");
   const btnSpinner = document.getElementById("btnSpinner");
   const btnText = document.getElementById("btnText");
+  const systemStatusText = document.getElementById("systemStatusText");
 
   const alertBanner = document.getElementById("alertBanner");
   const alertMessage = document.getElementById("alertMessage");
 
+  // DOM Elements - Report Dashboard
   const dashboardSection = document.getElementById("dashboardSection");
   const btnResetAnalysis = document.getElementById("btnResetAnalysis");
   const btnPrintReport = document.getElementById("btnPrintReport");
@@ -35,36 +39,56 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize Sample JDs from API
   fetchSampleJDs();
 
-  // 1. Drag & Drop File Handling
-  dropzone.addEventListener("click", () => resumeInput.click());
+  // 1. Drag & Drop and File Input Handling
+  if (dropzone && resumeInput) {
+    dropzone.addEventListener("click", () => resumeInput.click());
 
-  dropzone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropzone.classList.add("drag-active");
-  });
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("drag-active");
+    });
 
-  dropzone.addEventListener("dragleave", () => {
-    dropzone.classList.remove("drag-active");
-  });
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("drag-active");
+    });
 
-  dropzone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropzone.classList.remove("drag-active");
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileSelection(e.dataTransfer.files[0]);
-    }
-  });
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("drag-active");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFileSelection(e.dataTransfer.files[0]);
+      }
+    });
 
-  resumeInput.addEventListener("change", (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileSelection(e.target.files[0]);
-    }
-  });
+    resumeInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileSelection(e.target.files[0]);
+      }
+    });
+  }
 
-  btnRemoveFile.addEventListener("click", (e) => {
-    e.stopPropagation();
-    clearSelectedFile();
-  });
+  if (btnReplaceFile && resumeInput) {
+    btnReplaceFile.addEventListener("click", () => {
+      resumeInput.click();
+    });
+  }
+
+  if (btnRemoveFile) {
+    btnRemoveFile.addEventListener("click", (e) => {
+      e.stopPropagation();
+      clearSelectedFile();
+    });
+  }
+
+  if (btnResetWorkspace) {
+    btnResetWorkspace.addEventListener("click", () => {
+      clearSelectedFile();
+      if (jdTextarea) jdTextarea.value = "";
+      hideAlert();
+      if (dashboardSection) dashboardSection.style.display = "none";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   // "Use Sample Resume" Helper
   if (btnSampleResume) {
@@ -73,15 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch("/sample_data/sample_resume_swe.pdf");
         if (!response.ok) {
-          // If direct static fetch fails, fetch via API or blob
           throw new Error("Could not load sample PDF");
         }
         const blob = await response.blob();
         const sampleFile = new File([blob], "sample_resume_swe.pdf", { type: "application/pdf" });
         handleFileSelection(sampleFile);
-        showAlert("Loaded sample software engineering resume.", "success");
+        showAlert("Loaded sample candidate profile (Aarav Sharma — Software Engineer).", "info");
       } catch (err) {
-        // Fallback: create mock file with valid PDF bytes
         showAlert("Unable to auto-load sample PDF. Please select a PDF resume manually.", "error");
       }
     });
@@ -90,31 +112,31 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleFileSelection(file) {
     hideAlert();
     if (!file.name.toLowerCase().endsWith(".pdf")) {
-      showAlert("Only PDF files (.pdf) are supported. Please select a valid PDF document.", "error");
+      showAlert("Only PDF documents (.pdf) are supported. Please select a valid text-based PDF.", "error");
       return;
     }
 
     const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
     if (file.size > MAX_SIZE) {
-      showAlert("The selected file is too large (max 5 MB). Please select a smaller PDF.", "error");
+      showAlert("The selected document exceeds the 5 MB maximum file limit. Please select a smaller PDF.", "error");
       return;
     }
 
     currentFile = file;
-    selectedFileName.textContent = file.name;
-    selectedFileSize.textContent = formatBytes(file.size);
+    if (selectedFileName) selectedFileName.textContent = file.name;
+    if (selectedFileSize) selectedFileSize.textContent = formatBytes(file.size);
     
-    dropzone.style.display = "none";
-    fileSelectedBox.style.display = "flex";
+    if (dropzone) dropzone.style.display = "none";
+    if (fileSelectedBox) fileSelectedBox.style.display = "flex";
   }
 
   function clearSelectedFile() {
     currentFile = null;
-    resumeInput.value = "";
-    selectedFileName.textContent = "";
-    selectedFileSize.textContent = "";
-    fileSelectedBox.style.display = "none";
-    dropzone.style.display = "flex";
+    if (resumeInput) resumeInput.value = "";
+    if (selectedFileName) selectedFileName.textContent = "";
+    if (selectedFileSize) selectedFileSize.textContent = "";
+    if (fileSelectedBox) fileSelectedBox.style.display = "none";
+    if (dropzone) dropzone.style.display = "flex";
   }
 
   function formatBytes(bytes) {
@@ -125,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   }
 
-  // 2. Sample Job Descriptions
+  // 2. Fetch Sample Job Descriptions
   async function fetchSampleJDs() {
     try {
       const res = await fetch("/api/sample-jds");
@@ -135,12 +157,14 @@ document.addEventListener("DOMContentLoaded", () => {
         data.sample_jds.forEach((jd) => {
           const chip = document.createElement("button");
           chip.type = "button";
-          chip.className = "sample-chip";
+          chip.className = "preset-chip";
           chip.textContent = jd.title;
           chip.title = `${jd.company_type} • ${jd.experience}`;
           chip.addEventListener("click", () => {
-            jdTextarea.value = jd.description;
-            showAlert(`Loaded example job description for "${jd.title}".`, "info");
+            if (jdTextarea) {
+              jdTextarea.value = jd.description;
+              showAlert(`Loaded role description for "${jd.title}".`, "info");
+            }
           });
           sampleChipsRow.appendChild(chip);
         });
@@ -151,138 +175,205 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 3. Form Submission & Analysis
-  btnAnalyze.addEventListener("click", async () => {
-    hideAlert();
+  if (btnAnalyze) {
+    btnAnalyze.addEventListener("click", async () => {
+      hideAlert();
 
-    const jdText = jdTextarea.value.trim();
-    if (!currentFile) {
-      showAlert("Please upload your PDF resume to begin analysis.", "error");
-      return;
-    }
-
-    if (!jdText || jdText.split(/\s+/).length < 10) {
-      showAlert("Please enter a comprehensive job description (at least 2-3 sentences) or select one of the example roles.", "error");
-      return;
-    }
-
-    // Set Loading State
-    setLoadingState(true);
-
-    const formData = new FormData();
-    formData.append("resume", currentFile);
-    formData.append("job_description", jdText);
-
-    try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        body: formData
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorMsg = result.message || "An unexpected error occurred during analysis.";
-        showAlert(errorMsg, "error");
+      const jdText = jdTextarea ? jdTextarea.value.trim() : "";
+      if (!currentFile) {
+        showAlert("Please attach a PDF resume to analyze alignment.", "error");
         return;
       }
 
-      // Render Results Dashboard
-      renderDashboard(result);
+      if (!jdText || jdText.split(/\s+/).length < 10) {
+        showAlert("Please enter a comprehensive job description (at least 2-3 sentences) or select one of the role presets.", "error");
+        return;
+      }
 
-    } catch (err) {
-      showAlert("Network connection error. Please verify the server is running and try again.", "error");
-    } finally {
-      setLoadingState(false);
-    }
-  });
+      setLoadingState(true);
+
+      const formData = new FormData();
+      formData.append("resume", currentFile);
+      formData.append("job_description", jdText);
+
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          const errorMsg = result.message || "An unexpected error occurred during document processing.";
+          showAlert(errorMsg, "error");
+          return;
+        }
+
+        renderDashboard(result);
+
+      } catch (err) {
+        showAlert("Network connection error. Please verify the server is running and try again.", "error");
+      } finally {
+        setLoadingState(false);
+      }
+    });
+  }
 
   function setLoadingState(isLoading) {
     if (isLoading) {
-      btnAnalyze.disabled = true;
-      btnSpinner.style.display = "inline-block";
-      btnText.textContent = "Analyzing Qualifications...";
+      if (btnAnalyze) btnAnalyze.disabled = true;
+      if (btnSpinner) btnSpinner.style.display = "inline-block";
+      if (btnText) btnText.textContent = "Analyzing Qualifications...";
+      if (systemStatusText) systemStatusText.textContent = "Processing";
     } else {
-      btnAnalyze.disabled = false;
-      btnSpinner.style.display = "none";
-      btnText.textContent = "Analyze Resume Alignment";
+      if (btnAnalyze) btnAnalyze.disabled = false;
+      if (btnSpinner) btnSpinner.style.display = "none";
+      if (btnText) btnText.textContent = "Analyze Alignment";
+      if (systemStatusText) systemStatusText.textContent = "Ready";
     }
   }
 
-  // 4. Render Dashboard View
+  // 4. Render Analytical Dashboard Report
   function renderDashboard(data) {
-    // Reveal Dashboard
+    if (!dashboardSection) return;
+
     dashboardSection.style.display = "block";
     dashboardSection.scrollIntoView({ behavior: "smooth" });
 
-    // Candidate Info
+    // Candidate Identity & Meta
     const candidateNameEl = document.getElementById("dashCandidateName");
     const candidateLinksEl = document.getElementById("dashCandidateLinks");
-    candidateNameEl.textContent = data.candidate.name || "Candidate";
+    if (candidateNameEl) {
+      candidateNameEl.textContent = data.candidate.name || "Candidate Profile";
+    }
 
-    candidateLinksEl.innerHTML = "";
-    if (data.candidate.email) {
-      candidateLinksEl.innerHTML += `<span class="contact-item">✉ ${data.candidate.email}</span>`;
-    }
-    if (data.candidate.phone) {
-      candidateLinksEl.innerHTML += `<span class="contact-item">☎ ${data.candidate.phone}</span>`;
-    }
-    if (data.candidate.linkedin) {
-      candidateLinksEl.innerHTML += `<span class="contact-item">🔗 <a href="${data.candidate.linkedin.startsWith('http') ? data.candidate.linkedin : 'https://' + data.candidate.linkedin}" target="_blank">LinkedIn</a></span>`;
-    }
-    if (data.candidate.github) {
-      candidateLinksEl.innerHTML += `<span class="contact-item">💻 <a href="${data.candidate.github.startsWith('http') ? data.candidate.github : 'https://' + data.candidate.github}" target="_blank">GitHub</a></span>`;
-    }
-    candidateLinksEl.innerHTML += `<span class="contact-item">📄 ${data.document_metrics.page_count} Page (${data.document_metrics.word_count} words)</span>`;
+    if (candidateLinksEl) {
+      candidateLinksEl.innerHTML = "";
+      
+      if (data.candidate.email) {
+        candidateLinksEl.innerHTML += `
+          <span class="meta-link-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            ${escapeHtml(data.candidate.email)}
+          </span>
+        `;
+      }
 
-    // Alignment Score & Tier
+      if (data.candidate.phone) {
+        candidateLinksEl.innerHTML += `
+          <span class="meta-link-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            ${escapeHtml(data.candidate.phone)}
+          </span>
+        `;
+      }
+
+      if (data.candidate.linkedin) {
+        const url = data.candidate.linkedin.startsWith("http") ? data.candidate.linkedin : "https://" + data.candidate.linkedin;
+        candidateLinksEl.innerHTML += `
+          <span class="meta-link-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+            <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          </span>
+        `;
+      }
+
+      if (data.candidate.github) {
+        const url = data.candidate.github.startsWith("http") ? data.candidate.github : "https://" + data.candidate.github;
+        candidateLinksEl.innerHTML += `
+          <span class="meta-link-item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </span>
+        `;
+      }
+
+      candidateLinksEl.innerHTML += `
+        <span class="meta-link-item">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          ${data.document_metrics.page_count} Page (${data.document_metrics.word_count} words)
+        </span>
+      `;
+    }
+
+    // Score & Tier
     const scoreValEl = document.getElementById("dashScoreVal");
     const tierBadgeEl = document.getElementById("dashTierBadge");
-    
+    const interpretationEl = document.getElementById("dashScoreInterpretation");
+
     animateNumber(scoreValEl, 0, data.alignment.score, 600);
 
-    tierBadgeEl.textContent = data.alignment.fit_tier;
-    tierBadgeEl.className = `fit-tier-badge tier-${data.alignment.tier_badge}`;
+    if (tierBadgeEl) {
+      tierBadgeEl.textContent = data.alignment.fit_tier;
+      tierBadgeEl.className = `tier-badge-indicator tier-${data.alignment.tier_badge}`;
+    }
 
-    // 4-Component Breakdown
+    if (interpretationEl) {
+      if (data.alignment.score >= 75) {
+        interpretationEl.textContent = "Strong overall alignment. The candidate's technical profile directly matches the primary competencies and domain expectations of this role, with clear evidence across multiple project and experience contexts.";
+      } else if (data.alignment.score >= 55) {
+        interpretationEl.textContent = "Moderate technical alignment. The profile demonstrates significant overlap with core tools, but several required technologies or domain concepts are missing from the resume.";
+      } else {
+        interpretationEl.textContent = "Limited alignment with posted requirements. Significant differences exist between the candidate's stated experience and the specific technical stack required for this position.";
+      }
+    }
+
+    // 4-Component Score Breakdown
     renderBreakdownCards(data.alignment.score_breakdown.components);
 
-    // Chart.js Radar Visualization
-    renderRadarChart(data.alignment.score_breakdown.components, data.alignment.score);
+    // Chart.js Radar Chart
+    renderRadarChart(data.alignment.score_breakdown.components);
 
     // Skills Matrix
     fullSkillsData = data.skills;
     setupSkillsTabs(data.skills);
     renderSkillsCluster("all");
 
-    // Grounded AI Advisor
-    renderAdvisor(data.recommendations);
-
-    // Audit / Health
+    // Structural Health & Strengths
     renderAudit(data.audit, data.sections_detected);
+
+    // Contextual AI Recommendations
+    renderAdvisor(data.recommendations);
   }
 
   function renderBreakdownCards(components) {
     const listEl = document.getElementById("breakdownCardsList");
+    if (!listEl) return;
     listEl.innerHTML = "";
 
     components.forEach((comp) => {
       const card = document.createElement("div");
-      card.className = "component-card";
+      card.className = "breakdown-pillar";
       card.innerHTML = `
-        <div class="component-card-top">
-          <span class="component-card-name">${comp.name}</span>
-          <span class="component-card-weight">${comp.achieved_percent}% achieved (${comp.contribution_points} pts)</span>
+        <div class="pillar-top-row">
+          <span class="pillar-name">${escapeHtml(comp.name)}</span>
+          <span class="pillar-points">${comp.contribution_points} pts</span>
         </div>
-        <div class="component-progress-bar">
-          <div class="component-progress-fill" style="width: ${Math.min(100, comp.achieved_percent)}%;"></div>
+        <div class="pillar-bar-track">
+          <div class="pillar-bar-fill" style="width: ${Math.min(100, comp.achieved_percent)}%;"></div>
         </div>
-        <p class="component-card-desc">${comp.description}</p>
+        <p class="pillar-summary">${escapeHtml(comp.description)}</p>
       `;
       listEl.appendChild(card);
     });
   }
 
-  function renderRadarChart(components, overallScore) {
+  function renderRadarChart(components) {
     const canvas = document.getElementById("radarChart");
     if (!canvas) return;
 
@@ -303,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Candidate Evidence",
             data: achievedData,
-            backgroundColor: "rgba(24, 72, 160, 0.18)",
+            backgroundColor: "rgba(24, 72, 160, 0.16)",
             borderColor: "#1848A0",
             borderWidth: 2,
             pointBackgroundColor: "#1848A0",
@@ -313,10 +404,10 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Target Role Baseline",
             data: targetData,
-            backgroundColor: "rgba(218, 214, 204, 0.1)",
-            borderColor: "#DCD6CC",
+            backgroundColor: "rgba(220, 213, 201, 0.12)",
+            borderColor: "#DCD5C9",
             borderWidth: 1.5,
-            borderDash: [4, 4],
+            borderDash: [3, 3],
             pointRadius: 0
           }
         ]
@@ -326,8 +417,8 @@ document.addEventListener("DOMContentLoaded", () => {
         maintainAspectRatio: false,
         scales: {
           r: {
-            angleLines: { color: "#E8E4DC" },
-            grid: { color: "#E8E4DC" },
+            angleLines: { color: "#E8E3DA" },
+            grid: { color: "#E8E3DA" },
             suggestedMin: 0,
             suggestedMax: 100,
             ticks: {
@@ -340,7 +431,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 size: 11,
                 weight: "500"
               },
-              color: "#52525B"
+              color: "#4A4A52"
             }
           }
         },
@@ -350,17 +441,17 @@ document.addEventListener("DOMContentLoaded", () => {
             labels: {
               font: {
                 family: "'Plus Jakarta Sans', sans-serif",
-                size: 12
+                size: 11
               },
-              boxWidth: 12,
-              color: "#52525B"
+              boxWidth: 10,
+              color: "#4A4A52"
             }
           },
           tooltip: {
             backgroundColor: "#18181B",
             titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
             bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
-            padding: 10,
+            padding: 8,
             cornerRadius: 4
           }
         }
@@ -377,13 +468,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tabMissingCount) tabMissingCount.textContent = skills.missing_technical.length;
     if (tabUniqueCount) tabUniqueCount.textContent = skills.candidate_unique.length;
 
-    const tabBtns = document.querySelectorAll(".skill-tab-btn");
-    tabBtns.forEach((btn) => {
+    const filterBtns = document.querySelectorAll(".skill-filter-btn");
+    filterBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
-        tabBtns.forEach((b) => b.classList.remove("active"));
+        filterBtns.forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-        const category = btn.dataset.tab;
-        renderSkillsCluster(category);
+        renderSkillsCluster(btn.dataset.tab);
       });
     });
   }
@@ -393,7 +483,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container || !fullSkillsData) return;
 
     container.innerHTML = "";
-
     let items = [];
 
     if (filter === "all" || filter === "matched") {
@@ -407,7 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (filter === "all" || filter === "missing") {
       fullSkillsData.missing_technical.forEach((s) => {
-        items.push({ name: s, type: "missing", label: "Missing in Resume" });
+        items.push({ name: s, type: "missing", label: "Missing Requirement" });
       });
       fullSkillsData.missing_soft.forEach((s) => {
         items.push({ name: s, type: "missing", label: "Missing Soft" });
@@ -427,16 +516,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (items.length === 0) {
-      container.innerHTML = `<span style="font-size:0.86rem; color:var(--text-muted); font-style:italic;">No skills found in this view.</span>`;
+      container.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted); font-style:italic;">No skills found under this filter.</span>`;
       return;
     }
 
     items.forEach((item) => {
-      const tag = document.createElement("span");
-      tag.className = `skill-badge skill-${item.type}`;
-      tag.innerHTML = `<strong>${item.name}</strong> <small style="opacity:0.75; font-size:0.72rem;">(${item.label})</small>`;
-      container.appendChild(tag);
+      const pill = document.createElement("span");
+      pill.className = `skill-pill skill-pill-${item.type}`;
+      pill.innerHTML = `<strong>${escapeHtml(item.name)}</strong> <span class="pill-type-label">(${escapeHtml(item.label)})</span>`;
+      container.appendChild(pill);
     });
+  }
+
+  function renderAudit(audit, sections) {
+    const strengthsList = document.getElementById("resumeStrengthsList");
+    const prioritiesList = document.getElementById("improvementPrioritiesList");
+
+    if (strengthsList) {
+      strengthsList.innerHTML = "";
+      if (audit.strengths && audit.strengths.length > 0) {
+        audit.strengths.forEach((str) => {
+          const item = document.createElement("div");
+          item.className = "audit-entry-item";
+          item.innerHTML = `
+            <svg class="audit-check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>${escapeHtml(str)}</span>
+          `;
+          strengthsList.appendChild(item);
+        });
+      } else {
+        strengthsList.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted);">Standard profile coverage detected.</span>`;
+      }
+    }
+
+    if (prioritiesList) {
+      prioritiesList.innerHTML = "";
+      if (audit.improvement_priorities && audit.improvement_priorities.length > 0) {
+        audit.improvement_priorities.forEach((imp) => {
+          const item = document.createElement("div");
+          item.className = "priority-item-card";
+          const pClass = imp.priority.toLowerCase();
+          item.innerHTML = `
+            <div class="priority-tag-row">
+              <span class="priority-badge-label priority-${pClass}-tag">${escapeHtml(imp.priority)} Priority</span>
+            </div>
+            <div class="priority-area-title">${escapeHtml(imp.area)}</div>
+            <p class="priority-desc">${escapeHtml(imp.details)}</p>
+          `;
+          prioritiesList.appendChild(item);
+        });
+      } else {
+        prioritiesList.innerHTML = `<span style="font-size:0.84rem; color:var(--text-muted);">No critical structural gaps identified.</span>`;
+      }
+    }
   }
 
   function renderAdvisor(recommendations) {
@@ -454,49 +588,55 @@ document.addEventListener("DOMContentLoaded", () => {
       execSummary.textContent = `“${recommendations.executive_summary}”`;
     }
 
-    // Bullet enhancements
     if (bulletContainer) {
       bulletContainer.innerHTML = "";
       if (recommendations.bullet_enhancements && recommendations.bullet_enhancements.length > 0) {
         recommendations.bullet_enhancements.forEach((enh) => {
-          const card = document.createElement("div");
-          card.className = "enhancement-card";
-          card.innerHTML = `
-            <div class="enhancement-focus">${enh.focus_area}</div>
-            <div class="enhancement-critique">Observation: ${enh.critique}</div>
-            <div class="enhancement-action"><strong>Recommended Action:</strong> ${enh.recommended_action}</div>
+          const entry = document.createElement("div");
+          entry.className = "enhancement-entry";
+          entry.innerHTML = `
+            <div class="enhancement-head">${escapeHtml(enh.focus_area)}</div>
+            <div class="enhancement-context">${escapeHtml(enh.critique)}</div>
+            <div class="enhancement-rewrite-box">
+              <strong>Actionable Formula:</strong> ${escapeHtml(enh.recommended_action)}
+            </div>
           `;
-          bulletContainer.appendChild(card);
+          bulletContainer.appendChild(entry);
         });
       }
     }
 
-    // Gap mitigation
     if (gapGrid) {
       gapGrid.innerHTML = "";
       if (recommendations.gap_mitigation_plan && recommendations.gap_mitigation_plan.length > 0) {
         recommendations.gap_mitigation_plan.forEach((gap) => {
           const card = document.createElement("div");
-          card.className = "gap-card";
+          card.className = "gap-action-card";
           card.innerHTML = `
-            <div class="gap-skill-title">⚡ ${gap.missing_skill}</div>
-            <p class="gap-action-text">${gap.concrete_action}</p>
+            <div class="gap-skill-header">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              ${escapeHtml(gap.missing_skill)}
+            </div>
+            <p class="gap-action-body">${escapeHtml(gap.concrete_action)}</p>
           `;
           gapGrid.appendChild(card);
         });
       }
     }
 
-    // Interview prep topics
     if (interviewList) {
       interviewList.innerHTML = "";
       if (recommendations.interview_preparation_topics && recommendations.interview_preparation_topics.length > 0) {
         recommendations.interview_preparation_topics.forEach((topic, idx) => {
           const li = document.createElement("li");
-          li.className = "interview-topic-item";
+          li.className = "interview-prep-item";
           li.innerHTML = `
-            <span class="bullet-num">Q${idx + 1}</span>
-            <span>${topic}</span>
+            <span class="interview-q-badge">0${idx + 1}</span>
+            <span>${escapeHtml(topic)}</span>
           `;
           interviewList.appendChild(li);
         });
@@ -504,44 +644,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderAudit(audit, sections) {
-    const strengthsList = document.getElementById("resumeStrengthsList");
-    const prioritiesList = document.getElementById("improvementPrioritiesList");
-
-    if (strengthsList) {
-      strengthsList.innerHTML = "";
-      if (audit.strengths && audit.strengths.length > 0) {
-        audit.strengths.forEach((str) => {
-          const item = document.createElement("div");
-          item.className = "audit-item";
-          item.innerHTML = `<span style="color:var(--state-matched-text); font-weight:bold;">✔</span> <span>${str}</span>`;
-          strengthsList.appendChild(item);
-        });
-      } else {
-        strengthsList.innerHTML = `<span style="font-size:0.86rem; color:var(--text-muted);">Standard profile coverage.</span>`;
-      }
-    }
-
-    if (prioritiesList) {
-      prioritiesList.innerHTML = "";
-      if (audit.improvement_priorities && audit.improvement_priorities.length > 0) {
-        audit.improvement_priorities.forEach((imp) => {
-          const item = document.createElement("div");
-          item.className = "audit-item";
-          const pClass = imp.priority.toLowerCase();
-          item.innerHTML = `
-            <span class="audit-badge priority-${pClass}">${imp.priority}</span>
-            <div><strong>${imp.area}:</strong> ${imp.details}</div>
-          `;
-          prioritiesList.appendChild(item);
-        });
-      } else {
-        prioritiesList.innerHTML = `<span style="font-size:0.86rem; color:var(--text-muted);">No critical structural gaps identified.</span>`;
-      }
-    }
-  }
-
-  // Animate numeric score
   function animateNumber(element, start, end, duration) {
     if (!element) return;
     const range = end - start;
@@ -561,14 +663,15 @@ document.addEventListener("DOMContentLoaded", () => {
     window.requestAnimationFrame(step);
   }
 
-  // Feedback Helpers
   function showAlert(message, type = "error") {
+    if (!alertBanner || !alertMessage) return;
     alertMessage.textContent = message;
     alertBanner.style.display = "flex";
     if (type === "error") {
-      alertBanner.className = "alert-banner alert-error";
+      alertBanner.style.backgroundColor = "var(--state-missing-bg)";
+      alertBanner.style.borderColor = "var(--state-missing-border)";
+      alertBanner.style.color = "var(--state-missing-text)";
     } else {
-      alertBanner.className = "alert-banner";
       alertBanner.style.backgroundColor = "var(--cobalt-subtle)";
       alertBanner.style.borderColor = "var(--cobalt-border)";
       alertBanner.style.color = "var(--cobalt)";
@@ -576,13 +679,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hideAlert() {
-    alertBanner.style.display = "none";
+    if (alertBanner) alertBanner.style.display = "none";
   }
 
-  // Secondary Controls
+  function escapeHtml(text) {
+    if (!text) return "";
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   if (btnResetAnalysis) {
     btnResetAnalysis.addEventListener("click", () => {
-      dashboardSection.style.display = "none";
+      if (dashboardSection) dashboardSection.style.display = "none";
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
