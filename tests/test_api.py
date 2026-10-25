@@ -312,6 +312,103 @@ class TestParichayAPI(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertIsInstance(data["analyses"], list)
 
+    # =========================================================================
+    # API VALIDATION & EDGE CASE TESTS
+    # =========================================================================
+    def test_analyze_empty_job_description(self):
+        """Test POST /api/analyze with empty job description returns 400 ValidationError."""
+        self.login_test_user()
+        data = {
+            "resume": (io.BytesIO(self.valid_pdf_bytes), "sample_resume_swe.pdf"),
+            "job_description": "   "
+        }
+        response = self.client.post("/api/analyze", data=data, content_type="multipart/form-data")
+        self.assertEqual(response.status_code, 400)
+        res = response.get_json()
+        self.assertFalse(res["success"])
+        self.assertEqual(res["error_type"], "ValidationError")
+
+    def test_analyze_short_job_description(self):
+        """Test POST /api/analyze with job description < 10 words returns 400 ValidationError."""
+        self.login_test_user()
+        data = {
+            "resume": (io.BytesIO(self.valid_pdf_bytes), "sample_resume_swe.pdf"),
+            "job_description": "Hiring a senior developer."
+        }
+        response = self.client.post("/api/analyze", data=data, content_type="multipart/form-data")
+        self.assertEqual(response.status_code, 400)
+        res = response.get_json()
+        self.assertFalse(res["success"])
+        self.assertEqual(res["error_type"], "ValidationError")
+        self.assertIn("too brief", res["message"].lower())
+
+    def test_analyze_missing_resume_file(self):
+        """Test POST /api/analyze with no resume file attached returns 400 ValidationError."""
+        self.login_test_user()
+        data = {
+            "job_description": "We are seeking a senior full stack Python and React engineer with 5 years experience."
+        }
+        response = self.client.post("/api/analyze", data=data, content_type="multipart/form-data")
+        self.assertEqual(response.status_code, 400)
+        res = response.get_json()
+        self.assertFalse(res["success"])
+        self.assertEqual(res["error_type"], "ValidationError")
+
+    def test_analyze_invalid_file_extension(self):
+        """Test POST /api/analyze with non-PDF extension (.txt) returns 400 InvalidFileType."""
+        self.login_test_user()
+        data = {
+            "resume": (io.BytesIO(b"Hello plain text resume content"), "resume.txt"),
+            "job_description": "We are seeking a senior full stack Python and React engineer with 5 years experience."
+        }
+        response = self.client.post("/api/analyze", data=data, content_type="multipart/form-data")
+        self.assertEqual(response.status_code, 400)
+        res = response.get_json()
+        self.assertFalse(res["success"])
+        self.assertEqual(res["error_type"], "InvalidFileType")
+
+    def test_analyze_oversized_file(self):
+        """Test POST /api/analyze with file exceeding MAX_CONTENT_LENGTH returns 413 FileSizeExceeded."""
+        self.login_test_user()
+        # Create bytes larger than 5 MB
+        large_bytes = b"%PDF-1.4\n" + (b"0" * (5 * 1024 * 1024 + 1024))
+        data = {
+            "resume": (io.BytesIO(large_bytes), "oversized.pdf"),
+            "job_description": "We are seeking a senior full stack Python and React engineer with 5 years experience."
+        }
+        response = self.client.post("/api/analyze", data=data, content_type="multipart/form-data")
+        self.assertEqual(response.status_code, 413)
+        res = response.get_json()
+        self.assertFalse(res["success"])
+        self.assertEqual(res["error_type"], "FileSizeExceeded")
+
+    def test_history_item_retrieval_and_user_isolation(self):
+        """Test user history record retrieval and cross-user data isolation."""
+        # 1. Login user A and perform an analysis to populate history
+        user_a = self.login_test_user()
+        jd = "We are seeking a Machine Learning Engineer with Python, PyTorch, Docker, and SQL experience."
+        res_a = self.client.post("/api/analyze", data={
+            "resume": (io.BytesIO(self.valid_pdf_bytes), "sample_resume_swe.pdf"),
+            "job_description": jd
+        }, content_type="multipart/form-data")
+        self.assertEqual(res_a.status_code, 200)
+        analysis_id = res_a.get_json().get("saved_history_id")
+        self.assertIsNotNone(analysis_id)
+
+        # 2. User A can retrieve the specific analysis item
+        item_resp = self.client.get(f"/api/history/{analysis_id}")
+        self.assertEqual(item_resp.status_code, 200)
+        self.assertEqual(item_resp.get_json()["item"]["id"], analysis_id)
+
+        # 3. Login user B
+        user_b = self.login_test_user()
+        self.assertNotEqual(user_a["id"], user_b["id"])
+
+        # 4. User B cannot access User A's history record (404 isolation)
+        forbidden_resp = self.client.get(f"/api/history/{analysis_id}")
+        self.assertEqual(forbidden_resp.status_code, 404)
+
 
 if __name__ == "__main__":
     unittest.main()
+

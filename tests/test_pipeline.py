@@ -119,6 +119,71 @@ class TestParichayPipeline(unittest.TestCase):
         self.assertEqual(len(breakdown["components"]), 4)
         self.assertIn("formula_explanation", breakdown)
 
+    def test_pdf_empty_bytes_rejection(self):
+        """Verify empty (0 bytes) upload raises PDFParsingError."""
+        with self.assertRaises(PDFParsingError) as ctx:
+            PDFParser.extract_text_from_bytes(b"", "empty.pdf")
+        self.assertIn("empty (0 bytes)", str(ctx.exception))
+
+    def test_pdf_corrupted_header_rejection(self):
+        """Verify file lacking %PDF header raises PDFParsingError."""
+        with self.assertRaises(PDFParsingError) as ctx:
+            PDFParser.extract_text_from_bytes(b"NOT_A_PDF_FILE_HEADER_DATA_12345", "corrupt.pdf")
+        self.assertIn("valid PDF header format", str(ctx.exception))
+
+    def test_pdf_password_protected_rejection(self):
+        """Verify password-protected/encrypted PDF is cleanly rejected."""
+        import pymupdf as fitz
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((50, 72), "Confidential Resume Data")
+        perm = int(fitz.PDF_PERM_ACCESSIBILITY | fitz.PDF_PERM_PRINT)
+        encrypt_meth = fitz.PDF_ENCRYPT_AES_256
+        encrypted_bytes = doc.tobytes(encryption=encrypt_meth, user_pw="secret123", owner_pw="owner123", permissions=perm)
+        doc.close()
+
+        with self.assertRaises(PDFParsingError) as ctx:
+            PDFParser.extract_text_from_bytes(encrypted_bytes, "encrypted.pdf")
+        self.assertIn("password-protected", str(ctx.exception))
+
+    def test_unrelated_resume_alignment_scoring(self):
+        """Verify completely unrelated resume receives a low alignment score and Limited Alignment tier."""
+        chef_resume = """
+        MARCUS BEAN
+        Executive Pastry Chef & Culinary Director
+        marcus.bean.pastry@culinary.org | +1 (555) 432-8765 | Chicago, IL
+
+        PROFESSIONAL SUMMARY
+        Award-winning pastry chef with 8 years of fine dining kitchen management, artisan bread baking,
+        chocolate tempering, menu pricing, inventory sourcing, and staff supervision.
+
+        EXPERIENCE
+        Executive Pastry Chef — The Grand Bistro (2020 - Present)
+        - Managed daily pastry kitchen operations, food prep safety standards, and inventory.
+        - Designed seasonal dessert menus and trained 6 line cooks in French baking techniques.
+
+        EDUCATION
+        Associate Degree in Culinary Arts — Culinary Institute of America (2016)
+
+        SKILLS
+        Baking, French Pastries, Kitchen Safety, Food Cost Management, Plating, Menu Design
+        """
+        resume_skills = ResumeExtractor.extract_skills(chef_resume)
+        resume_sections = ResumeExtractor.segment_sections(chef_resume)
+        jd_info = JobDescriptionParser.parse_job_description(self.sample_jd_text)
+
+        match_res = ResumeJobMatcher.match(
+            resume_text=chef_resume,
+            jd_text=self.sample_jd_text,
+            resume_skills=resume_skills,
+            jd_skills=jd_info["skills"],
+            resume_sections=resume_sections
+        )
+
+        self.assertLessEqual(match_res["score"], 25)
+        self.assertEqual(match_res["fit_tier"], "Limited Alignment")
+        self.assertEqual(len(match_res["skills_analysis"]["matched_technical"]), 0)
+
     def test_ai_advisor_fallback(self):
         """Verify advisor returns grounded recommendations even without external API key."""
         pdf_res = PDFParser.extract_text_from_bytes(self.valid_pdf_bytes)
@@ -156,3 +221,5 @@ class TestParichayPipeline(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+

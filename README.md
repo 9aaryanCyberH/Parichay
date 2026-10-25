@@ -98,7 +98,9 @@ d:\Parichay\
 ├── app.py                      # Flask factory, public & protected routes, API endpoints
 ├── config.py                   # Centralized configuration & environment loader
 ├── parichay.db                 # SQLite database (Users & Analyses tables)
-├── requirements.txt            # Python dependencies
+├── requirements.txt            # Python dependencies (Flask, PyMuPDF, scikit-learn, gunicorn)
+├── Procfile                    # Production web server entrypoint (Gunicorn)
+├── render.yaml                 # Render cloud deployment configuration
 ├── .env.example                # Environment variables template
 ├── services/
 │   ├── database.py             # SQLite persistence: AuthManager & HistoryManager
@@ -119,11 +121,15 @@ d:\Parichay\
 │       └── favicon.svg         # High-precision vector favicon
 ├── templates/
 │   ├── landing.html            # Public marketing landing page (Screen 1)
+│   ├── auth_gateway.html       # Authentication gateway screen
 │   ├── login.html              # Sign-in page (Screen 2)
 │   ├── signup.html             # Registration page (Screen 3)
-│   └── index.html              # Full career workspace (Screens 4–9)
+│   ├── index.html              # Full career workspace (Screens 4–9)
+│   ├── privacy.html            # Public Privacy Policy
+│   ├── terms.html              # Public Terms of Service
+│   └── faq.html                # Public Frequently Asked Questions & Help Guide
 └── tests/
-    ├── test_pipeline.py        # Unit tests for PDF parsing, extraction, and matching
+    ├── test_pipeline.py        # Unit tests for PDF parsing, extraction, edge cases, and matching
     └── test_api.py             # Integration tests for auth, history, chat, and analysis APIs
 ```
 
@@ -136,6 +142,9 @@ d:\Parichay\
 python -m venv .venv
 # Windows PowerShell
 .\.venv\Scripts\Activate.ps1
+# Linux / macOS
+source .venv/bin/activate
+
 # Install dependencies
 pip install -r requirements.txt
 ```
@@ -143,9 +152,12 @@ pip install -r requirements.txt
 ### 2. Configure Environment
 Copy `.env.example` to `.env`:
 ```bash
+# Windows
 copy .env.example .env
+# Linux / macOS
+cp .env.example .env
 ```
-*(Optional)* Add your `GEMINI_API_KEY` for live generative responses. If no key is set, Parichay automatically uses its verified, grounded deterministic advice engine.
+*(Optional)* Add your `GEMINI_API_KEY` for live generative responses. If no key is configured, Parichay automatically operates using its grounded deterministic recommendation engine.
 
 ### 3. Start the Server
 ```bash
@@ -154,17 +166,36 @@ python app.py
 Visit `http://127.0.0.1:5000` in your web browser.
 
 ### 4. Running Tests
-Execute the automated test suite:
+Execute the complete automated test suite:
 ```bash
-python -m unittest discover -s tests -p "test_*.py"
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
-All 16 unit and integration tests pass out-of-the-box.
+All 31 unit and integration tests pass out-of-the-box.
 
 ---
 
-## Privacy Guarantee
+## Cloud Deployment Guide (Render / Heroku)
 
-- **In-Memory PDF Parsing**: Resumes are parsed in memory using PyMuPDF. Raw uploaded PDF documents are never stored or retained on disk.
-- **Data Minimization**: Only structured analytical scores and taxonomy matches are stored for authenticated candidates who explicitly want report persistence.
-- **Cross-User Data Isolation**: User history records are protected with foreign-key user constraints and session ownership checks.
-- **Anonymous Use Supported**: Candidates can test the complete matching tool without registering an account.
+Parichay includes production-ready deployment configurations:
+- **`Procfile`**: `web: gunicorn app:app --workers 2 --timeout 120`
+- **`render.yaml`**: Pre-configured Blueprint for 1-click Render deployment with Python 3.11+.
+
+### Deploying to Render
+1. Push the repository to GitHub.
+2. Sign in to [Render](https://render.com) and click **New +** &rarr; **Blueprint** (or **Web Service**).
+3. Connect your repository. Render automatically reads `render.yaml` and `requirements.txt`.
+4. In Environment Variables, set:
+   - `SECRET_KEY`: A secure random hex string.
+   - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API key.
+   - `FLASK_DEBUG`: `False`.
+5. Deploy. Gunicorn will serve the application on port `$PORT`.
+
+---
+
+## Privacy & Security Architecture
+
+- **In-Memory PDF Processing**: Resumes are parsed strictly in memory using PyMuPDF. Raw PDF documents are never saved to disk or persistent storage.
+- **Secure Authentication & Data Isolation**: Access to the Resume Intelligence Studio is protected with session cookies and salted password hashing (Werkzeug PBKDF2/scrypt). User analyses in SQLite are strictly filtered by foreign-key `user_id` ownership.
+- **Protected API Credentials**: AI credentials (`GEMINI_API_KEY`) and secret keys are loaded exclusively from server environment variables via `config.py`. No secrets or API keys are ever committed to Git or exposed to client-side JavaScript.
+- **Deterministic Offline Fallback**: In the absence of an external AI API key or network failure, Parichay gracefully falls back to a deterministic recommendation engine without leaking stack traces or internal errors.
+
