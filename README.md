@@ -1,4 +1,9 @@
-# Parichay (परिचय) — Where Your Potential Meets Opportunity
+<div align="center">
+  <img src="static/images/parichay-logo.svg" alt="Parichay Logo" width="460">
+  
+  <p><strong>Where Your Potential Meets Opportunity.</strong></p>
+  <p><em>AI-Powered Resume Intelligence &amp; Role Alignment Platform</em></p>
+</div>
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![Flask 3.1](https://img.shields.io/badge/Framework-Flask%203.1-black.svg)](https://flask.palletsprojects.com/)
@@ -6,8 +11,19 @@
 [![PyMuPDF](https://img.shields.io/badge/PDF-PyMuPDF-green.svg)](https://pymupdf.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Tagline:** *Where Your Potential Meets Opportunity.*  
-> **Product Category:** AI-Powered Resume Intelligence
+---
+
+## Brand Identity & Taglines
+
+| Dimension | Specification |
+| :--- | :--- |
+| **Project Name** | **Parichay** (परिचय &mdash; *Introduction, Identity, Acquaintance*) |
+| **Primary Tagline** | **Where Your Potential Meets Opportunity.** |
+| **Product Subtitle** | AI-Powered Resume Intelligence & Role Alignment Platform |
+| **Positioning Taglines** | &bull; *Explainable Alignment &bull; Zero Hallucination &bull; Actionable Intelligence*<br>&bull; *Bridge the Gap Between What You Have Built and Where You Belong.* |
+| **Brand Symbol** | **The Convergence Knot**: An interlocking dual-ribbon infinity nexus representing candidate background (cobalt/blue) seamlessly interweaving with career opportunities (amber/cyan). |
+| **Color System** | &bull; Electric Blue (`#007BFF`) & Deep Cobalt (`#0056B3`) &mdash; Foundation & Machine Learning<br>&bull; Warm Amber (`#FFB703`) & Gold (`#FB8500`) &mdash; Human Potential & Drive<br>&bull; Sky Azure (`#38BDF8`) & Ocean Cyan (`#0284C7`) &mdash; Opportunity & Growth<br>&bull; Slate Charcoal (`#0F172A`) & Warm Card Surface (`#FFFFFF` on `#EDF2F9`) |
+| **Typography** | `Plus Jakarta Sans` (Display/Brand), `Inter` (Data & Interface), `JetBrains Mono` (Metrics) |
 
 ---
 
@@ -18,7 +34,7 @@
 Unlike generic AI career tools that produce black-box percentage scores and hype-filled buzzwords, Parichay emphasizes **interpretability, grounded information extraction, and transparent scoring**.
 
 ### Core Tenets
-- **Editorial Information-First Design**: Inspired by Swiss typography, contemporary editorial publications, and professional research instruments. Warm off-white backgrounds (`#FAF8F5`), deep charcoal typography (`#18181B`), and restrained architectural cobalt accents (`#1848A0`). Zero purple-pink glowing blobs, zero fake testimonials, and zero bloated card-in-card designs.
+- **Figma-Grounded Dashboard Architecture**: Modeled after clean applicant management screen systems. Crisp white elevated cards (`#FFFFFF`) set against a cool background canvas (`#EDF2F9`), vibrant electric blue highlights (`#007BFF`), and a grounded slate-gray footer (`#636873`). Zero purple-pink glowing blobs, zero fake testimonials, and zero bloated card-in-card designs.
 - **Explainable Alignment Scoring**: The match percentage is strictly an **alignment measure**, not a predictive hiring probability. Every percentage point is broken down into four audited mathematical components.
 - **Scanned PDF & Error Detection**: Automatically detects image-only or unreadable PDFs using PyMuPDF and provides clear, actionable instructions.
 - **Contextual AI Recommendations**: Leverages the Google Gemini API with a deep, deterministic grounded fallback that produces tangible, project-level action items using Google's X-Y-Z formula.

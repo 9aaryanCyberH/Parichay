@@ -137,40 +137,70 @@ a:hover {
 .topbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 230px;
+  gap: 14px;
 }
 
 .brand-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
+  transition: opacity var(--transition);
+}
+
+.brand-logo:hover {
+  opacity: 0.92;
 }
 
 .brand-glyph {
   flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.brand-logo:hover .brand-glyph {
+  transform: rotate(6deg) scale(1.04);
+}
+
+.brand-title-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .brand-text {
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.38rem;
+  font-weight: 800;
   color: var(--text-heading);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .brand-tag {
   font-family: var(--font-main);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   background-color: var(--figma-blue-subtle);
   color: var(--figma-blue);
   border: 1px solid var(--figma-blue-border);
   padding: 2px 7px;
   border-radius: var(--radius-xs);
+  line-height: 1.2;
+}
+
+.topbar-tagline-divider {
+  width: 1px;
+  height: 22px;
+  background-color: var(--border-light);
+}
+
+.topbar-tagline {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 /* Center Search Pill (From Figma Template Header) */
@@ -389,6 +419,38 @@ a:hover {
   margin-bottom: 28px;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--border-light);
+}
+
+.stage-brand-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stage-kicker-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--figma-blue);
+  background-color: var(--figma-blue-subtle);
+  border: 1px solid var(--figma-blue-border);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.stage-kicker-dot {
+  color: var(--border-dark);
+  font-size: 0.75rem;
+}
+
+.stage-kicker-tagline {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
 }
 
 .stage-primary-title {
@@ -1458,7 +1520,9 @@ a:hover {
     justify-content: center;
   }
   .nav-label,
-  .sidebar-footer-box {
+  .sidebar-footer-box,
+  .topbar-tagline-divider,
+  .topbar-tagline {
     display: none;
   }
   .studio-two-col {
