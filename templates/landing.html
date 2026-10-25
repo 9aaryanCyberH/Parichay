@@ -17,11 +17,11 @@
   <!-- Base Style & Landing Page Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v=20261025_dark">
 
-  <!-- Immediate Theme Initializer -->
+  <!-- Immediate Theme Initializer: Strictly Defaults to Light Theme -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('parichay-theme');
-      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -425,19 +425,8 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const themeBtn = document.getElementById("themeToggleBtn");
-      if (themeBtn) {
-        themeBtn.addEventListener("click", () => {
-          const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-          const nextTheme = currentTheme === "dark" ? "light" : "dark";
-          document.documentElement.setAttribute("data-theme", nextTheme);
-          localStorage.setItem("parichay-theme", nextTheme);
-        });
-      }
-    });
-  </script>
+  <!-- Shared Theme Controller -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
 </body>
 </html>
 

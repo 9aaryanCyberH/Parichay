@@ -11,7 +11,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v=20261025_theme2">
+
+  <!-- Immediate Theme Initializer: Strictly Defaults to Light Theme -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('parichay-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 <body class="landing-body">
 
@@ -27,6 +39,12 @@
       </nav>
     </div>
     <div class="landing-nav-right">
+      <!-- Dark Mode Toggle Button (Assignment Section 5) -->
+      <button type="button" id="themeToggleBtn" class="btn-theme-toggle" aria-label="Toggle dark and light theme" title="Toggle theme">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+
       {% if current_user %}
         <a href="/studio" class="btn-nav-outline">{{ current_user.name.split()[0] }}'s Workspace</a>
         <a href="/logout" class="landing-nav-link" style="font-size: 0.86rem;">Sign out</a>
@@ -88,5 +106,6 @@
     </div>
   </footer>
 
+  <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
 </body>
 </html>

@@ -20,11 +20,11 @@
   <!-- Chart.js for Skill Match Visualization (Assignment Section 4) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
-  <!-- Immediate Theme Initializer -->
+  <!-- Immediate Theme Initializer: Strictly Defaults to Light Theme -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('parichay-theme');
-      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -799,7 +799,8 @@
     </div>
   </div>
 
-  <!-- Main JavaScript Application Logic -->
+  <!-- Shared Theme Controller & Main Studio Logic -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_askai"></script>
 </body>
 </html>

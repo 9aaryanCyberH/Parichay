@@ -28,14 +28,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggleBtn = document.getElementById("themeToggleBtn");
 
   // Dark Mode Toggle Listener (Assignment Section 5 - Optional)
-  if (themeToggleBtn) {
+  if (themeToggleBtn && window.ParichayTheme) {
+    // Already bound cleanly by theme.js, no double-binding
+  } else if (themeToggleBtn) {
     themeToggleBtn.addEventListener("click", () => {
-      const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-      const nextTheme = currentTheme === "dark" ? "light" : "dark";
-      document.documentElement.setAttribute("data-theme", nextTheme);
-      localStorage.setItem("parichay-theme", nextTheme);
-      if (typeof updateRadarChartTheme === "function") {
-        updateRadarChartTheme(nextTheme);
+      if (window.ParichayTheme) {
+        window.ParichayTheme.toggleTheme();
+      } else {
+        const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+        const nextTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        localStorage.setItem("parichay-theme", nextTheme);
+        if (typeof updateRadarChartTheme === "function") {
+          updateRadarChartTheme(nextTheme);
+        }
       }
     });
   }
@@ -611,6 +617,9 @@ document.addEventListener("DOMContentLoaded", () => {
     radarChartInstance.data.datasets[0].pointBackgroundColor = isDark ? "#B8F2D0" : "#123B35";
     radarChartInstance.update();
   }
+
+  // Expose globally for theme controller
+  window.updateRadarChartTheme = updateRadarChartTheme;
 
 
   // Populates Screen 6: Skills Matrix

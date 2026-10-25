@@ -72,6 +72,11 @@
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
+[data-theme="dark"] .app-topbar {
+  background-color: rgba(13, 22, 20, 0.94);
+  border-bottom-color: #203630;
+}
+
 [data-theme="dark"] .app-sidebar {
   background-color: #101C19;
   border-right-color: #203630;
@@ -85,18 +90,36 @@
 [data-theme="dark"] .sidebar-nav-item.active {
   background-color: #B8F2D0;
   color: #0C2824;
+  font-weight: 700;
 }
 
 [data-theme="dark"] .btn-topbar-solid,
 [data-theme="dark"] .btn-analyze-pill,
-[data-theme="dark"] .btn-nav-solid {
+[data-theme="dark"] .btn-nav-solid,
+[data-theme="dark"] .btn-new-analysis-pill {
   background-color: #B8F2D0;
   color: #0C2824;
+  font-weight: 700;
 }
 [data-theme="dark"] .btn-topbar-solid:hover,
 [data-theme="dark"] .btn-analyze-pill:hover,
-[data-theme="dark"] .btn-nav-solid:hover {
+[data-theme="dark"] .btn-nav-solid:hover,
+[data-theme="dark"] .btn-new-analysis-pill:hover {
   background-color: #DDF8E8;
+  color: #0C2824;
+}
+
+[data-theme="dark"] .btn-topbar-pill,
+[data-theme="dark"] .btn-export-pill {
+  border-color: #203630;
+  color: #ECFDF5;
+  background-color: #14221F;
+}
+[data-theme="dark"] .btn-topbar-pill:hover,
+[data-theme="dark"] .btn-export-pill:hover {
+  border-color: #B8F2D0;
+  color: #B8F2D0;
+  background-color: #172A25;
 }
 
 [data-theme="dark"] .dropzone-box {
@@ -115,6 +138,10 @@
   border-color: #203630;
   color: #B8F2D0;
 }
+[data-theme="dark"] .role-preset-pill:hover {
+  background: #203E36;
+  border-color: #B8F2D0;
+}
 
 [data-theme="dark"] .breakdown-table th {
   border-bottom-color: #203630;
@@ -124,13 +151,115 @@
   border-bottom-color: #203630;
 }
 
+/* Skills Matrix Dark Theming */
+[data-theme="dark"] .btn-matrix-tab {
+  background-color: #14221F;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .btn-matrix-tab.active {
+  background-color: #B8F2D0;
+  color: #0C2824;
+  border-color: #B8F2D0;
+  font-weight: 700;
+}
+[data-theme="dark"] .btn-matrix-tab.active .tab-badge-count {
+  background-color: #0C2824;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .skill-item {
+  background-color: #14221F;
+  border-color: #203630;
+}
+[data-theme="dark"] .skill-item:hover,
+[data-theme="dark"] .skill-item.active {
+  border-color: #B8F2D0;
+  background-color: #172A25;
+}
+
+/* Recommendations Dark Theming */
+[data-theme="dark"] .btn-rec-tab {
+  background-color: #14221F;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .btn-rec-tab.active {
+  background-color: #B8F2D0;
+  color: #0C2824;
+  border-color: #B8F2D0;
+  font-weight: 700;
+}
+[data-theme="dark"] .rec-executive-card {
+  background-color: #14221F;
+  border-color: #203630;
+  border-left: 4px solid #B8F2D0;
+}
+[data-theme="dark"] .rec-executive-badge {
+  background-color: #172A25;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .recommendation-pill-card {
+  background-color: #14221F;
+  border-color: #203630;
+}
+
+/* AI Assistant Chat Dark Theming */
+[data-theme="dark"] .chat-bubble-row.user .chat-bubble {
+  background-color: #B8F2D0;
+  color: #0C2824;
+  font-weight: 600;
+}
+[data-theme="dark"] .chat-bubble-row.assistant .chat-bubble {
+  background-color: #101C19;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .chat-suggestions-bar {
+  background-color: #101C19;
+  border-top-color: #203630;
+}
+[data-theme="dark"] .btn-chat-chip {
+  background-color: #172A25;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .btn-chat-chip:hover {
+  border-color: #B8F2D0;
+  background-color: #203E36;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .chat-input-bar-container {
+  background-color: #14221F;
+  border-top-color: #203630;
+}
+[data-theme="dark"] .chat-text-input {
+  background-color: #101C19;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .chat-text-input:focus {
+  background-color: #14221F;
+  border-color: #B8F2D0;
+}
+[data-theme="dark"] .btn-send-round {
+  background-color: #B8F2D0;
+  color: #0C2824;
+}
+[data-theme="dark"] .btn-send-round:hover {
+  background-color: #DDF8E8;
+  color: #0C2824;
+}
+
+/* Modal Dark Theming */
 [data-theme="dark"] .modal-content-box {
   background: #14221F;
   border-color: #203630;
   color: #ECFDF5;
 }
 
-/* Theme Toggle Button */
+/* Theme Toggle Button Styling & Strict Icon State
+   Default (Light theme): Show MOON button (🌙) to switch to Dark
+   Dark theme: Show SUN button (☀️) to switch to Light */
 .btn-theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -144,16 +273,35 @@
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 0;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
+  line-height: 1;
 }
+
 .btn-theme-toggle:hover {
   transform: translateY(-1px);
   border-color: var(--primary-teal);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
-[data-theme="dark"] .theme-icon-dark { display: none; }
-[data-theme="dark"] .theme-icon-light { display: inline-block; }
-:not([data-theme="dark"]) .theme-icon-dark { display: inline-block; }
-:not([data-theme="dark"]) .theme-icon-light { display: none; }
+
+/* Light Theme (Default): Show Moon, Hide Sun */
+.btn-theme-toggle .theme-icon-light {
+  display: none !important;
+}
+.btn-theme-toggle .theme-icon-dark {
+  display: inline-flex !important;
+}
+
+/* Dark Theme: Show Sun, Hide Moon */
+html[data-theme="dark"] .btn-theme-toggle .theme-icon-light,
+body[data-theme="dark"] .btn-theme-toggle .theme-icon-light,
+[data-theme="dark"] .btn-theme-toggle .theme-icon-light {
+  display: inline-flex !important;
+}
+html[data-theme="dark"] .btn-theme-toggle .theme-icon-dark,
+body[data-theme="dark"] .btn-theme-toggle .theme-icon-dark,
+[data-theme="dark"] .btn-theme-toggle .theme-icon-dark {
+  display: none !important;
+}
 
 /* Chart.js Radar Card */
 .radar-analysis-card {
