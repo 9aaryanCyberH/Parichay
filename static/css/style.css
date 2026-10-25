@@ -18,8 +18,8 @@
   --ink: #202622;
   --muted-slate: #5A6560;
   --muted-light: #7E8A84;
-  --border-subtle: #E2E6DF;
-  --border-hover: #CBD2C8;
+  --border-subtle: #C8D2CB;
+  --border-hover: #A4B2A8;
 
   --matched-green: #1A6340;
   --matched-green-bg: #E8F5EE;
@@ -41,9 +41,9 @@
   --radius-card: 16px;
   --radius-inner: 10px;
 
-  --shadow-sm: 0 2px 8px rgba(18, 59, 53, 0.05);
-  --shadow-md: 0 8px 24px rgba(18, 59, 53, 0.08);
-  --shadow-lg: 0 16px 40px rgba(18, 59, 53, 0.12);
+  --shadow-sm: 0 1px 3px rgba(18, 59, 53, 0.08), 0 3px 8px rgba(18, 59, 53, 0.04);
+  --shadow-md: 0 4px 16px rgba(18, 59, 53, 0.10), 0 8px 24px rgba(18, 59, 53, 0.06);
+  --shadow-lg: 0 16px 40px rgba(18, 59, 53, 0.14);
 }
 
 /* ==========================================================================
@@ -832,7 +832,7 @@ body.dashboard-body {
 
 /* Upload Dropzone */
 .dropzone-box {
-  border: 2px dashed #D5DBD3;
+  border: 2px dashed #B8C4BC;
   border-radius: 14px;
   padding: 36px 20px;
   text-align: center;
@@ -1456,7 +1456,7 @@ body.dashboard-body {
   justify-content: space-between;
   padding: 12px 16px;
   border-radius: 10px;
-  border: 1px solid #EFF1EC;
+  border: 1px solid var(--border-subtle);
   background-color: #FAFAF8;
   cursor: pointer;
   transition: all 0.16s ease;
@@ -2076,7 +2076,7 @@ body.dashboard-body {
   justify-content: space-between;
   padding: 16px 20px;
   border-radius: 12px;
-  border: 1px solid #EFF1EC;
+  border: 1px solid var(--border-subtle);
   background-color: #FAFAF8;
 }
 

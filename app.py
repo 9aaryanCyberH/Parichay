@@ -526,6 +526,7 @@ def chat():
 
     history = data.get("history", [])
     candidate = data.get("candidate", {})
+    skills = data.get("skills", {})
     job_profile = data.get("job_profile", {})
     alignment = data.get("alignment", {})
 
@@ -534,6 +535,7 @@ def chat():
             message=message,
             history=history,
             candidate_data=candidate,
+            skills_data=skills,
             job_data=job_profile,
             alignment_data=alignment,
             api_key=Config.GEMINI_API_KEY,

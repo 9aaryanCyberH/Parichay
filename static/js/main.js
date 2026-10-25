@@ -1225,7 +1225,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const payload = {
         message: msg,
         history: chatConversationHistory,
-        candidate: latestAnalysisData ? latestAnalysisData.candidate : {},
+        candidate: latestAnalysisData ? {
+          ...latestAnalysisData.candidate,
+          matched_skills: (latestAnalysisData.skills && latestAnalysisData.skills.matched_technical) || [],
+          missing_skills: (latestAnalysisData.skills && latestAnalysisData.skills.missing_technical) || [],
+          unique_skills: (latestAnalysisData.skills && latestAnalysisData.skills.candidate_unique) || []
+        } : {},
+        skills: latestAnalysisData ? latestAnalysisData.skills : {},
         job_profile: latestAnalysisData ? latestAnalysisData.job_profile : {},
         alignment: latestAnalysisData ? latestAnalysisData.alignment : {}
       };
@@ -1241,7 +1247,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await resp.json();
       if (result.success && result.reply) {
-        appendBubble("assistant", result.reply);
+        appendBubble("assistant", result.reply, result.engine, result.is_ai_live);
         chatConversationHistory.push({ role: "assistant", content: result.reply });
       } else {
         appendBubble("assistant", result.message || "I encountered an issue processing your question. Please try again.");
@@ -1253,18 +1259,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function appendBubble(role, content) {
+  function appendBubble(role, content, engine = "", isAiLive = false) {
     if (!chatMessagesFeed) return;
     const row = document.createElement("div");
     row.className = `chat-bubble-row ${role}`;
 
     const formatted = renderMarkdown(content);
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const engineTag = (role === "assistant" && engine)
+      ? `<span class="chat-engine-badge" style="margin-left: 8px; font-size: 0.72rem; opacity: 0.85; font-weight: 500;">&bull; ${escapeHtml(engine)}</span>`
+      : "";
 
     row.innerHTML = `
       <div class="chat-bubble">
         <div>${formatted}</div>
-        <div class="chat-time-tag">${timeStr}</div>
+        <div class="chat-time-tag">${timeStr}${engineTag}</div>
       </div>
     `;
 

@@ -240,6 +240,7 @@ Respond ONLY with a valid JSON object matching this schema:
         message: str,
         history: List[Dict[str, str]] = None,
         candidate_data: Dict[str, Any] = None,
+        skills_data: Dict[str, Any] = None,
         job_data: Dict[str, Any] = None,
         alignment_data: Dict[str, Any] = None,
         api_key: str = "",
@@ -250,21 +251,38 @@ Respond ONLY with a valid JSON object matching this schema:
         Understands candidate resume context, target role description, and alignment metrics.
         """
         history = history or []
-        candidate_data = candidate_data or {}
+        candidate_data = dict(candidate_data or {})
+        skills_data = skills_data or {}
         job_data = job_data or {}
         alignment_data = alignment_data or {}
 
-        api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+        # Merge skills_data into candidate_data if missing
+        if not candidate_data.get("matched_skills") and skills_data.get("matched_technical"):
+            candidate_data["matched_skills"] = skills_data.get("matched_technical", [])
+        if not candidate_data.get("missing_skills") and skills_data.get("missing_technical"):
+            candidate_data["missing_skills"] = skills_data.get("missing_technical", [])
+        if not candidate_data.get("unique_skills") and skills_data.get("candidate_unique"):
+            candidate_data["unique_skills"] = skills_data.get("candidate_unique", [])
 
-        # Try Google Gemini if configured
-        if api_key and api_key.strip() and not api_key.startswith("your_"):
+        api_key = (api_key or os.environ.get("GEMINI_API_KEY", "")).strip()
+
+        # Try Google Gemini if key is provided and valid
+        if api_key and not api_key.startswith("your_"):
             try:
-                gemini_reply = cls._call_gemini_chat(message, history, candidate_data, job_data, alignment_data, api_key, model)
+                gemini_reply, active_model = cls._call_gemini_chat(
+                    message=message,
+                    history=history,
+                    candidate_data=candidate_data,
+                    job_data=job_data,
+                    alignment_data=alignment_data,
+                    api_key=api_key,
+                    model=model
+                )
                 if gemini_reply:
                     return {
                         "success": True,
                         "reply": gemini_reply,
-                        "engine": f"Google {model}",
+                        "engine": f"Google Gemini ({active_model})",
                         "is_ai_live": True
                     }
             except Exception as e:
@@ -289,70 +307,146 @@ Respond ONLY with a valid JSON object matching this schema:
         alignment_data: Dict[str, Any],
         api_key: str,
         model: str
-    ) -> str:
-        """Invokes Gemini REST API with conversation history and candidate context."""
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-
+    ) -> tuple:
+        """
+        Invokes Gemini REST API with sanitized multiturn conversation history,
+        rich resume context, and multi-model failover support.
+        Returns (reply_text: str, active_model: str).
+        """
         candidate_name = candidate_data.get("name", "Candidate")
         matched_tech = candidate_data.get("matched_skills", [])
         missing_tech = candidate_data.get("missing_skills", [])
+        unique_tech = candidate_data.get("unique_skills", [])
         score = alignment_data.get("score", 0)
         fit_tier = alignment_data.get("fit_tier", "Evaluation Complete")
+        role_level = job_data.get("role_level", "Standard")
+        exp_years = job_data.get("experience_years", "Not specified")
 
-        system_instruction = f"""You are the Parichay AI Career Intelligence Copilot, an elite technical career advisor and resume strategist.
-Your mission is to help the candidate maximize their alignment with their target role, write impactful resume bullet points, prepare for technical interviews, and strategically close skill gaps.
+        system_instruction = f"""You are Parichay's Lead Technical Career Advisor and AI Career Copilot.
+You are assisting {candidate_name} with their resume, career development, and job application.
+You are grounded in this exact candidate session data:
+- Candidate Name: {candidate_name}
+- Overall Role Match Score: {score}% ({fit_tier})
+- Target Role Seniority: {role_level} (Experience Target: {exp_years})
+- Verified Matched Skills: {', '.join(matched_tech) if matched_tech else 'None currently verified'}
+- Identified Missing Skills in Target Role: {', '.join(missing_tech) if missing_tech else 'None identified'}
+- Candidate Unique Bonus Skills: {', '.join(unique_tech) if unique_tech else 'None'}
 
-Candidate Context:
-- Name: {candidate_name}
-- Current Alignment Score: {score}% ({fit_tier})
-- Matched Competencies: {', '.join(matched_tech) if matched_tech else 'None verified yet'}
-- Missing JD Competencies: {', '.join(missing_tech) if missing_tech else 'None identified'}
-- Target Role Seniority: {job_data.get('role_level', 'Not specified')}
-
-Guidelines:
-- Provide actionable, technically accurate, grounded advice.
-- When recommending bullet rewrites, ALWAYS use Google's X-Y-Z formula: "Accomplished [X] as measured by [Y], by doing [Z]".
-- Format your response with clean Markdown (use bullet points, bold text for key skills, and brief code blocks where helpful).
-- Keep answers focused, encouraging, and free from corporate fluff.
+Core Persona & Rules:
+1. Speak as an encouraging, pragmatic, senior engineering career advisor and hiring strategist.
+2. Be technically rigorous and specific. Address the candidate's exact technologies (e.g. {', '.join(matched_tech[:3]) if matched_tech else 'their stack'}).
+3. When suggesting resume bullet points, ALWAYS format them using Google's X-Y-Z formula: "Accomplished [X] as measured by [Y], by doing [Z]".
+4. When asked about skills to learn or gaps, suggest concrete micro-projects, architectural patterns, and production implementations.
+5. When asked about interview questions, provide realistic technical and architectural questions specific to the matched and missing technologies.
+6. Use clean GitHub Markdown: bold key terms, use bullet points, and provide concise code or configuration snippets when relevant.
+7. Answer any career, technical, interview, resume, or salary negotiation question thoroughly.
 """
 
-        # Build contents from history
+        # 1. Clean and normalize conversation history
+        # Exclude the current message if the frontend pushed it to the end of history
+        hist = list(history) if history else []
+        if hist and hist[-1].get("role") in ("user", "human") and hist[-1].get("content", "").strip() == message.strip():
+            hist = hist[:-1]
+
+        raw_turns = []
+        for turn in hist:
+            role = "user" if turn.get("role") in ("user", "human") else "model"
+            content = (turn.get("content") or "").strip()
+            if not content:
+                continue
+            # Merge consecutive turns of the same role to satisfy Gemini's strict alternating turn requirement
+            if raw_turns and raw_turns[-1]["role"] == role:
+                raw_turns[-1]["text"] += f"\n\n{content}"
+            else:
+                raw_turns.append({"role": role, "text": content})
+
+        # Gemini requires contents to start with 'user'. Drop leading 'model' turns
+        while raw_turns and raw_turns[0]["role"] != "user":
+            raw_turns.pop(0)
+
+        # Keep last 8 turns to stay within token budget
+        raw_turns = raw_turns[-8:]
+
         contents = []
-        for turn in history[-8:]:  # keep last 8 turns for context window
-            role = "user" if turn.get("role") == "user" else "model"
+        for item in raw_turns:
             contents.append({
-                "role": role,
-                "parts": [{"text": turn.get("content", "")}]
+                "role": item["role"],
+                "parts": [{"text": item["text"]}]
             })
 
         # Append current user prompt
+        user_turn_content = message.strip()
+        # If no prior turns, prepend quick session grounding to user prompt
+        if not contents:
+            user_turn_content = f"[Session: Candidate={candidate_name}, Match={score}%, Matched={matched_tech[:6]}, Missing={missing_tech[:6]}]\n\n{user_turn_content}"
+
         contents.append({
             "role": "user",
-            "parts": [{"text": f"Context: Candidate is {candidate_name}, score is {score}%, matched: {matched_tech}, missing: {missing_tech}.\n\nUser Question: {message}"}]
+            "parts": [{"text": user_turn_content}]
         })
 
-        payload = {
-            "contents": contents,
-            "systemInstruction": {
-                "parts": [{"text": system_instruction}]
-            },
-            "generationConfig": {
-                "temperature": 0.4,
-                "maxOutputTokens": 800
-            }
-        }
+        # 2. Ordered list of models to try
+        models_to_try = []
+        for m in [model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
+            if m and m not in models_to_try:
+                models_to_try.append(m)
 
         headers = {"Content-Type": "application/json"}
-        resp = requests.post(url, headers=headers, json=payload, timeout=12)
-        if resp.status_code == 200:
-            res_json = resp.json()
-            candidates = res_json.get("candidates", [])
-            if candidates:
-                parts = candidates[0].get("content", {}).get("parts", [])
-                if parts:
-                    return parts[0].get("text", "").strip()
 
-        return ""
+        for target_model in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:generateContent?key={api_key}"
+            
+            payload = {
+                "contents": contents,
+                "systemInstruction": {
+                    "parts": [{"text": system_instruction}]
+                },
+                "generationConfig": {
+                    "temperature": 0.4,
+                    "maxOutputTokens": 1000
+                }
+            }
+
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=12)
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    candidates = res_json.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts:
+                            text = parts[0].get("text", "").strip()
+                            if text:
+                                return text, target_model
+
+                # If systemInstruction caused a 400, retry with inlined system instruction
+                if resp.status_code == 400 and "systemInstruction" in resp.text:
+                    inline_contents = list(contents)
+                    if inline_contents:
+                        first_text = inline_contents[0]["parts"][0]["text"]
+                        inline_contents[0]["parts"][0]["text"] = f"{system_instruction}\n\n---\n\n{first_text}"
+                        retry_payload = {
+                            "contents": inline_contents,
+                            "generationConfig": {
+                                "temperature": 0.4,
+                                "maxOutputTokens": 1000
+                            }
+                        }
+                        retry_resp = requests.post(url, headers=headers, json=retry_payload, timeout=12)
+                        if retry_resp.status_code == 200:
+                            candidates = retry_resp.json().get("candidates", [])
+                            if candidates:
+                                parts = candidates[0].get("content", {}).get("parts", [])
+                                if parts:
+                                    text = parts[0].get("text", "").strip()
+                                    if text:
+                                        return text, target_model
+
+                logger.warning(f"Gemini API model {target_model} returned HTTP {resp.status_code}: {resp.text[:300]}")
+            except Exception as ex:
+                logger.warning(f"Gemini API call to model {target_model} raised exception: {ex}")
+
+        return "", ""
 
     @classmethod
     def _generate_grounded_chat_fallback(
@@ -371,10 +465,61 @@ Guidelines:
         candidate_name = candidate_data.get("name", "Candidate")
         matched_tech = candidate_data.get("matched_skills", [])
         missing_tech = candidate_data.get("missing_skills", [])
+        unique_tech = candidate_data.get("unique_skills", [])
         score = alignment_data.get("score", 0)
         fit_tier = alignment_data.get("fit_tier", "Evaluation Complete")
 
-        # 1. Check for specific skill inquiry (e.g. "how to learn Docker", "tell me about Kubernetes")
+        # 1. Gaps / Three most important gaps inquiry
+        if any(w in msg_lower for w in ["gap", "gaps", "three most important", "missing"]):
+            if missing_tech:
+                top_gaps = missing_tech[:3]
+                gap_items = "\n".join([f"{i+1}. **{g}** — Build a demonstrable feature or micro-service showcasing {g} to directly address this role requirement." for i, g in enumerate(top_gaps)])
+                return (
+                    f"### Priority Skill Gaps for **{candidate_name}**\n\n"
+                    f"Based on your target job description, here are the top competencies required that were not verified in your resume:\n\n"
+                    f"{gap_items}\n\n"
+                    f"**Next Steps:**\n"
+                    f"- Add these keywords to your projects or coursework if you have prior exposure.\n"
+                    f"- Review the tailored learning roadmap in the **Gap Mitigation** tab for step-by-step project architectures."
+                )
+            else:
+                return (
+                    f"### Skill Gap Analysis for **{candidate_name}**\n\n"
+                    f"Exceptional news: No major technical gaps were detected against this target role! You cover all primary technical requirements.\n\n"
+                    f"To strengthen your application further, focus on:\n"
+                    f"1. **Quantifying Engineering Outcomes:** Use Google's X-Y-Z formula on your project bullets.\n"
+                    f"2. **Highlighting Unique Strengths:** Emphasize bonus skills like {', '.join(unique_tech[:3]) if unique_tech else 'system design'}."
+                )
+
+        # 2. Score Calculation inquiry
+        if any(w in msg_lower for w in ["calculate", "calculated", "formula", "how was my score", "score calculation"]):
+            return (
+                f"### Alignment Score Methodology (**{score}%** &bull; {fit_tier})\n\n"
+                f"Your Parichay alignment score is calculated through a hybrid deterministic and semantic pipeline:\n\n"
+                f"1. **TF-IDF Vector Cosine Similarity (30% weight):** Measures vocabulary and conceptual overlap between your resume text and the job description.\n"
+                f"2. **Core Technical Skills Match (45% weight):** Ratio of verified required technical competencies present in your resume against the target role requirements.\n"
+                f"3. **Experience & Seniority Alignment (15% weight):** Assesses verified work history against the role's target seniority level.\n"
+                f"4. **Soft Skills & Architectural Context (10% weight):** Evaluates teamwork, leadership, testing, and deployment competencies.\n\n"
+                f"Closing the missing skills in your Skills Matrix will provide the largest direct increase to your score."
+            )
+
+        # 3. Project description improvement
+        if any(w in msg_lower for w in ["improve project", "project description", "project bullet", "help me improve"]):
+            sample_skill = matched_tech[0] if matched_tech else "Python"
+            return (
+                f"### How to Elevate Your Project Descriptions\n\n"
+                f"Transform task-based bullets into high-impact engineering accomplishments using **Google's X-Y-Z Formula** (*Accomplished [X] as measured by [Y], by doing [Z]*):\n\n"
+                f"**Before (Task-focused):**\n"
+                f"> *\"Built a web application using {sample_skill} and handled database operations.\"*\n\n"
+                f"**After (X-Y-Z Formula):**\n"
+                f"> *\"Architected an asynchronous {sample_skill} service that reduced query latency by **38%** across 15,000 daily requests by implementing connection pooling and Redis caching.\"*\n\n"
+                f"**3 Quick Checks for Every Project Bullet:**\n"
+                f"- [ ] Did you include a metric (%, time saved, users served)?\n"
+                f"- [ ] Did you specify the core technologies and architectural patterns?\n"
+                f"- [ ] Did you link to a public GitHub repository or live deployment?"
+            )
+
+        # 4. Check for specific skill inquiry
         for skill in missing_tech + matched_tech:
             if skill.lower() in msg_lower:
                 if skill in missing_tech:
@@ -399,8 +544,8 @@ Guidelines:
                         f"- **Example Bullet Rewrite:** *\"Architected a high-concurrency service in **{skill}**, maintaining **99.9% uptime** across 50K+ daily active users by implementing asynchronous processing and connection pooling.\"*"
                     )
 
-        # 2. X-Y-Z Formula / Bullet Point Rewriting
-        if any(w in msg_lower for w in ["bullet", "rewrite", "x-y-z", "xyz", "formula", "rephrase", "experience"]):
+        # 5. X-Y-Z Formula / Bullet Point Rewriting
+        if any(w in msg_lower for w in ["bullet", "rewrite", "x-y-z", "xyz", "rephrase", "experience"]):
             tech_sample = matched_tech[0] if matched_tech else "Python"
             return (
                 f"### Google's X-Y-Z Formula for **{candidate_name}**\n\n"
@@ -415,8 +560,8 @@ Guidelines:
                 f"💡 *Tip: Click 'Copy Bullet' on any recommendation in the AI Recommendations tab to quickly use them.*"
             )
 
-        # 3. Technical Interview Prep
-        if any(w in msg_lower for w in ["interview", "questions", "prep", "ask", "technical round"]):
+        # 6. Technical Interview Prep
+        if any(w in msg_lower for w in ["interview", "questions", "prep", "ask", "technical round", "practice"]):
             return (
                 f"### High-Probability Technical Interview Questions\n\n"
                 f"Based on your current alignment (**{score}%**) and the target role criteria, technical interviewers will likely focus on:\n\n"
@@ -430,8 +575,8 @@ Guidelines:
                 f"   * *\"Tell me about a time you had to deliver a feature with incomplete specifications or unfamiliar tooling. How did you navigate the trade-offs?\"*"
             )
 
-        # 4. Alignment Score / How to improve
-        if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align"]):
+        # 7. Alignment Score / How to improve / Prioritize
+        if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align", "prioritize", "learn"]):
             missing_str = ", ".join(f"**{m}**" for m in missing_tech[:3]) if missing_tech else "specialized tooling"
             return (
                 f"### Strategy to Elevate Your Alignment Score (Currently **{score}%** &bull; {fit_tier})\n\n"
@@ -446,7 +591,7 @@ Guidelines:
                 f"Would you like me to rewrite a specific project bullet point for you?"
             )
 
-        # 5. Competitive Advantage
+        # 8. Competitive Advantage
         if any(w in msg_lower for w in ["advantage", "strength", "stand out", "edge"]):
             return (
                 f"### Your Competitive Edge for this Target Role\n\n"
@@ -456,7 +601,7 @@ Guidelines:
                 f"- **Next Step:** By addressing the {len(missing_tech)} missing competencies highlighted in your Skills Matrix, you will have a comprehensive application that passes both automated ATS screens and engineering manager evaluations."
             )
 
-        # 6. General / Greeting / Fallback
+        # 9. General / Greeting / Fallback
         return (
             f"Hello **{candidate_name}**! I am your **Parichay AI Career Intelligence Copilot**.\n\n"
             f"I have reviewed your resume against the target role:\n"
@@ -464,9 +609,9 @@ Guidelines:
             f"- **Matched Core Technologies:** {', '.join(matched_tech[:3]) if matched_tech else 'In progress'}\n"
             f"- **Priority Skill Gaps:** {', '.join(missing_tech[:3]) if missing_tech else 'None'}\n\n"
             f"**Here are a few things you can ask me:**\n"
-            f"1. *\"Rewrite my experience bullet points using Google's X-Y-Z formula.\"*\n"
-            f"2. *\"How do I learn and prove competence in {missing_tech[0] if missing_tech else 'Docker'}?\"*\n"
-            f"3. *\"What technical interview questions will they ask me for this role?\"*\n"
-            f"4. *\"How can I raise my match score above 85%?\"*"
+            f"1. *\"What are the three most important gaps in my resume?\"*\n"
+            f"2. *\"Explain how my alignment score was calculated.\"*\n"
+            f"3. *\"Rewrite my experience bullet points using Google's X-Y-Z formula.\"*\n"
+            f"4. *\"What technical interview questions will they ask me for this role?\"*"
         )
 

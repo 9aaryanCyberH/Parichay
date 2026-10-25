@@ -14,6 +14,7 @@ import io
 import os
 import uuid
 import unittest
+from unittest.mock import patch, MagicMock
 from app import app
 from services.database import AuthManager, HistoryManager
 
@@ -357,6 +358,96 @@ class TestParichayAPI(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertIn("reply", data)
         self.assertGreater(len(data["reply"]), 20)
+
+    def test_chatbot_multiturn_alternating_turns(self):
+        """Test POST /api/chat with existing conversation history including consecutive user turns."""
+        self.login_test_user()
+        payload = {
+            "message": "Can you give me a STAR format answer for that?",
+            "history": [
+                {"role": "user", "content": "What technical interview questions should I practice?"},
+                {"role": "assistant", "content": "Interviewers will focus on Python memory management and Docker."},
+                {"role": "user", "content": "Can you give me a STAR format answer for that?"}
+            ],
+            "candidate": {
+                "name": "Priya Nair",
+                "matched_skills": ["Java", "Spring Boot"],
+                "missing_skills": ["Docker", "Kubernetes"]
+            },
+            "alignment": {
+                "score": 65,
+                "fit_tier": "Moderate Match"
+            }
+        }
+        response = self.client.post("/api/chat", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIn("reply", data)
+        self.assertGreater(len(data["reply"]), 20)
+
+    def test_chatbot_chip_prompts(self):
+        """Test POST /api/chat handles default suggestion chip prompts gracefully."""
+        self.login_test_user()
+        for chip_prompt in [
+            "What are the three most important gaps in my resume?",
+            "Explain how my alignment score was calculated.",
+            "Help me improve this project description."
+        ]:
+            response = self.client.post("/api/chat", json={
+                "message": chip_prompt,
+                "candidate": {"name": "Test User", "matched_skills": ["Python"], "missing_skills": ["AWS"]},
+                "alignment": {"score": 70, "fit_tier": "High Fit"}
+            })
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertTrue(data["success"])
+            self.assertIn("reply", data)
+
+    @patch("services.ai_advisor.requests.post")
+    def test_gemini_live_chat_integration_success(self, mock_post):
+        """Test that /api/chat invokes Gemini with valid alternating roles and returns live AI response."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {"text": "Here is an advanced X-Y-Z bullet tailored to your distributed systems background."}
+                        ]
+                    }
+                }
+            ]
+        }
+        mock_post.return_value = mock_response
+
+        self.login_test_user()
+        from config import Config
+        with patch.object(Config, "GEMINI_API_KEY", "test-api-key"), \
+             patch("services.ai_advisor.os.environ.get", return_value="test-api-key"):
+            response = self.client.post("/api/chat", json={
+                "message": "Give me an advanced bullet point.",
+                "history": [
+                    {"role": "user", "content": "Hello advisor"},
+                    {"role": "assistant", "content": "Hello! How can I help?"}
+                ],
+                "candidate": {"name": "Aarav", "matched_skills": ["Python"]},
+                "alignment": {"score": 85, "fit_tier": "Strong Match"}
+            })
+            self.assertEqual(response.status_code, 200)
+            data = response.get_json()
+            self.assertTrue(data["success"])
+            self.assertTrue(data["is_ai_live"])
+            self.assertIn("Google Gemini", data["engine"])
+            self.assertIn("advanced X-Y-Z", data["reply"])
+
+            # Verify alternating turns in the outbound request payload
+            call_kwargs = mock_post.call_args[1]
+            contents = call_kwargs["json"]["contents"]
+            for i in range(len(contents) - 1):
+                self.assertNotEqual(contents[i]["role"], contents[i+1]["role"],
+                                    "Adjacent turns in contents MUST NOT share the same role")
 
     def test_history_endpoint_authenticated(self):
         """Test GET /api/history endpoint returns valid response for authenticated user."""
