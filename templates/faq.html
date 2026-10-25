@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help &amp; FAQ — Parichay</title>
+  <meta name="description" content="Frequently asked questions about Parichay. Understand PDF parsing, alignment scoring, data privacy, and career coaching features.">
+  
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+
+  <header class="landing-navbar">
+    <div class="landing-nav-left">
+      <a href="/" class="landing-brand-link" aria-label="Parichay Home">
+        <img src="{{ url_for('static', filename='images/parichay-logo.svg') }}" alt="Parichay — Where Your Potential Meets Opportunity" class="landing-brand-logo-img">
+      </a>
+      <nav class="landing-nav-links">
+        <a href="/#features" class="landing-nav-link">Features</a>
+        <a href="/#how-it-works" class="landing-nav-link">How it works</a>
+        <a href="/privacy" class="landing-nav-link">Privacy</a>
+      </nav>
+    </div>
+    <div class="landing-nav-right">
+      {% if current_user %}
+        <a href="/studio" class="btn-nav-outline">{{ current_user.name.split()[0] }}'s Workspace</a>
+        <a href="/logout" class="landing-nav-link" style="font-size: 0.86rem;">Sign out</a>
+      {% else %}
+        <a href="/login" class="btn-nav-outline">Sign in</a>
+        <a href="/auth" class="btn-nav-solid">Launch Studio</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="section-wrapper" style="max-width: 860px; padding: 56px 24px 80px 24px;">
+    <div class="section-kicker">KNOWLEDGE BASE &amp; ANSWERS</div>
+    <h1 class="section-heading" style="font-size: 2.8rem; margin-bottom: 24px;">Frequently Asked Questions</h1>
+    <p class="section-subtext" style="margin-bottom: 40px;">
+      Clear, practical answers about how Parichay evaluates your resume, handles document data, and calculates role alignment.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Which PDF formats are supported?</h3>
+        <p class="feature-desc">
+          Parichay supports standard digital, text-based PDF documents exported from Google Docs, Microsoft Word, LaTeX, or Canva, up to 5 MB in file size.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Why can't Parichay read my resume?</h3>
+        <p class="feature-desc">
+          If your resume is a flat scan, a photographed document, or flattened raster graphics without an embedded text layer, PyMuPDF cannot extract readable characters. To resolve this, export your resume as an electronic PDF directly from your word processor.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">How is the alignment score calculated?</h3>
+        <p class="feature-desc">
+          Your alignment score is an explainable composite of 4 mathematical components: Technical Skills coverage (45%), TF-IDF cosine semantic similarity (35%), Soft Skills &amp; practices (10%), and Resume Structure completeness (10%).
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Does a high score guarantee an interview?</h3>
+        <p class="feature-desc">
+          No. The score is strictly an objective alignment measure comparing keyword and semantic patterns with the job description. It does not predict recruiter decisions or guarantee screening pass-through.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Why might a skill not be detected?</h3>
+        <p class="feature-desc">
+          Skills are extracted using our curated technology taxonomy and contextual pattern matching. If a skill is heavily abbreviated, misspelled, or implied without being named, it may not be detected.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Is my resume stored on disk?</h3>
+        <p class="feature-desc">
+          No. Uploaded PDF files are parsed strictly in memory. We never save raw resume files to disk or retain them after the analysis request finishes.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">Is my resume shared with an AI provider?</h3>
+        <p class="feature-desc">
+          Raw resume documents are never sent to external AI providers. Only structured summaries (extracted skills lists and score metrics) are sent to the Google Gemini API when generating AI recommendations.
+        </p>
+      </div>
+
+      <div class="feature-teal-card" style="padding: 24px 28px;">
+        <h3 class="feature-title" style="font-size: 1.15rem; margin-bottom: 8px;">How can I delete saved analyses?</h3>
+        <p class="feature-desc">
+          When signed in, go to the "My Analyses" section in your sidebar. Click the "Delete" button next to any historical entry to immediately and permanently remove it from the database.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="landing-footer">
+    <div class="footer-copy-left">
+      <span class="footer-brand-title">Parichay</span>
+      <span class="footer-tagline-text">Where Your Potential Meets Opportunity.</span>
+    </div>
+    <div class="footer-links-right">
+      <a href="/" class="footer-link">Home</a>
+      <a href="/privacy" class="footer-link">Privacy Policy</a>
+      <a href="/terms" class="footer-link">Terms of Service</a>
+      <span style="font-size: 0.8rem; color: var(--muted-slate);">&copy; 2026 Parichay. All rights reserved.</span>
+    </div>
+  </footer>
+
+</body>
+</html>

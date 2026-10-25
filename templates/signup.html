@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Your Account — Parichay</title>
-  <meta name="description" content="Create a Parichay account to save your resume analysis history, access the AI Assistant, and track your career readiness.">
+  <title>Create Account — Parichay</title>
+  <meta name="description" content="Create your Parichay account to access your workspace, uncover resume gaps, and keep track of your analyses.">
   
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
   <div class="auth-page-container">
     <div class="auth-split-card">
       
-      <!-- Left Column: Sage Art Canvas with Diagonal Gradient Lozenges (Matches Screenshot) -->
+      <!-- Left Column: Sage Art Canvas with Parichay Brand & Graphic -->
       <div class="auth-art-column">
         <a href="/" class="auth-brand-header" aria-label="Parichay Home">
           <img src="{{ url_for('static', filename='images/parichay-logo.svg') }}" alt="Parichay" class="auth-brand-logo-img">
@@ -30,11 +30,11 @@
         </div>
       </div>
 
-      <!-- Right Column: Registration Form (Matches Screenshot) -->
+      <!-- Right Column: Registration Form -->
       <div class="auth-form-column">
         <div class="auth-form-box">
-          <h1 class="auth-title">Create your<br>account</h1>
-          <p class="auth-subtitle">Join Parichay and take the next step in your career journey.</p>
+          <h1 class="auth-title">Make your next<br>move with clarity.</h1>
+          <p class="auth-subtitle">Create your Parichay account to access your workspace and, where enabled, keep track of your analyses.</p>
 
           {% if error %}
           <div class="auth-error-banner" role="alert">
@@ -48,24 +48,32 @@
           {% endif %}
 
           <form action="/signup" method="POST" class="auth-actual-form">
+            <input type="hidden" name="next" value="{{ next_url or '' }}">
+
             <div class="auth-input-group">
               <label for="nameInput" class="auth-label">Full name</label>
               <input type="text" id="nameInput" name="name" class="auth-text-input" placeholder="Your name" value="{{ name or '' }}" required autofocus>
             </div>
 
             <div class="auth-input-group">
-              <label for="emailInput" class="auth-label">Email</label>
+              <label for="emailInput" class="auth-label">Email address</label>
               <input type="email" id="emailInput" name="email" class="auth-text-input" placeholder="your@email.com" value="{{ email or '' }}" required>
             </div>
 
             <div class="auth-input-group">
               <label for="passwordInput" class="auth-label">Password</label>
-              <input type="password" id="passwordInput" name="password" class="auth-text-input" placeholder="Create a password (min 6 characters)" minlength="6" required>
+              <input type="password" id="passwordInput" name="password" class="auth-text-input" placeholder="Minimum 6 characters" minlength="6" required>
+              <span class="auth-field-hint" style="font-size: 0.74rem; color: var(--muted-slate); margin-top: 3px;">Password must be at least 6 characters.</span>
+            </div>
+
+            <div class="auth-input-group">
+              <label for="confirmPasswordInput" class="auth-label">Confirm password</label>
+              <input type="password" id="confirmPasswordInput" name="confirm_password" class="auth-text-input" placeholder="Re-enter your password" minlength="6" required>
             </div>
 
             <div class="auth-checkbox-group">
               <input type="checkbox" id="termsCheck" required checked>
-              <label for="termsCheck">I agree to the <a href="#terms" onclick="alert('Parichay terms: safe in-memory document parsing, no permanent document retention.'); return false;">Terms of Service</a> and <a href="#privacy" onclick="alert('Parichay privacy: confidential, zero document storage.'); return false;">Privacy Policy</a></label>
+              <label for="termsCheck">I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.</label>
             </div>
 
             <button type="submit" class="btn-auth-submit-pill">
@@ -77,38 +85,17 @@
             </button>
           </form>
 
-          <!-- Social Provider Options -->
-          <div class="auth-divider-line">
-            <span>Or continue with</span>
-          </div>
-
-          <div class="auth-social-row">
-            <button type="button" class="btn-social-auth" title="Sign up with LinkedIn" onclick="alert('To preserve privacy, please register with your email and password.');">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0A66C2">
-                <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.64a1.59 1.59 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.59 1.59 0 0 0-1.6-1.6z"/>
-              </svg>
-            </button>
-            <button type="button" class="btn-social-auth" title="Sign up with Google" onclick="alert('To preserve privacy, please register with your email and password.');">
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="auth-switch-row">
+          <div class="auth-switch-row" style="margin-top: 24px;">
             <span>Already have an account?</span>
-            <a href="/login" class="auth-switch-link">Log in</a>
+            <a href="/login{% if next_url and next_url != '/studio' %}?next={{ next_url }}{% endif %}" class="auth-switch-link">Sign in</a>
           </div>
 
           <div class="auth-footer-notes">
             <a href="/">What is Parichay?</a>
             <span>&bull;</span>
-            <a href="#cookie" onclick="alert('Parichay uses strictly essential session cookies for authentication.'); return false;">Cookie Declaration</a>
+            <a href="/terms">Terms of Service</a>
             <span>&bull;</span>
-            <a href="#privacy" onclick="alert('Parichay operates in-memory with zero persistent document storage.'); return false;">Privacy policy</a>
+            <a href="/privacy">Privacy Policy</a>
           </div>
         </div>
       </div>

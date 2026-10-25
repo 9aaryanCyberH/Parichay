@@ -512,50 +512,255 @@ body.landing-body {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Landing Clean Footer */
-.landing-footer {
+.hero-eyebrow-tag {
+  display: inline-block;
+  font-family: var(--font-main);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-teal);
+  background-color: var(--mint-soft);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
+  align-self: flex-start;
+}
+
+.how-it-works-cta-box {
+  text-align: center;
+  margin-top: 48px;
+  padding: 36px 24px;
+  background-color: rgba(184, 242, 208, 0.22);
+  border: 1px solid rgba(10, 54, 58, 0.08);
+  border-radius: 16px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.how-it-works-cta-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px 0;
+}
+
+.how-it-works-cta-box p {
+  font-size: 0.95rem;
+  color: var(--muted-slate);
+  margin: 0 0 20px 0;
+}
+
+.btn-privacy-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-teal);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-privacy-read:hover {
+  color: var(--primary-teal-hover);
+}
+
+/* ==========================================================================
+   POLISHED CREATOR FOOTER
+   - Dedicated creator credit section with verified portrait
+   - Clean editorial layout, recognizable icons, accessible links
+   - Warm ivory, deep teal, mint accent, generous whitespace
+   ========================================================================== */
+.landing-creator-footer {
   border-top: 1px solid var(--border-subtle);
   background-color: var(--warm-ivory);
-  padding: 36px 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 54px 32px 40px 32px;
+  margin-top: 32px;
+}
+
+.creator-footer-inner {
   max-width: 1240px;
   margin: 0 auto;
 }
 
-.footer-copy-left {
+.creator-main-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
 }
 
-.footer-brand-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.98rem;
-  color: var(--ink);
-}
-
-.footer-tagline-text {
-  font-size: 0.82rem;
-  color: var(--muted-slate);
-}
-
-.footer-links-right {
+.creator-profile-card {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 22px;
 }
 
-.footer-link {
-  font-size: 0.84rem;
+.creator-avatar-wrap {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2.5px solid #B8F2D0;
+  box-shadow: 0 4px 14px rgba(10, 54, 58, 0.08);
+  background-color: #E8ECE6;
+}
+
+.creator-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.creator-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.creator-eyebrow {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-teal);
+  margin-bottom: 2px;
+}
+
+.creator-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0 0 4px 0;
+}
+
+.creator-desc {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--muted-slate);
+  margin: 0 0 12px 0;
+  max-width: 480px;
+}
+
+.creator-links-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.creator-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background-color: #FFFFFF;
+  color: var(--ink);
+  text-decoration: none;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.creator-link-pill:hover {
+  border-color: var(--primary-teal);
+  color: var(--primary-teal);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(10, 54, 58, 0.1);
+}
+
+.creator-link-pill.resume {
+  background-color: var(--mint-soft);
+  border-color: rgba(10, 54, 58, 0.15);
+  color: var(--primary-teal);
+}
+
+.creator-link-pill.resume:hover {
+  background-color: #A3EBBF;
+  border-color: var(--primary-teal);
+}
+
+.creator-brand-block {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  max-width: 320px;
+}
+
+.creator-brand-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 2px;
+}
+
+.creator-tagline-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary-teal);
+  margin-bottom: 6px;
+}
+
+.creator-brand-note {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted-slate);
+  margin: 0;
+}
+
+.creator-footer-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: 32px 0 20px 0;
+}
+
+.creator-legal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--muted-slate);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.creator-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.creator-legal-link {
   color: var(--muted-slate);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
-.footer-link:hover {
+.creator-legal-link:hover {
   color: var(--primary-teal);
+  text-decoration: underline;
+}
+
+.legal-separator {
+  color: var(--border-subtle);
+}
+
+/* Landing Clean Footer Legacy Fallback */
+.landing-footer {
+  display: none;
 }
 
 /* ==========================================================================
@@ -890,5 +1095,41 @@ body.landing-body {
   }
   .hero-heading {
     font-size: 2.6rem;
+  }
+  .creator-main-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  .creator-brand-block {
+    text-align: left;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .creator-profile-card {
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .creator-avatar-wrap {
+    width: 64px;
+    height: 64px;
+  }
+  .creator-links-row {
+    gap: 8px;
+  }
+  .creator-link-pill {
+    padding: 5px 12px;
+    font-size: 0.78rem;
+  }
+  .creator-legal-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .creator-legal-links {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 }

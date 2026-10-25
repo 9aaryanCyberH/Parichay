@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Parichay</title>
+  <meta name="description" content="Parichay Privacy Policy. Transparent information on document processing, in-memory parsing, data minimization, and user privacy rights.">
+  
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+
+  <!-- Navbar -->
+  <header class="landing-navbar">
+    <div class="landing-nav-left">
+      <a href="/" class="landing-brand-link" aria-label="Parichay Home">
+        <img src="{{ url_for('static', filename='images/parichay-logo.svg') }}" alt="Parichay — Where Your Potential Meets Opportunity" class="landing-brand-logo-img">
+      </a>
+      <nav class="landing-nav-links">
+        <a href="/#features" class="landing-nav-link">Features</a>
+        <a href="/#how-it-works" class="landing-nav-link">How it works</a>
+        <a href="/faq" class="landing-nav-link">Help &amp; FAQ</a>
+      </nav>
+    </div>
+    <div class="landing-nav-right">
+      {% if current_user %}
+        <a href="/studio" class="btn-nav-outline">{{ current_user.name.split()[0] }}'s Workspace</a>
+        <a href="/logout" class="landing-nav-link" style="font-size: 0.86rem;">Sign out</a>
+      {% else %}
+        <a href="/login" class="btn-nav-outline">Sign in</a>
+        <a href="/auth" class="btn-nav-solid">Launch Studio</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="section-wrapper" style="max-width: 860px; padding: 56px 24px 80px 24px;">
+    <div class="section-kicker">DATA PROTECTION &amp; TRUST</div>
+    <h1 class="section-heading" style="font-size: 2.8rem; margin-bottom: 24px;">Privacy Policy</h1>
+    <p class="section-subtext" style="margin-bottom: 40px;">
+      Last updated: October 2026. This policy explains clearly and accurately how Parichay processes your documents, manages accounts, and protects your career information.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 32px; font-size: 0.96rem; line-height: 1.7; color: var(--ink);">
+      <section>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-teal);">1. In-Memory Document Processing</h2>
+        <p>
+          When you upload a resume to Parichay, our engine processes the document in-memory using PyMuPDF. <strong>Raw PDF resume documents are never permanently stored, cached, or written to disk.</strong> Once the alignment analysis calculation finishes and the response payload is returned to your browser session, the uploaded file bytes are immediately released from memory.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-teal);">2. Account Data &amp; Analysis History</h2>
+        <p>
+          If you create a Parichay account, we store only the information required to authenticate you and persist your analysis history:
+        </p>
+        <ul style="padding-left: 20px; margin: 10px 0;">
+          <li><strong>Account details:</strong> Your name, email address, and a securely salted and hashed password (via PBKDF2/SHA-256). We never store plaintext passwords.</li>
+          <li><strong>Analysis metadata:</strong> The computed match score, matched skill tags, identified gaps, target role title, and timestamp of analysis.</li>
+        </ul>
+        <p>
+          You maintain full ownership of your data. You can delete any saved analysis report at any time directly from the "My Analyses" tab in your workspace.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-teal);">3. External AI Provider Interaction</h2>
+        <p>
+          Parichay includes an AI Career Advisor powered server-side by the Google Gemini API when configured.
+        </p>
+        <p>
+          <strong>What is transmitted:</strong> Only structured technical summaries—specifically the candidate's extracted skill lists, target job requirements, and computed score metrics. Raw PDF files or unredacted document files are never transmitted to external APIs.
+        </p>
+        <p>
+          <strong>Deterministic fallback:</strong> When external API keys are not provided or if the service is unreachable, Parichay automatically uses its verified, deterministic in-memory rule engine. We never simulate or fabricate live AI calls.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-teal);">4. Cookies and Sessions</h2>
+        <p>
+          Parichay uses strictly essential HTTP session cookies for user authentication and CSRF protection. We do not use third-party tracking pixels, marketing cookies, or external analytics trackers.
+        </p>
+      </section>
+
+      <section>
+        <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--primary-teal);">5. Contact &amp; Inquiries</h2>
+        <p>
+          For privacy inquiries or account data deletion requests, contact the creator at <a href="https://www.linkedin.com/in/aaryan-k-ba3985246/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-teal); font-weight: 600; text-decoration: underline;">Aaryan Kumar on LinkedIn</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="landing-footer">
+    <div class="footer-copy-left">
+      <span class="footer-brand-title">Parichay</span>
+      <span class="footer-tagline-text">Where Your Potential Meets Opportunity.</span>
+    </div>
+    <div class="footer-links-right">
+      <a href="/" class="footer-link">Home</a>
+      <a href="/terms" class="footer-link">Terms of Service</a>
+      <a href="/faq" class="footer-link">Help &amp; FAQ</a>
+      <span style="font-size: 0.8rem; color: var(--muted-slate);">&copy; 2026 Parichay. All rights reserved.</span>
+    </div>
+  </footer>
+
+</body>
+</html>

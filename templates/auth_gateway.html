@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Started — Parichay</title>
+  <meta name="description" content="Sign in or create an account to access the Parichay Resume Intelligence Studio and Career Workspace.">
+  
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="auth-body-canvas">
+
+  <div class="auth-page-container">
+    <div class="auth-split-card">
+      
+      <!-- Left Column: Sage Art Canvas with Diagonal Gradient Lozenges (Screen 2/3 Match) -->
+      <div class="auth-art-column">
+        <a href="/" class="auth-brand-header" aria-label="Parichay Home">
+          <img src="{{ url_for('static', filename='images/parichay-logo.svg') }}" alt="Parichay — Where Your Potential Meets Opportunity" class="auth-brand-logo-img">
+        </a>
+
+        <div class="auth-art-graphic-wrap">
+          <img src="{{ url_for('static', filename='images/parichay-art.svg') }}" alt="Parichay Career Discovery Visual Graphic" class="auth-graphic-img">
+        </div>
+      </div>
+
+      <!-- Right Column: Authentication Gateway (Requirement 7) -->
+      <div class="auth-form-column">
+        <div class="auth-form-box">
+          <h1 class="auth-title">Your next step<br>starts here.</h1>
+          <p class="auth-subtitle">Sign in to access your workspace, or create an account to get started with Parichay.</p>
+
+          <div class="gateway-actions-column" style="display: flex; flex-direction: column; gap: 14px; margin: 32px 0 24px 0;">
+            <a href="{{ url_for('login', next=next_url) }}" class="btn-auth-submit-pill" style="text-decoration: none; font-size: 0.96rem; padding: 14px 20px;">
+              <span>Sign in to your account</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+
+            <a href="{{ url_for('signup', next=next_url) }}" class="btn-pill-secondary" style="justify-content: center; text-align: center; font-size: 0.94rem; padding: 13px 20px;">
+              <span>Create an account</span>
+            </a>
+          </div>
+
+          <div class="auth-switch-row" style="margin-top: 18px;">
+            <a href="/" class="auth-forgot-link" style="font-size: 0.88rem; color: var(--muted-slate);">
+              &larr; Return to homepage
+            </a>
+          </div>
+
+          <div class="auth-footer-notes" style="margin-top: 48px;">
+            <a href="/privacy">Privacy Policy</a>
+            <span>&bull;</span>
+            <a href="/terms">Terms of Service</a>
+            <span>&bull;</span>
+            <a href="/faq">Help &amp; FAQ</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

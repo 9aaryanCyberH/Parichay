@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parichay — Resume Intelligence & Career Workspace</title>
-  <meta name="description" content="Parichay Resume Intelligence Studio. Comprehensive career-readiness, explainable alignment scoring, and grounded AI assistant.">
+  <title>Resume Studio — Parichay</title>
+  <meta name="description" content="Parichay Resume Intelligence Studio. Comprehensive role alignment analysis, explainable scoring breakdown, and grounded AI assistant.">
   
   <!-- Favicon SVG -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
@@ -28,22 +28,22 @@
     </div>
 
     <div class="topbar-right">
-      <a href="/" class="btn-topbar-pill" title="Return to Landing Page">
+      <a href="/" class="btn-topbar-pill" title="Return to landing page">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
-        <span>Landing Page</span>
+        <span>Landing page</span>
       </a>
 
       {% if current_user %}
         <span class="btn-topbar-pill" style="cursor: default; font-weight: 500;">
-          {{ current_user.name }} ({{ current_user.account_type }})
+          {{ current_user.name }}
         </span>
         <a href="/logout" class="btn-topbar-pill" style="color: var(--missing-red);">Sign out</a>
       {% else %}
-        <a href="/login" class="btn-topbar-pill">Sign In</a>
-        <a href="/signup" class="btn-topbar-solid">Sign Up</a>
+        <a href="/login" class="btn-topbar-pill">Sign in</a>
+        <a href="/signup" class="btn-topbar-solid">Sign up</a>
       {% endif %}
     </div>
   </header>
@@ -51,10 +51,10 @@
   <!-- App Shell: Sidebar Navigation + Main Stage -->
   <div class="app-shell">
     
-    <!-- Left Sidebar (Screens 4–9 Navigation) -->
+    <!-- Left Sidebar Navigation -->
     <aside class="app-sidebar" aria-label="Primary Navigation">
       <nav class="sidebar-nav">
-        <!-- Resume Studio (Upload & JD) -->
+        <!-- Resume Studio -->
         <button type="button" class="sidebar-nav-item active" data-view="studio" id="navStudio">
           <div class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -67,7 +67,7 @@
           <span>Resume Studio</span>
         </button>
 
-        <!-- Overview (Analysis Result) -->
+        <!-- Overview -->
         <button type="button" class="sidebar-nav-item" data-view="overview" id="navOverview">
           <div class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -86,7 +86,7 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
-          <span>Skills Matrix</span>
+          <span>Skills matrix</span>
         </button>
 
         <!-- AI Recommendations -->
@@ -96,7 +96,7 @@
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </div>
-          <span>AI Recommendations</span>
+          <span>AI recommendations</span>
         </button>
 
         <!-- Document Audit -->
@@ -107,10 +107,10 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
-          <span>Document Audit</span>
+          <span>Document audit</span>
         </button>
 
-        <!-- AI Assistant -->
+        <!-- Parichay AI Assistant -->
         <button type="button" class="sidebar-nav-item" data-view="assistant" id="navAssistant">
           <div class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -119,10 +119,10 @@
               <path d="M12 7v4"></path>
             </svg>
           </div>
-          <span>AI Assistant</span>
+          <span>AI assistant</span>
         </button>
 
-        <!-- My Analyses (History) -->
+        <!-- My Analyses -->
         <button type="button" class="sidebar-nav-item" data-view="history" id="navHistory">
           <div class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -130,7 +130,7 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <span>My Analyses</span>
+          <span>My analyses</span>
         </button>
 
         <!-- Settings -->
@@ -162,7 +162,7 @@
               <polyline points="10 17 15 12 10 7"></polyline>
               <line x1="15" y1="12" x2="3" y2="12"></line>
             </svg>
-            <span>Sign in to save history</span>
+            <span>Sign in</span>
           </a>
         {% endif %}
       </div>
@@ -182,30 +182,30 @@
       </div>
 
       <!-- ====================================================================
-           VIEW 1: SCREEN 4 — RESUME STUDIO (UPLOAD & JOB DESCRIPTION)
+           VIEW 1: RESUME STUDIO (UPLOAD & TARGET JOB DESCRIPTION)
            ==================================================================== -->
       <div id="viewStudio" class="view-panel active">
         <div class="studio-header">
-          <h1 class="studio-title">Let's analyze your resume.</h1>
+          <h1 class="studio-title">Let's understand your fit for the role.</h1>
           <p class="studio-subtitle">
-            Upload your resume and add a target job description to get personalized insights and recommendations.
+            Upload your resume and add a target job description to uncover relevant strengths, skill gaps, and opportunities to improve your application.
           </p>
         </div>
 
-        <!-- 2-Column Upload & JD Grid (Screen 4) -->
+        <!-- 2-Column Upload & JD Grid -->
         <div class="studio-two-col-grid">
           
-          <!-- Column 1: Upload Resume Box -->
+          <!-- Column 1: Resume Upload Box -->
           <div class="studio-card">
             <div class="studio-card-header">
               <h2 class="studio-step-title">
-                <span>1</span> Upload Resume
+                <span>1</span> Your resume
               </h2>
-              <span class="studio-badge-subtle">PDF &bull; Max 5 MB</span>
+              <span class="studio-badge-subtle">Upload a text-based PDF, up to 5 MB</span>
             </div>
 
             <!-- Drag & Drop Zone -->
-            <div id="dropzone" class="dropzone-box" tabindex="0" role="button" aria-label="Upload PDF Resume">
+            <div id="dropzone" class="dropzone-box" tabindex="0" role="button" aria-label="Drop your PDF here or browse your device">
               <div class="dropzone-icon-circle">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -213,9 +213,9 @@
                   <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
               </div>
-              <div class="dropzone-main-text">Drag & drop your resume here</div>
-              <div class="dropzone-sub-text">or click to browse from your device</div>
-              <button type="button" class="btn-choose-file-pill">Choose File</button>
+              <div class="dropzone-main-text">Drop your PDF here or browse your device</div>
+              <div class="dropzone-sub-text">Upload a text-based PDF, up to 5 MB.</div>
+              <button type="button" class="btn-choose-file-pill">Choose file</button>
               <input type="file" id="resumeInput" style="display: none;" accept=".pdf" aria-label="Select PDF resume">
             </div>
 
@@ -241,7 +241,7 @@
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                 </svg>
-                <span>Use a sample resume (Aarav Sharma &mdash; Software Engineer)</span>
+                <span>Try a sample resume (Aarav Sharma &mdash; Software Engineer)</span>
               </button>
             </div>
           </div>
@@ -250,47 +250,55 @@
           <div class="studio-card">
             <div class="studio-card-header">
               <h2 class="studio-step-title">
-                <span>2</span> Target Job Description
+                <span>2</span> Target job description
               </h2>
-              <span class="studio-badge-subtle">Requirements & Skills</span>
+              <span class="studio-badge-subtle">Requirements &amp; skills</span>
             </div>
 
-            <textarea id="jdTextarea" class="jd-textarea" placeholder="Paste the job description, required skills, responsibilities, and qualifications here..." aria-label="Job description"></textarea>
+            <textarea id="jdTextarea" class="jd-textarea" placeholder="Paste the job description, including required skills, qualifications, and responsibilities..." aria-label="Target job description"></textarea>
 
             <div class="popular-roles-row">
-              <span class="popular-roles-label">Popular Roles:</span>
+              <span class="popular-roles-label">Role presets:</span>
               <div id="sampleChipsRow" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <button type="button" class="role-preset-pill" data-role="Software Engineer">Software Engineer</button>
+                <button type="button" class="role-preset-pill" data-role="Machine Learning Engineer">Machine Learning Engineer</button>
+                <button type="button" class="role-preset-pill" data-role="Full-Stack Software Engineer">Full-Stack Software Engineer</button>
                 <button type="button" class="role-preset-pill" data-role="Data Analyst">Data Analyst</button>
-                <button type="button" class="role-preset-pill" data-role="ML Engineer">ML Engineer</button>
-                <button type="button" class="role-preset-pill" data-role="DevOps Engineer">DevOps Engineer</button>
+                <button type="button" class="role-preset-pill" data-role="Cloud & DevOps Engineer">Cloud &amp; DevOps Engineer</button>
               </div>
+            </div>
+            
+            <div style="font-size: 0.76rem; color: var(--muted-slate); margin-top: 10px;">
+              More specific job requirements help make the comparison more informative.
             </div>
           </div>
 
         </div>
 
-        <!-- Action Bar: Analyze Button -->
-        <div class="studio-action-bar">
+        <!-- Action Bar: Analyze Button & In-Memory Privacy Note -->
+        <div class="studio-action-bar" style="flex-direction: column; align-items: center; gap: 14px;">
           <button type="button" id="btnAnalyze" class="btn-analyze-pill">
             <span id="btnSpinner" style="display: none;">⏳</span>
-            <span id="btnText">Analyze Resume</span>
+            <span id="btnText">Analyze resume</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </button>
+          
+          <p style="font-size: 0.78rem; color: var(--muted-slate); max-width: 680px; text-align: center; margin: 0; line-height: 1.45;">
+            Documents are parsed in-memory during active sessions. Uploaded files are never permanently stored on disk. When AI features are used, extracted text snippets are processed securely via the Google Gemini API solely for response generation.
+          </p>
         </div>
       </div>
 
       <!-- ====================================================================
-           VIEW 2: SCREEN 5 — ANALYSIS RESULT (OVERVIEW)
+           VIEW 2: ANALYSIS OVERVIEW
            ==================================================================== -->
       <div id="viewOverview" class="view-panel">
         <div class="overview-topbar">
           <div class="overview-title-group">
-            <h2 id="overviewTitleCandidate">Your Resume Analysis</h2>
-            <span id="overviewDateText" class="overview-date-subtext">Analyzed on 25-Oct 2026</span>
+            <h2 id="overviewTitleCandidate">Your resume alignment report</h2>
+            <span id="overviewDateText" class="overview-date-subtext">Explore how the evidence in your resume compares with the requirements of your target role.</span>
           </div>
 
           <div class="overview-actions-row">
@@ -300,7 +308,7 @@
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              <span>Export Report</span>
+              <span>Export report</span>
             </button>
 
             <button type="button" id="btnNewAnalysis" class="btn-new-analysis-pill">
@@ -308,12 +316,12 @@
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              <span>New Analysis</span>
+              <span>New analysis</span>
             </button>
           </div>
         </div>
 
-        <!-- Gauge + Breakdown Grid (Screen 5) -->
+        <!-- Gauge + Breakdown Grid -->
         <div class="overview-score-grid">
           
           <!-- Left: Circular Match Gauge -->
@@ -329,24 +337,31 @@
               </div>
             </div>
 
+            <div style="font-size: 0.82rem; font-weight: 700; color: var(--primary-teal); margin-top: 6px;">
+              Estimated role alignment
+            </div>
             <div id="dashCandidateName" style="font-weight: 700; font-size: 1.05rem; margin-top: 4px;">Candidate Name</div>
             <div id="dashCandidateLinks" class="candidate-quick-meta">Contact details verified</div>
+
+            <p style="font-size: 0.74rem; line-height: 1.4; color: var(--muted-slate); margin: 12px 0 0 0; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+              This score summarizes the alignment estimated by Parichay's matching methodology. It is not a probability of being hired and does not guarantee a screening outcome.
+            </p>
           </div>
 
           <!-- Right: Match Breakdown Table -->
           <div class="match-breakdown-card">
-            <h3 class="breakdown-table-title">Match Breakdown</h3>
+            <h3 class="breakdown-table-title">Score breakdown</h3>
             <table class="breakdown-table">
               <thead>
                 <tr>
-                  <th>Category</th>
+                  <th>Component</th>
                   <th>Weight</th>
                   <th class="col-right">Score</th>
                 </tr>
               </thead>
               <tbody id="breakdownTableBody">
                 <tr>
-                  <td>Technical Skills</td>
+                  <td>Technical skills alignment</td>
                   <td>45%</td>
                   <td class="col-right">
                     <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 84%;"></span></span>
@@ -354,7 +369,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Role Context</td>
+                  <td>Contextual similarity</td>
                   <td>35%</td>
                   <td class="col-right">
                     <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
@@ -362,7 +377,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Soft Skills</td>
+                  <td>Soft skills &amp; practices</td>
                   <td>10%</td>
                   <td class="col-right">
                     <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
@@ -370,7 +385,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Resume Structure</td>
+                  <td>Resume structure</td>
                   <td>10%</td>
                   <td class="col-right">
                     <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
@@ -383,66 +398,66 @@
 
         </div>
 
-        <!-- Key Insights (4 Cards in Screen 5) -->
-        <h3 class="insights-row-header">Key Insights</h3>
+        <!-- Key Insights (4 Cards) -->
+        <h3 class="insights-row-header">Key insights</h3>
         <div class="key-insights-grid">
           <div class="insight-card">
             <div class="insight-icon-box matched">✓</div>
             <div>
-              <div class="insight-title">Matched Skills</div>
-              <p id="insightMatchedText" class="insight-desc">12 skills align with the job requirements</p>
+              <div class="insight-title">Matched skills</div>
+              <p id="insightMatchedText" class="insight-desc">Skills supported by candidate evidence</p>
             </div>
           </div>
 
           <div class="insight-card">
             <div class="insight-icon-box missing">!</div>
             <div>
-              <div class="insight-title">Missing Skills</div>
-              <p id="insightMissingText" class="insight-desc">4 important skills to work on</p>
+              <div class="insight-title">Potential skill gaps</div>
+              <p id="insightMissingText" class="insight-desc">Requirements not confidently identified in text</p>
             </div>
           </div>
 
           <div class="insight-card">
             <div class="insight-icon-box strong">★</div>
             <div>
-              <div class="insight-title">Strong Points</div>
-              <p id="insightStrongText" class="insight-desc">Great project experience & clear structure</p>
+              <div class="insight-title">Additional strengths</div>
+              <p id="insightStrongText" class="insight-desc">Valuable qualifications beyond target JD baseline</p>
             </div>
           </div>
 
           <div class="insight-card">
             <div class="insight-icon-box recommendation">💡</div>
             <div>
-              <div class="insight-title">Recommendations</div>
-              <p id="insightRecText" class="insight-desc">5 personalized suggestions generated</p>
+              <div class="insight-title">Recommended next steps</div>
+              <p id="insightRecText" class="insight-desc">Practical steps for strengthening your application</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- ====================================================================
-           VIEW 3: SCREEN 6 — SKILLS MATRIX
+           VIEW 3: SKILLS MATRIX
            ==================================================================== -->
       <div id="viewSkills" class="view-panel">
         <div class="skills-matrix-header">
-          <h2 class="skills-matrix-title">Skills Matrix</h2>
-          <p class="skills-matrix-subtitle">Compare your skills with the job requirements.</p>
+          <h2 class="skills-matrix-title">See the skills behind your score.</h2>
+          <p class="skills-matrix-subtitle">Explore the relationship between the target role's requirements and the qualifications identified in your resume.</p>
         </div>
 
-        <!-- Tabs: Matched Skills, Missing Skills, Additional Skills -->
+        <!-- Tabs: Matched skills, Potential gaps, Additional skills -->
         <div class="matrix-filter-tabs">
           <button type="button" class="btn-matrix-tab active" data-filter="matched">
-            <span>Matched Skills</span>
+            <span>Matched skills</span>
             <span id="tabCountMatched" class="tab-badge-count">0</span>
           </button>
 
           <button type="button" class="btn-matrix-tab" data-filter="missing">
-            <span>Missing Skills</span>
+            <span>Potential gaps</span>
             <span id="tabCountMissing" class="tab-badge-count">0</span>
           </button>
 
           <button type="button" class="btn-matrix-tab" data-filter="additional">
-            <span>Additional Skills</span>
+            <span>Additional skills</span>
             <span id="tabCountUnique" class="tab-badge-count">0</span>
           </button>
         </div>
@@ -455,7 +470,7 @@
             <!-- Dynamically populated -->
           </div>
 
-          <!-- Right Column: Interactive Detail Panel (Matches Screen 6) -->
+          <!-- Right Column: Interactive Detail Panel -->
           <div class="skill-detail-card" id="skillDetailPanel">
             <div class="detail-header-row">
               <h3 id="detailSkillTitle" class="detail-skill-title">Python</h3>
@@ -463,14 +478,14 @@
             </div>
 
             <p id="detailSkillDesc" class="detail-skill-desc">
-              Proficiency in Python for data analysis, machine learning, and backend development.
+              Requirement details and evidence extraction summary.
             </p>
 
-            <div class="detail-section-label">Your Evidence</div>
+            <div class="detail-section-label">Evidence in resume</div>
             <ul id="detailEvidenceList" class="detail-evidence-list">
-              <li class="detail-evidence-item">Extracted from technical skills section</li>
+              <li class="detail-evidence-item">Extracted from technical background section</li>
               <li class="detail-evidence-item">Corroborated across project achievements</li>
-              <li class="detail-evidence-item">High relevance to core job requirements</li>
+              <li class="detail-evidence-item">High relevance to role requirements</li>
             </ul>
 
             <div class="detail-confidence-box">
@@ -488,34 +503,34 @@
       </div>
 
       <!-- ====================================================================
-           VIEW 4: SCREEN 7 — AI RECOMMENDATIONS
+           VIEW 4: AI RECOMMENDATIONS
            ==================================================================== -->
       <div id="viewRecommendations" class="view-panel">
         <div class="recommendations-header">
-          <h2 class="recommendations-title">AI Recommendations</h2>
-          <p class="recommendations-subtitle">Personalized suggestions to improve your resume and career readiness.</p>
+          <h2 class="recommendations-title">Turn insights into action.</h2>
+          <p class="recommendations-subtitle">Use the findings from your analysis to decide which resume improvements and learning priorities deserve attention first.</p>
         </div>
 
         <!-- Recommendation Tabs -->
         <div class="recommendations-tabs-row">
-          <button type="button" class="btn-rec-tab active" data-rec-tab="improvements">Resume Improvements</button>
-          <button type="button" class="btn-rec-tab" data-rec-tab="skills">Skill Development</button>
-          <button type="button" class="btn-rec-tab" data-rec-tab="interview">Interview Preparation</button>
+          <button type="button" class="btn-rec-tab active" data-rec-tab="improvements">Strengthen resume bullets</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="skills">Address important skill gaps</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="interview">Prepare for interviews</button>
         </div>
 
-        <!-- 3 Numbered Recommendation Cards (Screen 7) -->
+        <!-- Numbered Recommendation Cards -->
         <div id="recCardsRow" class="recommendations-cards-grid">
           <!-- Dynamically populated -->
         </div>
       </div>
 
       <!-- ====================================================================
-           VIEW 5: SCREEN 9 LEFT — DOCUMENT AUDIT
+           VIEW 5: DOCUMENT AUDIT
            ==================================================================== -->
       <div id="viewAudit" class="view-panel">
         <div class="audit-header">
-          <h2 class="audit-title">Document Audit</h2>
-          <p class="audit-subtitle">Check your resume for ATS compatibility and best practices.</p>
+          <h2 class="audit-title">Review the details that shape your resume.</h2>
+          <p class="audit-subtitle">Check the document's readability and supported structural elements before using it for a job application.</p>
         </div>
 
         <div class="audit-card-container" id="auditChecklistContainer">
@@ -523,8 +538,8 @@
             <div class="audit-item-left">
               <div class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">File Format</div>
-                <div id="auditFileFormatSub" class="audit-item-sub">PDF format (Good)</div>
+                <div class="audit-item-name">File format &amp; PDF readability</div>
+                <div id="auditFileFormatSub" class="audit-item-sub">Text-based PDF format parsed cleanly</div>
               </div>
             </div>
           </div>
@@ -533,8 +548,8 @@
             <div class="audit-item-left">
               <div class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">Resume Length</div>
-                <div id="auditResumeLengthSub" class="audit-item-sub">1-2 pages (Good)</div>
+                <div class="audit-item-name">Resume length</div>
+                <div id="auditResumeLengthSub" class="audit-item-sub">1–2 pages (Appropriate length)</div>
               </div>
             </div>
           </div>
@@ -543,8 +558,8 @@
             <div class="audit-item-left">
               <div class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">Contact Information</div>
-                <div id="auditContactSub" class="audit-item-sub">All contact details found</div>
+                <div class="audit-item-name">Contact details</div>
+                <div id="auditContactSub" class="audit-item-sub">Essential contact channels verified</div>
               </div>
             </div>
           </div>
@@ -553,8 +568,8 @@
             <div class="audit-item-left">
               <div class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">Section Structure</div>
-                <div id="auditStructureSub" class="audit-item-sub">Well organized with standard headers</div>
+                <div class="audit-item-name">Section completeness</div>
+                <div id="auditStructureSub" class="audit-item-sub">Standard sections present (Experience, Education, Skills)</div>
               </div>
             </div>
           </div>
@@ -563,8 +578,8 @@
             <div class="audit-item-left">
               <div id="auditVerbsIcon" class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">Action Verbs</div>
-                <div id="auditVerbsSub" class="audit-item-sub">Strong action verbs identified</div>
+                <div class="audit-item-name">Action verbs &amp; writing clarity</div>
+                <div id="auditVerbsSub" class="audit-item-sub">Active verbs identified throughout project descriptions</div>
               </div>
             </div>
           </div>
@@ -573,21 +588,25 @@
             <div class="audit-item-left">
               <div class="audit-check-circle pass">✓</div>
               <div>
-                <div class="audit-item-name">Readability</div>
-                <div id="auditReadabilitySub" class="audit-item-sub">Good (Grade 10-12 professional level)</div>
+                <div class="audit-item-name">Reading clarity</div>
+                <div id="auditReadabilitySub" class="audit-item-sub">Professional reading level (Grade 10–12 standard)</div>
               </div>
             </div>
           </div>
         </div>
+
+        <div style="font-size: 0.78rem; color: var(--muted-slate); margin-top: 18px; max-width: 680px; line-height: 1.45;">
+          Note: These checks reflect general document readability and structural guidelines. They do not simulate any specific employer's proprietary ATS or guarantee applicant screening outcomes.
+        </div>
       </div>
 
       <!-- ====================================================================
-           VIEW 6: SCREEN 8 — PARICHAY AI ASSISTANT (CHAT)
+           VIEW 6: PARICHAY AI ASSISTANT (CHAT)
            ==================================================================== -->
       <div id="viewAssistant" class="view-panel">
         <div class="assistant-header">
-          <h2 class="assistant-title">Parichay AI Assistant</h2>
-          <p class="assistant-subtitle">Ask questions about your resume, get career advice, or explore your analysis.</p>
+          <h2 class="assistant-title">Let's work through your next step.</h2>
+          <p class="assistant-subtitle">Ask about your alignment report, explore skill gaps, improve your resume wording, or prepare for the role you're targeting.</p>
         </div>
 
         <div class="chat-wrapper-card">
@@ -596,24 +615,25 @@
             <div class="chat-bubble-row assistant">
               <div class="chat-bubble">
                 <p><strong>Hello! I am your Parichay Career Assistant.</strong></p>
-                <p>I have access to your parsed resume and target job requirements. Ask me anything about tailoring your bullets, bridging technical gaps, or preparing for interviews!</p>
+                <p>I have access to your parsed resume evidence and target role requirements. Ask me about closing skill gaps, clarifying project bullets, or preparing for technical interviews!</p>
               </div>
             </div>
           </div>
 
           <!-- Suggestion Chips Bar -->
           <div class="chat-suggestions-bar">
-            <button type="button" class="btn-chat-chip" data-prompt="How can I improve my match score?">How can I improve my match score?</button>
-            <button type="button" class="btn-chat-chip" data-prompt="Rewrite my project bullets using Google's X-Y-Z formula.">Google X-Y-Z Bullets</button>
-            <button type="button" class="btn-chat-chip" data-prompt="How can I learn and prove competence in my missing skills?">Bridge Skill Gaps</button>
-            <button type="button" class="btn-chat-chip" data-prompt="What technical interview questions will they ask for this role?">Interview Prep</button>
+            <button type="button" class="btn-chat-chip" data-prompt="What are the three most important gaps in my resume?">Three most important gaps</button>
+            <button type="button" class="btn-chat-chip" data-prompt="Explain how my alignment score was calculated.">Explain score calculation</button>
+            <button type="button" class="btn-chat-chip" data-prompt="Help me improve this project description.">Improve project description</button>
+            <button type="button" class="btn-chat-chip" data-prompt="Which skills should I prioritize learning?">Prioritize skills to learn</button>
+            <button type="button" class="btn-chat-chip" data-prompt="What technical interview questions should I practice?">Interview practice questions</button>
           </div>
 
           <!-- Chat Input Bar -->
           <div class="chat-input-bar-container">
             <form id="chatForm" class="chat-input-form">
-              <input type="text" id="chatInputField" class="chat-text-input" placeholder="Ask a question about your resume or career..." autocomplete="off">
-              <button type="submit" id="btnChatSend" class="btn-send-round" aria-label="Send Message">
+              <input type="text" id="chatInputField" class="chat-text-input" placeholder="Ask about your alignment report, skills, or resume wording..." autocomplete="off">
+              <button type="submit" id="btnChatSend" class="btn-send-round" aria-label="Send message">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                   <line x1="22" y1="2" x2="11" y2="13"></line>
                   <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -629,8 +649,8 @@
            ==================================================================== -->
       <div id="viewHistory" class="view-panel">
         <div class="history-header">
-          <h2 class="history-title">My Analyses</h2>
-          <p class="history-subtitle">Your saved resume analyses and historical report records.</p>
+          <h2 class="history-title">Your career progress, in context.</h2>
+          <p class="history-subtitle">Revisit saved reports, compare target roles, and review earlier recommendations when persistent history is available.</p>
         </div>
 
         {% if not current_user %}
@@ -640,7 +660,7 @@
               <line x1="12" y1="16" x2="12" y2="12"></line>
               <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
-            <span>You are currently browsing as a guest. <a href="/login" style="color: var(--primary-teal); font-weight: 700; text-decoration: underline;">Sign in or create an account</a> to automatically save and retrieve your analysis history across sessions.</span>
+            <span>You are browsing as a guest. <a href="/login" style="color: var(--primary-teal); font-weight: 700; text-decoration: underline;">Sign in or create an account</a> to automatically save and retrieve your analysis history across sessions.</span>
           </div>
         {% endif %}
 
@@ -653,18 +673,18 @@
       </div>
 
       <!-- ====================================================================
-           VIEW 8: SCREEN 9 RIGHT — PROFILE & SETTINGS
+           VIEW 8: PROFILE & SETTINGS
            ==================================================================== -->
       <div id="viewSettings" class="view-panel">
         <div class="settings-header">
-          <h2 class="settings-title">Profile & Settings</h2>
-          <p class="settings-subtitle">Manage your account and preferences.</p>
+          <h2 class="settings-title">Your account, your preferences.</h2>
+          <p class="settings-subtitle">Manage personal details, account email, password, and privacy preferences.</p>
         </div>
 
         <div class="settings-card">
           <div class="settings-tabs-row">
             <button type="button" class="btn-settings-tab active">Profile</button>
-            <button type="button" class="btn-settings-tab" onclick="alert('Security settings: Password updates are enabled.');">Security</button>
+            <button type="button" class="btn-settings-tab" onclick="alert('Password and security updates are managed in your session profile.');">Security</button>
           </div>
 
           <form id="settingsForm">
@@ -674,19 +694,26 @@
             </div>
 
             <div class="settings-form-group">
-              <label for="settingsEmailInput" class="settings-label">Email</label>
+              <label for="settingsEmailInput" class="settings-label">Account email</label>
               <input type="email" id="settingsEmailInput" class="settings-input" value="{{ current_user.email if current_user else 'guest@example.com' }}" {% if not current_user %}disabled{% endif %}>
             </div>
 
             <div class="settings-form-group">
-              <label class="settings-label">Account type</label>
+              <label class="settings-label">Account status</label>
               <div class="account-type-box">
                 <span class="plan-name-text">{{ current_user.account_type if current_user else 'Free Plan' }}</span>
-                <button type="button" class="btn-upgrade-pill" onclick="alert('You are already on the full Parichay feature tier.');">Upgrade</button>
+                <span style="font-size: 0.82rem; color: var(--muted-slate);">Active workspace</span>
               </div>
             </div>
 
-            <button type="submit" id="btnSaveSettings" class="btn-save-settings">Save Changes</button>
+            <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+              <label class="settings-label">Data &amp; privacy controls</label>
+              <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0 0 10px 0;">
+                All documents are parsed strictly in memory. You can clear your saved historical records at any time from My analyses.
+              </p>
+            </div>
+
+            <button type="submit" id="btnSaveSettings" class="btn-save-settings">Save changes</button>
           </form>
         </div>
       </div>
@@ -699,14 +726,14 @@
   <div id="suggestionModal" class="modal-overlay">
     <div class="modal-content-card">
       <div class="modal-header-row">
-        <h3 id="modalTitle" class="modal-title">Recommendation Details</h3>
+        <h3 id="modalTitle" class="modal-title">Recommendation details</h3>
         <button type="button" id="btnModalClose" class="btn-modal-close">&times;</button>
       </div>
       <div id="modalBody" class="modal-body-content">
         Loading recommendation details...
       </div>
       <div style="text-align: right;">
-        <button type="button" id="btnModalAction" class="btn-topbar-solid" style="padding: 8px 24px;">Got It</button>
+        <button type="button" id="btnModalAction" class="btn-topbar-solid" style="padding: 8px 24px;">Got it</button>
       </div>
     </div>
   </div>

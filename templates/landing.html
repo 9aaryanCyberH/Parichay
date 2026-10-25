@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Parichay — Where Your Potential Meets Opportunity</title>
-  <meta name="description" content="Parichay is an AI-powered resume intelligence platform. Get clear, data-driven understanding of how well your resume fits a job and how to improve with personalized AI insights.">
+  <meta name="description" content="Parichay is an AI-powered resume intelligence platform. Understand how your resume aligns with the roles you want, identify skills gaps, and get actionable recommendations.">
   
   <!-- Favicon SVG -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
@@ -19,7 +19,7 @@
 </head>
 <body class="landing-body">
 
-  <!-- Top Sticky Navbar (Screen 1 Header) -->
+  <!-- Top Sticky Navbar -->
   <header class="landing-navbar">
     <div class="landing-nav-left">
       <a href="/" class="landing-brand-link" aria-label="Parichay Home">
@@ -28,8 +28,8 @@
 
       <nav class="landing-nav-links">
         <a href="#features" class="landing-nav-link">Features</a>
-        <a href="#how-it-works" class="landing-nav-link">How It Works</a>
-        <a href="#privacy" class="landing-nav-link">Privacy</a>
+        <a href="#how-it-works" class="landing-nav-link">How it works</a>
+        <a href="/privacy" class="landing-nav-link">Privacy</a>
       </nav>
     </div>
 
@@ -43,7 +43,7 @@
         <a href="/login" class="btn-nav-outline">Sign in</a>
       {% endif %}
 
-      <a href="/studio" class="btn-nav-solid">
+      <a href="{% if current_user %}/studio{% else %}/auth?next=/studio{% endif %}" class="btn-nav-solid">
         <span>Launch Studio</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -53,64 +53,65 @@
     </div>
   </header>
 
-  <!-- Main Hero Section (Screen 1) -->
+  <!-- Main Hero Section -->
   <main>
     <div class="hero-container">
       <div class="hero-split-grid">
         
         <!-- Left Column: Copy & Actions -->
         <div class="hero-copy-column">
+          <div class="hero-eyebrow-tag">YOUR NEXT CAREER MOVE STARTS WITH CLARITY</div>
           <h1 class="hero-heading">
             Where Your Potential Meets Opportunity.
           </h1>
           
           <p class="hero-paragraph">
-            Get a clear, data-driven understanding of how well your resume fits a job and how to improve with AI-powered insights.
+            Understand how your resume aligns with the roles you want. Parichay analyzes your experience, identifies relevant skills, highlights gaps, and turns the findings into practical steps for improving your application.
           </p>
 
           <div class="hero-action-row">
-            <a href="/studio" class="btn-pill-primary">
-              <span>Analyze My Resume</span>
+            <a href="{% if current_user %}/studio{% else %}/auth?next=/studio{% endif %}" class="btn-pill-primary">
+              <span>Analyze my resume</span>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </a>
 
-            <a href="#features" class="btn-pill-secondary">
-              <span>Learn More</span>
+            <a href="#how-it-works" class="btn-pill-secondary">
+              <span>Explore how it works</span>
             </a>
           </div>
 
-          <!-- 3-Step Indicator Strip (Screen 1 Bottom) -->
+          <!-- 3-Step Summary Strip -->
           <div class="hero-steps-strip">
             <div class="hero-step-item">
               <div class="step-number-bubble">1</div>
               <div class="step-text-wrap">
-                <span class="step-label">Upload</span>
-                <span class="step-subtext">Your Resume</span>
+                <span class="step-label">Upload your resume</span>
+                <span class="step-subtext">Start with your existing PDF.</span>
               </div>
             </div>
 
             <div class="hero-step-item">
               <div class="step-number-bubble">2</div>
               <div class="step-text-wrap">
-                <span class="step-label">Add</span>
-                <span class="step-subtext">Job Description</span>
+                <span class="step-label">Add a target role</span>
+                <span class="step-subtext">Tell Parichay which opportunity you're pursuing.</span>
               </div>
             </div>
 
             <div class="hero-step-item">
               <div class="step-number-bubble">3</div>
               <div class="step-text-wrap">
-                <span class="step-label">Get</span>
-                <span class="step-subtext">Detailed Insights</span>
+                <span class="step-label">Get actionable insights</span>
+                <span class="step-subtext">Understand your alignment and identify what to improve.</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Column: Sage Artwork Box -->
+        <!-- Right Column: Artwork Box -->
         <div class="hero-art-column">
           <div class="hero-art-box">
             <img src="{{ url_for('static', filename='images/parichay-art.svg') }}" alt="Parichay Career Discovery Visual Graphic">
@@ -120,13 +121,13 @@
       </div>
     </div>
 
-    <!-- Product Pillars & Features Section -->
+    <!-- Product Features Section -->
     <section id="features" class="section-wrapper">
       <div class="section-header-center">
-        <div class="section-kicker">Comprehensive Career Intelligence</div>
-        <h2 class="section-heading">Built for Precision, Transparency, and Growth</h2>
+        <div class="section-kicker">BUILT FOR CAREER CLARITY</div>
+        <h2 class="section-heading">More than a match score.</h2>
         <p class="section-subtext">
-          Parichay eliminates recruitment guesswork with verified document extraction, explainable scoring formulas, and actionable AI recommendations.
+          A useful resume review should explain what is working, what is missing, and what you can do next. Parichay brings these insights together in one focused workspace.
         </p>
       </div>
 
@@ -141,9 +142,9 @@
               <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
           </div>
-          <h3 class="feature-title">Resume Intelligence Studio</h3>
+          <h3 class="feature-title">Resume intelligence</h3>
           <p class="feature-desc">
-            Upload PDF documents with PyMuPDF verification. Match your skills against any customized role description or one-click industry role presets.
+            Extract relevant information from a text-based PDF, including skills, education, experience, projects, and certifications where identifiable.
           </p>
         </div>
 
@@ -151,12 +152,13 @@
         <div class="feature-teal-card">
           <div class="feature-icon-circle">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <h3 class="feature-title">Transparent Skills Matrix</h3>
+          <h3 class="feature-title">Explainable role alignment</h3>
           <p class="feature-desc">
-            Audit matched competencies, pinpoint missing requirements, and view candidate evidence bullets with calibrated confidence scoring.
+            Compare your resume with a specific job description. Explore the estimated alignment score and understand how technical skills, contextual similarity, soft skills, and resume structure contribute to it.
           </p>
         </div>
 
@@ -164,16 +166,12 @@
         <div class="feature-teal-card">
           <div class="feature-icon-circle">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-              <circle cx="12" cy="5" r="2"></circle>
-              <path d="M12 7v4"></path>
-              <line x1="8" y1="16" x2="8.01" y2="16"></line>
-              <line x1="16" y1="16" x2="16.01" y2="16"></line>
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
             </svg>
           </div>
-          <h3 class="feature-title">Parichay AI Assistant</h3>
+          <h3 class="feature-title">Skills gap analysis</h3>
           <p class="feature-desc">
-            Contextual career chatbot grounded in your actual resume extraction data. Ask questions, explore gap closures, and prepare for interviews.
+            See which requirements are supported by your resume, which relevant skills may be missing, and which additional capabilities you bring.
           </p>
         </div>
 
@@ -184,9 +182,9 @@
               <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
             </svg>
           </div>
-          <h3 class="feature-title">4-Pillar Alignment Math</h3>
+          <h3 class="feature-title">Actionable AI recommendations</h3>
           <p class="feature-desc">
-            No black-box guesses. We clearly break down your score across Technical Skills (45%), Semantic TF-IDF (35%), Soft Skills (10%), and Structure (10%).
+            Receive suggestions for improving resume bullets, emphasizing relevant evidence, addressing skill gaps, and preparing for technical interviews.
           </p>
         </div>
 
@@ -198,9 +196,9 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
-          <h3 class="feature-title">ATS & Document Quality Audit</h3>
+          <h3 class="feature-title">Document quality review</h3>
           <p class="feature-desc">
-            Audit file format, page length, section presence, contact details completeness, and active action verbs for maximum ATS pass-through.
+            Review supported checks for resume structure, section completeness, contact details, and writing clarity. Describe these as document-quality checks rather than guarantees of ATS acceptance.
           </p>
         </div>
 
@@ -209,12 +207,12 @@
           <div class="feature-icon-circle">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+              <path d="M12 6v6l4 2"></path>
             </svg>
           </div>
-          <h3 class="feature-title">Persistent Analysis History</h3>
+          <h3 class="feature-title">Analysis history</h3>
           <p class="feature-desc">
-            Sign in to track your career readiness over time, revisit historical reports, compare target roles, and export polished PDFs.
+            When authenticated history is implemented and enabled, revisit saved analyses and compare your resume's alignment with different opportunities.
           </p>
         </div>
       </div>
@@ -223,37 +221,61 @@
     <!-- How It Works Section -->
     <section id="how-it-works" class="section-wrapper" style="padding-top: 0;">
       <div class="section-header-center">
-        <div class="section-kicker">Straightforward Workflow</div>
-        <h2 class="section-heading">How Parichay Delivers Value</h2>
+        <div class="section-kicker">WORKFLOW</div>
+        <h2 class="section-heading">A clearer path from resume to readiness.</h2>
         <p class="section-subtext">
-          Designed for candidates who want actionable clarity without decorative marketing fluff.
+          Start with the experience you already have. Parichay helps you examine it against a specific role and turn the results into a focused improvement plan.
         </p>
       </div>
 
       <div class="features-grid-teal">
+        <!-- Step 01 -->
         <div class="feature-teal-card">
-          <div class="feature-icon-circle">1</div>
-          <h3 class="feature-title">Direct PDF Parsing</h3>
+          <div class="feature-icon-circle">01</div>
+          <h3 class="feature-title">Step 01 — Add your resume</h3>
           <p class="feature-desc">
-            Upload your resume. Our parsing engine extracts contact links, education, work experience, and cataloged technical skills in memory.
+            Upload a text-based PDF. Parichay extracts readable content and identifies relevant sections and qualifications. Scanned or unreadable documents should receive a clear explanation of what needs to change.
           </p>
         </div>
 
+        <!-- Step 02 -->
         <div class="feature-teal-card">
-          <div class="feature-icon-circle">2</div>
-          <h3 class="feature-title">Role Extraction & Math</h3>
+          <div class="feature-icon-circle">02</div>
+          <h3 class="feature-title">Step 02 — Define your target</h3>
           <p class="feature-desc">
-            We extract the requirements and build TF-IDF vector embeddings to compute cosine similarity alongside taxonomy-grounded skill sets.
+            Paste a job description or choose an available role preset. Include responsibilities, required skills, and qualifications for a more useful comparison.
           </p>
         </div>
 
+        <!-- Step 03 -->
         <div class="feature-teal-card">
-          <div class="feature-icon-circle">3</div>
-          <h3 class="feature-title">Grounded Career Coaching</h3>
+          <div class="feature-icon-circle">03</div>
+          <h3 class="feature-title">Step 03 — Understand your alignment</h3>
           <p class="feature-desc">
-            Receive Google X-Y-Z bullet rewrites, specific project suggestions to bridge missing competencies, and chat interactively with your analysis.
+            Review the estimated score, matched skills, potentially missing requirements, and evidence found in your resume. Explore the score breakdown rather than relying on one number alone.
           </p>
         </div>
+
+        <!-- Step 04 -->
+        <div class="feature-teal-card">
+          <div class="feature-icon-circle">04</div>
+          <h3 class="feature-title">Step 04 — Plan your next move</h3>
+          <p class="feature-desc">
+            Use targeted suggestions to improve descriptions, demonstrate existing skills more clearly, and identify learning or project work that could strengthen your profile.
+          </p>
+        </div>
+      </div>
+
+      <div class="how-it-works-cta-box">
+        <h3>Ready to see where you stand?</h3>
+        <p>Analyze your resume against any target role in seconds.</p>
+        <a href="{% if current_user %}/studio{% else %}/auth?next=/studio{% endif %}" class="btn-pill-primary">
+          <span>Analyze my resume</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
       </div>
     </section>
 
@@ -267,18 +289,21 @@
           </svg>
         </div>
         <div class="privacy-content">
-          <h3>Your Resume Privacy & Document Safety</h3>
+          <h3>Your career information deserves care.</h3>
           <p>
-            Parichay operates on strict privacy principles. We parse your PDF in-memory. Raw uploaded resume files are never stored or retained on disk.
+            Resumes contain personal information. Parichay processes documents responsibly, explains how information is handled, and avoids collecting or retaining more data than necessary.
           </p>
           <p>
-            If you create an account, only structured analytical metadata (skills, alignment score, and candidate name) is stored in your private history database to let you reload previous reports.
+            Documents are parsed in-memory during active sessions. Raw uploaded PDF files are never stored or retained on disk. When authenticated, only structured analytical metadata is saved in your private history database to allow revisiting previous reports. Extracted text snippets processed by the Google Gemini API are handled strictly for response generation without retaining or training on your information.
           </p>
-          <div class="privacy-bullets-row">
-            <span class="privacy-pill">In-Memory Parsing</span>
-            <span class="privacy-pill">No Raw File Retention</span>
-            <span class="privacy-pill">Cross-User Data Isolation</span>
-            <span class="privacy-pill">Anonymous Use Supported</span>
+          <div class="privacy-action-row" style="margin-top: 18px;">
+            <a href="/privacy" class="btn-privacy-read">
+              <span>Read our Privacy Policy</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
           </div>
         </div>
       </div>
@@ -290,8 +315,8 @@
       <p>
         Take the next step in your career journey with calibrated AI resume intelligence and actionable feedback.
       </p>
-      <a href="/studio" class="btn-cta-mint">
-        <span>Analyze My Resume Now</span>
+      <a href="{% if current_user %}/studio{% else %}/auth?next=/studio{% endif %}" class="btn-cta-mint">
+        <span>Analyze my resume</span>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="5" y1="12" x2="19" y2="12"></line>
           <polyline points="12 5 19 12 12 19"></polyline>
@@ -300,18 +325,84 @@
     </div>
   </main>
 
-  <!-- Clean Footer -->
-  <footer class="landing-footer">
-    <div class="footer-copy-left">
-      <span class="footer-brand-title">Parichay</span>
-      <span class="footer-tagline-text">Where Your Potential Meets Opportunity.</span>
-    </div>
+  <!-- Creator Footer -->
+  <footer class="landing-creator-footer">
+    <div class="creator-footer-inner">
+      
+      <!-- Top Row: Creator Profile + Brand Block -->
+      <div class="creator-main-row">
+        
+        <!-- Creator Profile Card -->
+        <div class="creator-profile-card">
+          <div class="creator-avatar-wrap">
+            <img src="{{ url_for('static', filename='images/creator/aaryan-kumar.jpg') }}" alt="Aaryan Kumar — Creator of Parichay" class="creator-avatar-img">
+          </div>
+          
+          <div class="creator-details">
+            <div class="creator-eyebrow">Designed & developed by</div>
+            <h3 class="creator-name">Aaryan Kumar</h3>
+            <p class="creator-desc">
+              Building thoughtful technology at the intersection of AI and meaningful user experiences.
+            </p>
+            
+            <div class="creator-links-row">
+              <a href="https://www.linkedin.com/in/aaryan-k-ba3985246/" target="_blank" rel="noopener noreferrer" class="creator-link-pill" title="LinkedIn Profile">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.64a1.59 1.59 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.59 1.59 0 0 0-1.6-1.6z"/>
+                </svg>
+                <span>LinkedIn</span>
+              </a>
 
-    <div class="footer-links-right">
-      <a href="/studio" class="footer-link">Resume Studio</a>
-      <a href="/login" class="footer-link">Sign In</a>
-      <a href="/signup" class="footer-link">Register</a>
-      <a href="#privacy" class="footer-link">Privacy Statement</a>
+              <a href="https://github.com/9aaryanCyberH" target="_blank" rel="noopener noreferrer" class="creator-link-pill" title="GitHub Profile">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg>
+                <span>GitHub</span>
+              </a>
+
+              <a href="/static/docs/aaryan-kumar-resume.pdf" target="_blank" rel="noopener noreferrer" class="creator-link-pill resume" title="View Resume PDF">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>View Resume</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parichay Brand Block -->
+        <div class="creator-brand-block">
+          <div class="creator-brand-title">Parichay</div>
+          <div class="creator-tagline-text">Where Your Potential Meets Opportunity.</div>
+          <p class="creator-brand-note">
+            AI-powered resume intelligence designed to turn career evidence into actionable steps.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Subtle Divider -->
+      <div class="creator-footer-divider"></div>
+
+      <!-- Bottom Subrow: Legal & Copyright -->
+      <div class="creator-legal-row">
+        <div class="creator-copyright">
+          &copy; 2026 Parichay. All rights reserved.
+        </div>
+
+        <nav class="creator-legal-links" aria-label="Legal & Support Navigation">
+          <a href="/privacy" class="creator-legal-link">Privacy Policy</a>
+          <span class="legal-separator">&bull;</span>
+          <a href="/terms" class="creator-legal-link">Terms of Service</a>
+          <span class="legal-separator">&bull;</span>
+          <a href="/faq" class="creator-legal-link">Help & FAQ</a>
+        </nav>
+      </div>
+
     </div>
   </footer>
 

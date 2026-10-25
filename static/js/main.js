@@ -413,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       breakdownTableBody.innerHTML = `
         <tr>
-          <td>Technical Skills</td>
+          <td>Technical skills alignment</td>
           <td>45%</td>
           <td class="col-right">
             <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: ${(techScore / 45) * 100}%;"></span></span>
@@ -421,7 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
         </tr>
         <tr>
-          <td>Role Context</td>
+          <td>Contextual similarity</td>
           <td>35%</td>
           <td class="col-right">
             <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: ${(tfidfScore / 35) * 100}%;"></span></span>
@@ -429,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
         </tr>
         <tr>
-          <td>Soft Skills</td>
+          <td>Soft skills and engineering practices</td>
           <td>10%</td>
           <td class="col-right">
             <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: ${(softScore / 10) * 100}%;"></span></span>
@@ -437,7 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
         </tr>
         <tr>
-          <td>Resume Structure</td>
+          <td>Resume structure</td>
           <td>10%</td>
           <td class="col-right">
             <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: ${(structScore / 10) * 100}%;"></span></span>
@@ -551,11 +551,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (detailSkillDesc) {
       if (skill.status === "matched") {
-        detailSkillDesc.textContent = `Demonstrated proficiency in ${skill.name}. Explicitly verified in the uploaded resume against target job posting requirements.`;
+        detailSkillDesc.textContent = `Demonstrated proficiency in ${skill.name}. Explicitly verified in the uploaded resume against target job description requirements.`;
       } else if (skill.status === "missing") {
-        detailSkillDesc.textContent = `${skill.name} is a key requirement in the target role description, but is not detected in your resume evidence.`;
+        detailSkillDesc.textContent = `${skill.name} is a key requirement in the target role description, but could not be confidently identified in your extracted resume text. If you have relevant experience, consider adding explicit evidence.`;
       } else {
-        detailSkillDesc.textContent = `Bonus candidate competency in ${skill.name}. Provides unique competitive advantage beyond baseline role requirements.`;
+        detailSkillDesc.textContent = `Additional strength in ${skill.name}. Demonstrates capabilities beyond the target role's baseline requirements.`;
       }
     }
 
@@ -563,28 +563,28 @@ document.addEventListener("DOMContentLoaded", () => {
       detailEvidenceList.innerHTML = "";
       if (skill.status === "matched") {
         detailEvidenceList.innerHTML = `
-          <li class="detail-evidence-item">Extracted directly from candidate technical background</li>
-          <li class="detail-evidence-item">Corroborated in verified projects & experience bullets</li>
-          <li class="detail-evidence-item">Exact match with target role specification</li>
+          <li class="detail-evidence-item">Extracted from candidate background & qualifications</li>
+          <li class="detail-evidence-item">Corroborated across project and experience descriptions</li>
+          <li class="detail-evidence-item">Directly supports role requirement</li>
         `;
         if (detailConfidenceLabel) detailConfidenceLabel.textContent = "High";
         if (detailConfidenceBar) detailConfidenceBar.style.width = "90%";
       } else if (skill.status === "missing") {
         detailEvidenceList.innerHTML = `
           <li class="detail-evidence-item">Listed in target job description requirements</li>
-          <li class="detail-evidence-item">Zero explicit occurrences detected in resume text</li>
-          <li class="detail-evidence-item">Recommended for bullet addition or portfolio inclusion</li>
+          <li class="detail-evidence-item">Not confidently detected in extracted resume text</li>
+          <li class="detail-evidence-item">Candidate may possess this skill without mentioning it</li>
         `;
-        if (detailConfidenceLabel) detailConfidenceLabel.textContent = "Action Needed";
-        if (detailConfidenceBar) detailConfidenceBar.style.width = "20%";
+        if (detailConfidenceLabel) detailConfidenceLabel.textContent = "Review needed";
+        if (detailConfidenceBar) detailConfidenceBar.style.width = "25%";
       } else {
         detailEvidenceList.innerHTML = `
-          <li class="detail-evidence-item">Found in candidate resume skills section</li>
-          <li class="detail-evidence-item">Expands candidate domain versatility</li>
-          <li class="detail-evidence-item">Valuable supplementary expertise</li>
+          <li class="detail-evidence-item">Identified in candidate qualifications section</li>
+          <li class="detail-evidence-item">Expands candidate technical versatility</li>
+          <li class="detail-evidence-item">Valuable supplementary capability</li>
         `;
-        if (detailConfidenceLabel) detailConfidenceLabel.textContent = "Good Evidence";
-        if (detailConfidenceBar) detailConfidenceBar.style.width = "75%";
+        if (detailConfidenceLabel) detailConfidenceLabel.textContent = "Demonstrated";
+        if (detailConfidenceBar) detailConfidenceBar.style.width = "80%";
       }
     }
   }

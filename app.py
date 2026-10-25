@@ -5,7 +5,8 @@ Provides web routes, file upload handling, and analysis pipeline endpoints.
 import os
 import json
 import logging
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from functools import wraps
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -21,6 +22,34 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config.from_object(Config)
 
+
+def is_safe_url(target: str) -> bool:
+    """Validates that a redirect target is a safe relative URL to prevent open redirects."""
+    if not target:
+        return False
+    # Must start with a single forward slash, not double-slash or backslash
+    return target.startswith("/") and not target.startswith("//") and "\\" not in target
+
+
+def login_required(f):
+    """Decorator ensuring that routes are protected against unauthenticated access."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get("user_id"):
+            dest = request.full_path if request.query_string else request.path
+            if request.path.startswith("/api/"):
+                return jsonify({
+                    "success": False,
+                    "authenticated": False,
+                    "error_type": "AuthenticationRequired",
+                    "message": "Authentication required. Please sign in to access Parichay Resume Studio.",
+                    "redirect": url_for("auth_gateway", next=dest)
+                }), 401
+            return redirect(url_for("auth_gateway", next=dest))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 # Context processor to make current_user available in all templates
 @app.context_processor
 def inject_current_user():
@@ -29,6 +58,7 @@ def inject_current_user():
         user = AuthManager.get_user_by_id(user_id)
         return {"current_user": user}
     return {"current_user": None}
+
 
 # Load sample JDs into memory for quick serving
 SAMPLE_JDS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sample_data", "sample_jds.json")
@@ -50,10 +80,51 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/studio")
+@app.route("/auth")
+def auth_gateway():
+    """
+    Authentication gateway page.
+    Displays when unauthenticated users attempt to Launch Studio or open protected views.
+    Offers 'Sign In' or 'Create Account' with the mint/peach split-screen branding.
+    """
+    if session.get("user_id"):
+        return redirect(url_for("studio"))
+    next_url = request.args.get("next", "")
+    if not is_safe_url(next_url):
+        next_url = url_for("studio")
+    return render_template("auth_gateway.html", next_url=next_url)
+
+
+@app.route("/privacy")
+def privacy():
+    """Renders the clear, transparent Parichay privacy policy."""
+    return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    """Renders the clear, readable Parichay terms of service."""
+    return render_template("terms.html")
+
+
+@app.route("/faq")
+def faq():
+    """Renders the comprehensive Parichay help & FAQ guide."""
+    return render_template("faq.html")
+
+
+@app.route("/docs/<path:filename>")
+def serve_docs(filename):
+    """Serves verified document assets like the creator's resume PDF."""
+    docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "docs")
+    return send_from_directory(docs_dir, secure_filename(filename))
+
+
 @app.route("/app")
+@app.route("/studio")
+@login_required
 def studio():
-    """Renders the main Parichay resume intelligence studio and analysis tool."""
+    """Renders the main Parichay resume intelligence studio (Protected)."""
     return render_template("index.html")
 
 
@@ -62,7 +133,11 @@ def studio():
 # ============================================================================
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Renders login page and handles user sign-in."""
+    """Renders login page and handles user sign-in with safe post-auth redirect."""
+    next_url = request.args.get("next") or request.form.get("next") or url_for("studio")
+    if not is_safe_url(next_url):
+        next_url = url_for("studio")
+
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
@@ -74,25 +149,37 @@ def login():
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
             if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
-                return jsonify({"success": True, "redirect": url_for("studio")})
-            return redirect(url_for("studio"))
+                return jsonify({"success": True, "redirect": next_url})
+            return redirect(next_url)
         else:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
                 return jsonify({"success": False, "message": auth_res["message"]}), 400
-            return render_template("login.html", error=auth_res["message"], email=email)
+            return render_template("login.html", error=auth_res["message"], email=email, next_url=next_url)
 
     if session.get("user_id"):
-        return redirect(url_for("studio"))
-    return render_template("login.html")
+        return redirect(next_url)
+    return render_template("login.html", next_url=next_url)
 
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    """Renders sign-up page and handles user account creation."""
+    """Renders sign-up page and handles user account creation with confirm password validation."""
+    next_url = request.args.get("next") or request.form.get("next") or url_for("studio")
+    if not is_safe_url(next_url):
+        next_url = url_for("studio")
+
     if request.method == "POST":
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if confirm_password and password != confirm_password:
+            error_msg = "Passwords do not match. Please re-enter your password."
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": error_msg}), 400
+            return render_template("signup.html", error=error_msg, name=name, email=email, next_url=next_url)
+
         reg_res = AuthManager.register_user(name, email, password)
 
         if reg_res["success"]:
@@ -101,16 +188,16 @@ def signup():
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
             if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
-                return jsonify({"success": True, "redirect": url_for("studio")})
-            return redirect(url_for("studio"))
+                return jsonify({"success": True, "redirect": next_url})
+            return redirect(next_url)
         else:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
                 return jsonify({"success": False, "message": reg_res["message"]}), 400
-            return render_template("signup.html", error=reg_res["message"], name=name, email=email)
+            return render_template("signup.html", error=reg_res["message"], name=name, email=email, next_url=next_url)
 
     if session.get("user_id"):
-        return redirect(url_for("studio"))
-    return render_template("signup.html")
+        return redirect(next_url)
+    return render_template("signup.html", next_url=next_url)
 
 
 @app.route("/logout")
@@ -148,6 +235,7 @@ def get_sample_file(filename):
 
 
 @app.route("/api/analyze", methods=["POST"])
+@login_required
 def analyze_resume():
     """
     Main analysis endpoint.
@@ -363,22 +451,19 @@ def analyze_resume():
 # USER HISTORY & ACCOUNT ENDPOINTS
 # ============================================================================
 @app.route("/api/history", methods=["GET"])
+@login_required
 def get_history():
     """Returns saved analysis history for the logged-in user."""
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"success": False, "authenticated": False, "items": [], "analyses": []})
     items = HistoryManager.get_user_analyses(user_id)
     return jsonify({"success": True, "authenticated": True, "items": items, "analyses": items})
 
 
 @app.route("/api/history/<int:analysis_id>", methods=["GET", "DELETE"])
+@login_required
 def manage_history_item(analysis_id):
     """Retrieves or deletes a specific analysis record."""
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"success": False, "message": "Authentication required."}), 401
-
     if request.method == "DELETE":
         deleted = HistoryManager.delete_analysis(analysis_id, user_id)
         return jsonify({"success": deleted})
@@ -390,12 +475,10 @@ def manage_history_item(analysis_id):
 
 
 @app.route("/api/settings", methods=["POST"])
+@login_required
 def update_settings():
     """Updates profile information for the authenticated user."""
     user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"success": False, "message": "Authentication required."}), 401
-
     data = request.get_json(silent=True) or request.form
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
@@ -409,6 +492,7 @@ def update_settings():
 
 
 @app.route("/api/chat", methods=["POST"])
+@login_required
 def chat():
     """
     Conversational AI Career Chatbot endpoint.
