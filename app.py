@@ -5,6 +5,7 @@ Provides web routes, file upload handling, and analysis pipeline endpoints.
 import os
 import json
 import logging
+from datetime import timedelta
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=14)
 
 
 def is_safe_url(target: str) -> bool:
@@ -145,6 +147,7 @@ def login():
 
         if auth_res["success"]:
             user = auth_res["user"]
+            session.permanent = True
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
@@ -184,6 +187,7 @@ def signup():
 
         if reg_res["success"]:
             user = reg_res["user"]
+            session.permanent = True
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
