@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parichay — Where Your Potential Meets Opportunity | AI Resume Intelligence</title>
+  <meta name="description" content="An editorial, explainable AI-powered resume intelligence application designed for candidates to evaluate their resume alignment against target job requirements.">
+  
+  <!-- Favicon SVG inline -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231848A0'><path d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/></svg>">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Newsreader & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js for Analytical Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Top App Navigation & Brand Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <div class="brand-wordmark">
+          Parichay
+          <span class="brand-badge">Intelligence</span>
+        </div>
+        <div class="brand-tagline">Where Your Potential Meets Opportunity.</div>
+      </div>
+      <div class="header-meta">
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          Ready for Analysis
+        </span>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">GDG BPPIMT Selection</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="main-wrapper">
+
+    <!-- Workspace Introduction Banner -->
+    <section class="editorial-intro">
+      <h1 class="lead-title">Resume alignment evaluated with explainable precision.</h1>
+      <p class="lead-desc">
+        Parichay pairs PyMuPDF document extraction with scikit-learn TF-IDF semantic modeling to deliver a transparent, grounded audit of your technical qualifications against any target role.
+      </p>
+    </section>
+
+    <!-- Error & Feedback Banner -->
+    <div id="alertBanner" class="alert-banner" role="alert">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <div id="alertMessage">Please provide the necessary inputs.</div>
+    </div>
+
+    <!-- Two-Column Analysis Input Workspace -->
+    <section class="workspace-grid" aria-label="Analysis Workspace">
+      
+      <!-- Panel 1: Resume Upload -->
+      <div class="workspace-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-num">1</span>
+            Candidate Resume
+          </div>
+          <span class="panel-hint">Text-based PDF (Max 5 MB)</span>
+        </div>
+
+        <div id="dropzone" class="upload-dropzone" tabindex="0" role="button" aria-label="Upload PDF Resume">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor"/>
+            <path d="M14 2V8H20" stroke="currentColor"/>
+            <path d="M12 18V12M12 12L9 15M12 12L15 15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="upload-prompt">Drop your PDF resume here, or click to browse</div>
+          <div class="upload-details">Exported from Google Docs, LaTeX, Canva, or Word</div>
+          <input type="file" id="resumeInput" class="hidden-file-input" accept=".pdf" aria-label="Select resume PDF file">
+        </div>
+
+        <!-- Selected File State Display -->
+        <div id="fileSelectedBox" class="file-selected-box">
+          <div class="file-info-group">
+            <svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <div class="file-name-size">
+              <div id="selectedFileName" class="file-name">resume.pdf</div>
+              <div id="selectedFileSize" class="file-size">145 KB</div>
+            </div>
+          </div>
+          <button type="button" id="btnRemoveFile" class="btn-remove-file" aria-label="Remove uploaded file">Change</button>
+        </div>
+
+        <!-- Helper shortcut to test with authentic sample resume -->
+        <div class="sample-resume-hint">
+          <span>Need a quick file to test?</span>
+          <button type="button" id="btnSampleResume" class="btn-text-action">Use Sample Software Engineer Resume</button>
+        </div>
+      </div>
+
+      <!-- Panel 2: Job Description Input -->
+      <div class="workspace-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-num">2</span>
+            Target Job Description
+          </div>
+          <span class="panel-hint">Paste full posting or select example</span>
+        </div>
+
+        <div class="jd-input-wrapper">
+          <textarea id="jdTextarea" class="jd-textarea" placeholder="Paste the job description, required qualifications, key technologies, and role responsibilities here..." aria-label="Target Job Description"></textarea>
+          
+          <div class="sample-jd-bar">
+            <div class="sample-jd-label">Curated Sample Job Roles:</div>
+            <div id="sampleChipsRow" class="sample-chips-row">
+              <!-- Dynamically populated from /api/sample-jds -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Primary Action Bar -->
+    <div class="action-bar-container">
+      <div class="action-bar-meta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Safe in-memory document processing. No PDFs or personal data are permanently stored.</span>
+      </div>
+      <button type="button" id="btnAnalyze" class="btn-primary" aria-label="Run Resume Alignment Analysis">
+        <span id="btnSpinner" class="spinner"></span>
+        <span id="btnText">Analyze Resume Alignment</span>
+      </button>
+    </div>
+
+    <!-- ======================================================================
+         ANALYSIS DASHBOARD (Appears upon real backend completion)
+         ====================================================================== -->
+    <section id="dashboardSection" aria-label="Analysis Results Dashboard">
+
+      <!-- Candidate & Document Header Card -->
+      <div class="dashboard-lead-panel">
+        <div class="candidate-header-bar">
+          <div class="candidate-identity">
+            <h2 id="dashCandidateName" class="candidate-name">Candidate Name</h2>
+            <div id="dashCandidateLinks" class="candidate-contact-links">
+              <!-- Contact details & metrics injected here -->
+            </div>
+          </div>
+          <div class="dashboard-controls">
+            <button type="button" id="btnResetAnalysis" class="btn-secondary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+              Analyze Another Resume
+            </button>
+            <button type="button" id="btnPrintReport" class="btn-secondary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              Export Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Alignment Score & Transparent Weighting Grid -->
+        <div class="alignment-hero-grid">
+          
+          <!-- Large Score Display -->
+          <div class="score-display-column">
+            <div>
+              <div class="score-label-kicker">Estimated Alignment Measure</div>
+              <div class="score-big-num">
+                <span id="dashScoreVal">0</span>
+                <span class="score-percent-symbol">%</span>
+              </div>
+              <div id="dashTierBadge" class="fit-tier-badge tier-high">Evaluation Complete</div>
+            </div>
+            <div class="disclaimer-note">
+              <strong>Methodology Notice:</strong> This score represents lexical, semantic, and skill alignment with the target description. It is not an assessment of candidate competence or a predictive hiring probability.
+            </div>
+          </div>
+
+          <!-- 4-Component Transparent Score Calculation -->
+          <div class="breakdown-display-column">
+            <div class="breakdown-header-row">
+              <h3 class="breakdown-title">Explainable Score Calculation</h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Weighted Algorithm: 45% Tech + 35% TF-IDF + 10% Soft + 10% Structure</span>
+            </div>
+            <div id="breakdownCardsList" class="breakdown-cards-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Analytical Visualization and Document Completeness Row -->
+      <div class="analytics-two-col">
+        
+        <!-- Radar Chart: Candidate Evidence vs Target Baseline -->
+        <div class="analytics-card">
+          <div class="panel-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+            <h3 class="panel-title">Alignment Dimension Radar</h3>
+            <span class="panel-hint">Evidence vs. Target Role</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="radarChart" aria-label="Alignment Radar Chart" role="img"></canvas>
+          </div>
+        </div>
+
+        <!-- Resume Health & Section Inventory -->
+        <div class="analytics-card">
+          <div class="panel-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+            <h3 class="panel-title">Resume Structural Health</h3>
+            <span class="panel-hint">Section Evidence Audit</span>
+          </div>
+          <div id="resumeStrengthsList" style="margin-top: 14px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Skills Matrix Panel -->
+      <div class="skills-matrix-panel">
+        <div class="panel-header" style="margin-bottom: 14px; padding-bottom: 10px;">
+          <h3 class="panel-title">Competency & Skills Matrix</h3>
+          <span class="panel-hint">Classified against standard technical taxonomy</span>
+        </div>
+
+        <!-- Filter Tabs -->
+        <nav class="skills-filter-nav" aria-label="Skills Filter">
+          <button type="button" class="skill-tab-btn active" data-tab="all">
+            All Extracted
+          </button>
+          <button type="button" class="skill-tab-btn" data-tab="matched">
+            Matched In Role <span id="tabCountMatched" class="tab-badge">0</span>
+          </button>
+          <button type="button" class="skill-tab-btn" data-tab="missing">
+            Missing in Resume <span id="tabCountMissing" class="tab-badge">0</span>
+          </button>
+          <button type="button" class="skill-tab-btn" data-tab="unique">
+            Candidate Bonus Skills <span id="tabCountUnique" class="tab-badge">0</span>
+          </button>
+          <button type="button" class="skill-tab-btn" data-tab="unverified">
+            Contextual Mentions
+          </button>
+        </nav>
+
+        <!-- Tag Cluster Container -->
+        <div id="skillsClusterContainer" class="skills-tags-cluster">
+          <!-- Populated by main.js -->
+        </div>
+      </div>
+
+      <!-- Grounded AI Advisor Recommendations -->
+      <div class="advisor-editorial-panel">
+        <div class="advisor-top-badge">
+          <h3 class="panel-title" style="font-size: 1.25rem;">
+            Contextual Recommendations
+          </h3>
+          <span id="advisorEngineBadge" class="advisor-engine-meta">Parichay Advisor Engine</span>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="executive-summary-box">
+          <p id="advisorExecutiveSummary" class="executive-summary-text">
+            “Evaluating alignment details...”
+          </p>
+        </div>
+
+        <!-- Bullet Point Rewrites (Google's X-Y-Z formula) -->
+        <h4 class="advice-subheading">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
+        <div id="bulletEnhancementsList">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Gap Mitigation Plan -->
+        <h4 class="advice-subheading">Targeted Skill Gap Mitigation Plan</h4>
+        <div id="gapMitigationGrid" class="gap-mitigation-grid">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Interview Prep Topics -->
+        <h4 class="advice-subheading">Likely Technical Interview Focus Areas</h4>
+        <ul id="interviewPrepList" class="interview-topics-list">
+          <!-- Dynamically populated -->
+        </ul>
+      </div>
+
+      <!-- Strengths & Prioritized Improvement Actions -->
+      <div class="audit-two-col">
+        <div class="audit-card">
+          <div class="panel-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+            <h3 class="panel-title">Prioritized Action Items</h3>
+            <span class="panel-hint">Immediate resume revisions</span>
+          </div>
+          <div id="improvementPrioritiesList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="audit-card">
+          <div class="panel-header" style="margin-bottom: 12px; padding-bottom: 8px;">
+            <h3 class="panel-title">About Parichay's Core Stack</h3>
+            <span class="panel-hint">Engineering Foundations</span>
+          </div>
+          <div style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6;">
+            <p style="margin-bottom: 10px;">
+              <strong>Document Parser:</strong> PyMuPDF delivers high-speed, structure-preserving extraction and rejects scanned/image-only PDFs.
+            </p>
+            <p style="margin-bottom: 10px;">
+              <strong>Similarity Engine:</strong> scikit-learn computes n-gram TF-IDF vectors with vocabulary coverage to provide explainable document alignment without black-box scores.
+            </p>
+            <p>
+              <strong>AI Advisor:</strong> Direct Google Gemini API integration with a deterministic fallback ensures reliable, grounded advice without dummy placeholders.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Clean Editorial Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>
+        <strong>Parichay</strong> — Where Your Potential Meets Opportunity.
+      </div>
+      <div>
+        Built for the GDG BPPIMT AI/ML Team Selection Assignment &bull; 2026
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Script -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

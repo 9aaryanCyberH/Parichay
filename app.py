@@ -1,0 +1,280 @@
+"""
+app.py - Main Flask application for Parichay (AI-Powered Resume Intelligence).
+Provides web routes, file upload handling, and analysis pipeline endpoints.
+"""
+import os
+import json
+import logging
+from flask import Flask, render_template, request, jsonify
+from werkzeug.utils import secure_filename
+
+from config import Config
+from services.pdf_parser import PDFParser, PDFParsingError
+from services.extractor import ResumeExtractor, JobDescriptionParser
+from services.matcher import ResumeJobMatcher
+from services.ai_advisor import AIAdvisor
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+app.config.from_object(Config)
+
+# Load sample JDs into memory for quick serving
+SAMPLE_JDS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sample_data", "sample_jds.json")
+sample_jds_cache = []
+if os.path.exists(SAMPLE_JDS_PATH):
+    try:
+        with open(SAMPLE_JDS_PATH, "r", encoding="utf-8") as f:
+            sample_jds_cache = json.load(f)
+    except Exception as e:
+        logger.warning(f"Could not load sample JDs: {e}")
+
+
+@app.route("/")
+def index():
+    """Renders the main Parichay workspace and dashboard interface."""
+    return render_template("index.html")
+
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    """API health check endpoint."""
+    return jsonify({
+        "status": "healthy",
+        "service": "Parichay Resume Intelligence",
+        "version": "1.0.0",
+        "gemini_api_configured": bool(Config.GEMINI_API_KEY and not Config.GEMINI_API_KEY.startswith("your_"))
+    })
+
+
+@app.route("/api/sample-jds", methods=["GET"])
+def get_sample_jds():
+    """Returns curated sample job descriptions for quick testing."""
+    return jsonify({
+        "success": True,
+        "sample_jds": sample_jds_cache
+    })
+
+@app.route("/sample_data/<filename>", methods=["GET"])
+def get_sample_file(filename):
+    """Serves sample resume and testing files safely."""
+    from flask import send_from_directory
+    sample_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sample_data")
+    return send_from_directory(sample_dir, secure_filename(filename))
+
+
+@app.route("/api/analyze", methods=["POST"])
+def analyze_resume():
+    """
+    Main analysis endpoint.
+    Accepts:
+        - resume: PDF file
+        - job_description: string text
+    Returns:
+        Structured analysis JSON with match score, explainable breakdown,
+        skills gap matrix, section inventory, and grounded recommendations.
+    """
+    # 1. Validate Job Description
+    job_description = request.form.get("job_description", "").strip()
+    if not job_description:
+        return jsonify({
+            "success": False,
+            "error_type": "ValidationError",
+            "message": "Please provide a job description or select one of the curated example roles."
+        }), 400
+
+    if len(job_description.split()) < 10:
+        return jsonify({
+            "success": False,
+            "error_type": "ValidationError",
+            "message": "The provided job description is too brief. Please provide at least 2-3 sentences outlining the role requirements."
+        }), 400
+
+    # 2. Validate Resume File
+    if "resume" not in request.files:
+        return jsonify({
+            "success": False,
+            "error_type": "ValidationError",
+            "message": "No resume file was attached. Please select a PDF resume to analyze."
+        }), 400
+
+    file = request.files["resume"]
+    if not file or file.filename == "":
+        return jsonify({
+            "success": False,
+            "error_type": "ValidationError",
+            "message": "Please select a valid PDF resume file from your computer."
+        }), 400
+
+    filename = secure_filename(file.filename)
+    if not filename.lower().endswith(".pdf"):
+        return jsonify({
+            "success": False,
+            "error_type": "InvalidFileType",
+            "message": "Only PDF files (.pdf) are supported. Please export your resume as a text-based PDF."
+        }), 400
+
+    # Read bytes safely in memory (enforces max size limits)
+    try:
+        pdf_bytes = file.read()
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error_type": "FileReadError",
+            "message": f"Unable to read the uploaded file: {str(e)}"
+        }), 400
+
+    if len(pdf_bytes) > Config.MAX_CONTENT_LENGTH:
+        return jsonify({
+            "success": False,
+            "error_type": "FileSizeExceeded",
+            "message": "File exceeds the 5 MB maximum upload limit. Please upload a smaller PDF."
+        }), 413
+
+    # 3. Parse PDF with PyMuPDF
+    try:
+        pdf_data = PDFParser.extract_text_from_bytes(pdf_bytes, filename=filename)
+    except PDFParsingError as pe:
+        logger.warning(f"PDF parsing error for {filename}: {pe}")
+        return jsonify({
+            "success": False,
+            "error_type": "PDFParsingError",
+            "message": str(pe)
+        }), 400
+    except Exception as e:
+        logger.exception("Unexpected error while parsing PDF")
+        return jsonify({
+            "success": False,
+            "error_type": "InternalParsingError",
+            "message": f"An unexpected error occurred while parsing the PDF: {str(e)}"
+        }), 500
+
+    resume_text = pdf_data["text"]
+
+    # 4. Extract Structured Entities & Skills from Resume
+    contact_info = ResumeExtractor.extract_contact_info(resume_text)
+    sections = ResumeExtractor.segment_sections(resume_text)
+    resume_skills = ResumeExtractor.extract_skills(resume_text)
+    experience_entries = ResumeExtractor.extract_experience_entries(sections.get("experience", "") or sections.get("internships", ""))
+    education_entries = ResumeExtractor.extract_education_details(sections.get("education", ""))
+
+    # 5. Parse Job Description
+    jd_data = JobDescriptionParser.parse_job_description(job_description)
+
+    # 6. Execute TF-IDF Matching & Explainable Scoring
+    try:
+        match_data = ResumeJobMatcher.match(
+            resume_text=resume_text,
+            jd_text=job_description,
+            resume_skills=resume_skills,
+            jd_skills=jd_data["skills"],
+            resume_sections=sections
+        )
+    except Exception as e:
+        logger.exception("Matching calculation failed")
+        return jsonify({
+            "success": False,
+            "error_type": "MatchingError",
+            "message": f"Failed to compute similarity alignment: {str(e)}"
+        }), 500
+
+    # 7. Generate Grounded AI Recommendations
+    resume_summary = {
+        "contact": contact_info,
+        "sections": sections,
+        "skills": resume_skills,
+        "word_count": pdf_data["word_count"],
+        "page_count": pdf_data["page_count"]
+    }
+
+    try:
+        recommendations = AIAdvisor.generate_recommendations(
+            resume_data=resume_summary,
+            jd_data=jd_data,
+            match_data=match_data,
+            api_key=Config.GEMINI_API_KEY,
+            model=Config.GEMINI_MODEL
+        )
+    except Exception as e:
+        logger.warning(f"Advisor generation encountered error: {e}")
+        recommendations = AIAdvisor._generate_grounded_fallback(resume_summary, jd_data, match_data)
+
+    # 8. Assemble Complete Response
+    response_payload = {
+        "success": True,
+        "filename": filename,
+        "document_metrics": {
+            "page_count": pdf_data["page_count"],
+            "word_count": pdf_data["word_count"],
+            "character_count": pdf_data["char_count"]
+        },
+        "candidate": {
+            "name": contact_info.get("name") or "Candidate",
+            "email": contact_info.get("email"),
+            "phone": contact_info.get("phone"),
+            "linkedin": contact_info.get("linkedin"),
+            "github": contact_info.get("github"),
+            "portfolio": contact_info.get("portfolio")
+        },
+        "job_profile": {
+            "role_level": jd_data.get("role_level"),
+            "experience_years": jd_data.get("experience_years"),
+            "required_education": jd_data.get("required_education"),
+            "word_count": jd_data.get("word_count")
+        },
+        "alignment": {
+            "score": match_data["score"],
+            "fit_tier": match_data["fit_tier"],
+            "tier_badge": match_data["tier_badge"],
+            "raw_cosine": match_data["score_breakdown"]["raw_cosine"],
+            "vocabulary_coverage_percent": match_data["score_breakdown"]["vocabulary_coverage_percent"],
+            "score_breakdown": match_data["score_breakdown"]
+        },
+        "skills": {
+            "matched_technical": match_data["skills_analysis"]["matched_technical"],
+            "missing_technical": match_data["skills_analysis"]["missing_technical"],
+            "candidate_unique": match_data["skills_analysis"]["candidate_unique"],
+            "matched_soft": match_data["skills_analysis"]["matched_soft"],
+            "missing_soft": match_data["skills_analysis"]["missing_soft"],
+            "unverified_skills": match_data["skills_analysis"]["unverified_skills"],
+            "counts": match_data["skills_analysis"]["counts"],
+            "candidate_all_categorized": resume_skills.get("categorized", {})
+        },
+        "sections_detected": {
+            "available_sections": list(sections.keys()),
+            "education_snippets": education_entries,
+            "has_experience": bool(sections.get("experience") or sections.get("internships")),
+            "has_projects": bool(sections.get("projects")),
+            "has_certifications": bool(sections.get("certifications"))
+        },
+        "audit": {
+            "strengths": match_data["strengths"],
+            "improvement_priorities": match_data["improvement_priorities"]
+        },
+        "recommendations": recommendations
+    }
+
+    return jsonify(response_payload)
+
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({
+        "success": False,
+        "error_type": "FileSizeExceeded",
+        "message": "File exceeds the 5 MB maximum upload limit. Please upload a smaller PDF resume."
+    }), 413
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error_type": "NotFound",
+        "message": "The requested resource could not be found."
+    }), 404
+
+
+if __name__ == "__main__":
+    app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG)
