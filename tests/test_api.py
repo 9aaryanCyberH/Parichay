@@ -220,6 +220,49 @@ class TestParichayAPI(unittest.TestCase):
         self.assertEqual(good_login.status_code, 302)
         self.assertIn("/studio", good_login.headers["Location"])
 
+    def test_ghost_session_handling_and_no_loop(self):
+        """Test stale/nonexistent user_id session is cleared and does not trap user in redirect loops."""
+        # 1. Simulate a ghost session cookie (user_id not in database)
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = 99999999
+            sess["user_name"] = "Ghost User"
+            sess["user_email"] = "ghost@example.com"
+
+        # 2. Visiting protected /studio clears ghost session and redirects to /auth
+        resp_studio = self.client.get("/studio", follow_redirects=False)
+        self.assertEqual(resp_studio.status_code, 302)
+        self.assertIn("/auth", resp_studio.headers["Location"])
+
+        # 3. Visiting /login directly does not bounce back to /studio; renders login form (200 OK)
+        resp_login = self.client.get("/login")
+        self.assertEqual(resp_login.status_code, 200)
+        self.assertIn("Sign in to continue your resume journey", resp_login.get_data(as_text=True))
+
+        # 4. Visiting /signup directly does not bounce back to /studio; renders signup form (200 OK)
+        resp_signup = self.client.get("/signup")
+        self.assertEqual(resp_signup.status_code, 200)
+        self.assertIn("Create your Parichay account to access your workspace", resp_signup.get_data(as_text=True))
+
+    def test_topbar_button_classes_harmonized(self):
+        """Test topbar auth buttons in index.html use matching btn-topbar-pill without color clash."""
+        user = self.login_test_user()
+        resp = self.client.get("/studio")
+        self.assertEqual(resp.status_code, 200)
+        html = resp.get_data(as_text=True)
+
+        # Authenticated state shows current user name and signout pill
+        self.assertIn(user["name"], html)
+        self.assertIn("Sign out", html)
+        self.assertIn("btn-topbar-signout", html)
+
+        # Confirm unauthenticated fallback in template source uses matching btn-topbar-pill
+        template_path = os.path.join(BASE_DIR, "templates", "index.html")
+        with open(template_path, "r", encoding="utf-8") as f:
+            tmpl_content = f.read()
+        self.assertIn('class="btn-topbar-pill">Sign in</a>', tmpl_content)
+        self.assertIn('class="btn-topbar-pill">Sign up</a>', tmpl_content)
+        self.assertNotIn('class="btn-topbar-solid">Sign up</a>', tmpl_content)
+
     # =========================================================================
     # AUTHENTICATED WORKSPACE & ANALYSIS PIPELINE TESTS
     # =========================================================================

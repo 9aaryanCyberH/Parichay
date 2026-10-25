@@ -8,8 +8,10 @@ Verifies Section 5 Optional Requirement:
 """
 
 import unittest
+import uuid
 from html.parser import HTMLParser
 from app import app
+from services.database import AuthManager
 
 
 class ToggleParser(HTMLParser):
@@ -50,10 +52,12 @@ class TestDarkModeAudit(unittest.TestCase):
                 self.assertIn("localStorage.getItem('parichay-theme')", content, f"Route {route} missing head theme init")
 
     def test_studio_page_has_theme_toggle_and_scripts(self):
+        reg = AuthManager.register_user("Admin User", f"admin_{uuid.uuid4().hex[:6]}@example.com", "AdminPass123!")
+        user = reg["user"]
         with self.client.session_transaction() as sess:
-            sess["user_id"] = "test-uuid-admin"
-            sess["user_name"] = "Admin User"
-            sess["user_email"] = "admin@example.com"
+            sess["user_id"] = user["id"]
+            sess["user_name"] = user["name"]
+            sess["user_email"] = user["email"]
 
         res = self.client.get("/studio")
         self.assertEqual(res.status_code, 200)

@@ -60,12 +60,16 @@
 
       {% if current_user %}
         <span class="btn-topbar-pill" style="cursor: default; font-weight: 500;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 2px;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           {{ current_user.name }}
         </span>
-        <a href="/logout" class="btn-topbar-pill" style="color: var(--missing-red);">Sign out</a>
+        <a href="/logout" class="btn-topbar-pill btn-topbar-signout">Sign out</a>
       {% else %}
         <a href="/login" class="btn-topbar-pill">Sign in</a>
-        <a href="/signup" class="btn-topbar-solid">Sign up</a>
+        <a href="/signup" class="btn-topbar-pill">Sign up</a>
       {% endif %}
     </div>
   </header>

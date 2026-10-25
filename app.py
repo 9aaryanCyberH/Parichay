@@ -37,7 +37,11 @@ def login_required(f):
     """Decorator ensuring that routes are protected against unauthenticated access."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get("user_id"):
+        user_id = session.get("user_id")
+        user = AuthManager.get_user_by_id(user_id) if user_id else None
+        if not user:
+            if user_id:
+                session.clear()
             dest = request.full_path if request.query_string else request.path
             if request.path.startswith("/api/"):
                 return jsonify({
@@ -58,7 +62,9 @@ def inject_current_user():
     user_id = session.get("user_id")
     if user_id:
         user = AuthManager.get_user_by_id(user_id)
-        return {"current_user": user}
+        if user:
+            return {"current_user": user}
+        session.clear()
     return {"current_user": None}
 
 
@@ -89,8 +95,11 @@ def auth_gateway():
     Displays when unauthenticated users attempt to Launch Studio or open protected views.
     Offers 'Sign In' or 'Create Account' with the mint/peach split-screen branding.
     """
-    if session.get("user_id"):
-        return redirect(url_for("studio"))
+    user_id = session.get("user_id")
+    if user_id:
+        if AuthManager.get_user_by_id(user_id):
+            return redirect(url_for("studio"))
+        session.clear()
     next_url = request.args.get("next", "")
     if not is_safe_url(next_url):
         next_url = url_for("studio")
@@ -140,6 +149,12 @@ def login():
     if not is_safe_url(next_url):
         next_url = url_for("studio")
 
+    user_id = session.get("user_id")
+    if user_id:
+        if AuthManager.get_user_by_id(user_id):
+            return redirect(next_url)
+        session.clear()
+
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
@@ -159,8 +174,6 @@ def login():
                 return jsonify({"success": False, "message": auth_res["message"]}), 400
             return render_template("login.html", error=auth_res["message"], email=email, next_url=next_url)
 
-    if session.get("user_id"):
-        return redirect(next_url)
     return render_template("login.html", next_url=next_url)
 
 
@@ -170,6 +183,12 @@ def signup():
     next_url = request.args.get("next") or request.form.get("next") or url_for("studio")
     if not is_safe_url(next_url):
         next_url = url_for("studio")
+
+    user_id = session.get("user_id")
+    if user_id:
+        if AuthManager.get_user_by_id(user_id):
+            return redirect(next_url)
+        session.clear()
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -199,8 +218,6 @@ def signup():
                 return jsonify({"success": False, "message": reg_res["message"]}), 400
             return render_template("signup.html", error=reg_res["message"], name=name, email=email, next_url=next_url)
 
-    if session.get("user_id"):
-        return redirect(next_url)
     return render_template("signup.html", next_url=next_url)
 
 

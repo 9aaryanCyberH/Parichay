@@ -63,6 +63,7 @@
   --primary-teal-light: #203E36;
   --matched-green-bg: #064E3B;
   --matched-green-border: #047857;
+  --missing-red: #F87171;
   --missing-red-bg: #451A1A;
   --missing-red-border: #991B1B;
   --partial-amber-bg: #45220B;
@@ -403,6 +404,26 @@ body.dashboard-body {
   border-color: var(--primary-teal);
   color: var(--primary-teal);
   background-color: #FFFFFF;
+}
+
+.btn-topbar-signout {
+  color: var(--missing-red);
+}
+
+.btn-topbar-signout:hover {
+  border-color: var(--missing-red);
+  color: var(--missing-red);
+  background-color: var(--missing-red-bg);
+}
+
+[data-theme="dark"] .btn-topbar-signout {
+  color: #F87171;
+}
+
+[data-theme="dark"] .btn-topbar-signout:hover {
+  border-color: #F87171;
+  color: #F87171;
+  background-color: #451A1A;
 }
 
 .btn-topbar-solid {
