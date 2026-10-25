@@ -1395,9 +1395,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // 8. SETTINGS PROFILE UPDATE (Screen 9 Right)
+  // 8. SETTINGS PROFILE & SECURITY UPDATE (Screen 9 Right)
   // ==========================================================================
   function initSettingsForm() {
+    const tabBtnProfile = document.getElementById("tabBtnProfile");
+    const tabBtnSecurity = document.getElementById("tabBtnSecurity");
+    const settingsPanelProfile = document.getElementById("settingsPanelProfile");
+    const settingsPanelSecurity = document.getElementById("settingsPanelSecurity");
+    const securityForm = document.getElementById("securityForm");
+    const securityNewPassword = document.getElementById("securityNewPassword");
+    const securityConfirmPassword = document.getElementById("securityConfirmPassword");
+
+    if (tabBtnProfile && tabBtnSecurity && settingsPanelProfile && settingsPanelSecurity) {
+      tabBtnProfile.addEventListener("click", () => {
+        tabBtnProfile.classList.add("active");
+        tabBtnSecurity.classList.remove("active");
+        settingsPanelProfile.style.display = "block";
+        settingsPanelSecurity.style.display = "none";
+      });
+
+      tabBtnSecurity.addEventListener("click", () => {
+        tabBtnSecurity.classList.add("active");
+        tabBtnProfile.classList.remove("active");
+        settingsPanelSecurity.style.display = "block";
+        settingsPanelProfile.style.display = "none";
+      });
+    }
+
     if (settingsForm) {
       settingsForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -1421,6 +1445,44 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } catch (e) {
           showAlert("Error saving settings.", "error");
+        }
+      });
+    }
+
+    if (securityForm) {
+      securityForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const newPass = securityNewPassword ? securityNewPassword.value.trim() : "";
+        const confirmPass = securityConfirmPassword ? securityConfirmPassword.value.trim() : "";
+
+        if (!newPass) {
+          showAlert("Please enter a new password.", "error");
+          return;
+        }
+        if (newPass.length < 6) {
+          showAlert("Password must be at least 6 characters long.", "error");
+          return;
+        }
+        if (newPass !== confirmPass) {
+          showAlert("Passwords do not match.", "error");
+          return;
+        }
+
+        try {
+          const resp = await fetch("/api/settings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ new_password: newPass })
+          });
+          const res = await resp.json();
+          if (res.success) {
+            showAlert("Password updated successfully.", "info");
+            securityForm.reset();
+          } else {
+            showAlert(res.message || "Failed to update password.", "error");
+          }
+        } catch (err) {
+          showAlert("Error updating password.", "error");
         }
       });
     }

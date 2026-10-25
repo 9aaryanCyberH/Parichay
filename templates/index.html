@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_clean_chat">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20261025_settings_v3">
   
   <!-- Chart.js for Skill Match Visualization (Assignment Section 4) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -748,38 +748,65 @@
 
         <div class="settings-card">
           <div class="settings-tabs-row">
-            <button type="button" class="btn-settings-tab active">Profile</button>
-            <button type="button" class="btn-settings-tab" onclick="alert('Password and security updates are managed in your session profile.');">Security</button>
+            <button type="button" class="btn-settings-tab active" id="tabBtnProfile">Profile</button>
+            <button type="button" class="btn-settings-tab" id="tabBtnSecurity">Security</button>
           </div>
 
-          <form id="settingsForm">
-            <div class="settings-form-group">
-              <label for="settingsNameInput" class="settings-label">Full name</label>
-              <input type="text" id="settingsNameInput" class="settings-input" value="{{ current_user.name if current_user else 'Guest Candidate' }}">
-            </div>
-
-            <div class="settings-form-group">
-              <label for="settingsEmailInput" class="settings-label">Account email</label>
-              <input type="email" id="settingsEmailInput" class="settings-input" value="{{ current_user.email if current_user else 'guest@example.com' }}" {% if not current_user %}disabled{% endif %}>
-            </div>
-
-            <div class="settings-form-group">
-              <label class="settings-label">Account status</label>
-              <div class="account-type-box">
-                <span class="plan-name-text">{{ current_user.account_type if current_user else 'Free Plan' }}</span>
-                <span style="font-size: 0.82rem; color: var(--muted-slate);">Active workspace</span>
+          <!-- PROFILE TAB PANEL -->
+          <div id="settingsPanelProfile" class="settings-tab-panel">
+            <form id="settingsForm">
+              <div class="settings-form-group">
+                <label for="settingsNameInput" class="settings-label">Full name</label>
+                <input type="text" id="settingsNameInput" class="settings-input" value="{{ current_user.name if current_user else 'Guest Candidate' }}">
               </div>
-            </div>
 
-            <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-              <label class="settings-label">Data &amp; privacy controls</label>
-              <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0 0 10px 0;">
-                All documents are parsed strictly in memory. You can clear your saved historical records at any time from My analyses.
-              </p>
-            </div>
+              <div class="settings-form-group">
+                <label for="settingsEmailInput" class="settings-label">Account email</label>
+                <input type="email" id="settingsEmailInput" class="settings-input" value="{{ current_user.email if current_user else 'guest@example.com' }}" {% if not current_user %}disabled{% endif %}>
+              </div>
 
-            <button type="submit" id="btnSaveSettings" class="btn-save-settings">Save changes</button>
-          </form>
+              <div class="settings-form-group">
+                <label class="settings-label">Account status</label>
+                <div class="account-type-box">
+                  <span class="plan-name-text">{{ current_user.account_type if current_user else 'Free Plan' }}</span>
+                  <span class="account-status-badge">Active workspace</span>
+                </div>
+              </div>
+
+              <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+                <label class="settings-label">Data &amp; privacy controls</label>
+                <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0 0 10px 0;">
+                  All documents are parsed strictly in memory. You can clear your saved historical records at any time from My analyses.
+                </p>
+              </div>
+
+              <button type="submit" id="btnSaveSettings" class="btn-save-settings">Save changes</button>
+            </form>
+          </div>
+
+          <!-- SECURITY TAB PANEL -->
+          <div id="settingsPanelSecurity" class="settings-tab-panel" style="display: none;">
+            <form id="securityForm">
+              <div class="settings-form-group">
+                <label for="securityNewPassword" class="settings-label">New password</label>
+                <input type="password" id="securityNewPassword" class="settings-input" placeholder="Enter new password (min. 6 characters)">
+              </div>
+
+              <div class="settings-form-group">
+                <label for="securityConfirmPassword" class="settings-label">Confirm new password</label>
+                <input type="password" id="securityConfirmPassword" class="settings-input" placeholder="Confirm new password">
+              </div>
+
+              <div class="settings-form-group" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+                <label class="settings-label">Session security</label>
+                <p style="font-size: 0.8rem; color: var(--muted-slate); margin: 0 0 10px 0;">
+                  Session authenticated via PBKDF2 HMAC-SHA256 password hashing. Sign out anytime to invalidate active session cookies.
+                </p>
+              </div>
+
+              <button type="submit" id="btnSaveSecurity" class="btn-save-settings">Update password</button>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -805,6 +832,6 @@
 
   <!-- Shared Theme Controller & Main Studio Logic -->
   <script src="{{ url_for('static', filename='js/theme.js') }}?v=20261025_theme2"></script>
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_native_chat"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_settings_v3"></script>
 </body>
 </html>

@@ -496,13 +496,17 @@ def manage_history_item(analysis_id):
 def update_settings():
     """Updates profile information for the authenticated user."""
     user_id = session.get("user_id")
-    data = request.get_json(silent=True) or request.form
-    name = data.get("name", "").strip()
-    email = data.get("email", "").strip()
+    user = AuthManager.get_user_by_id(user_id)
+    if not user:
+        return jsonify({"success": False, "message": "User account not found."}), 404
+
+    data = request.get_json(silent=True) or request.form or {}
+    name = data.get("name", "").strip() or user.get("name", "")
+    email = data.get("email", "").strip() or user.get("email", "")
     new_password = data.get("new_password", "").strip()
 
     res = AuthManager.update_profile(user_id, name, email, new_password)
-    if res["success"]:
+    if res.get("success"):
         session["user_name"] = name
         session["user_email"] = email
     return jsonify(res)

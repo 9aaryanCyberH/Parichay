@@ -431,6 +431,70 @@
   color: #ECFDF5;
 }
 
+/* Settings View Dark Theming */
+[data-theme="dark"] .settings-card {
+  background-color: #14221F;
+  border-color: #203630;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .settings-tabs-row {
+  border-bottom-color: #203630;
+}
+[data-theme="dark"] .btn-settings-tab {
+  color: #94A3B8;
+}
+[data-theme="dark"] .btn-settings-tab:hover {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .btn-settings-tab.active {
+  background-color: #172A25;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .settings-label {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .settings-input {
+  background-color: #0D1614;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] .settings-input:focus {
+  background-color: #101C19;
+  border-color: #B8F2D0;
+  color: #ECFDF5;
+  box-shadow: 0 0 0 3px rgba(184, 242, 208, 0.15);
+}
+[data-theme="dark"] .settings-input:disabled {
+  background-color: #0A1210;
+  color: #64748B;
+  border-color: #1A2C26;
+  cursor: not-allowed;
+}
+[data-theme="dark"] .account-type-box {
+  background-color: #0D1614;
+  border-color: #203630;
+}
+[data-theme="dark"] .plan-name-text {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .account-status-badge {
+  background-color: #172A25;
+  color: #B8F2D0;
+  border-color: #203630;
+}
+[data-theme="dark"] .btn-save-settings {
+  background-color: #B8F2D0 !important;
+  color: #0C2824 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(184, 242, 208, 0.25);
+}
+[data-theme="dark"] .btn-save-settings:hover {
+  background-color: #DDF8E8 !important;
+  color: #0C2824 !important;
+  box-shadow: 0 6px 20px rgba(184, 242, 208, 0.4);
+  transform: translateY(-1px);
+}
+
 /* Theme Toggle Button Styling & Strict Icon State
    Default (Light theme): Show MOON button (🌙) to switch to Dark
    Dark theme: Show SUN button (☀️) to switch to Light */
@@ -2351,6 +2415,17 @@ body.dashboard-body {
   color: var(--ink);
 }
 
+.account-status-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-teal);
+  background-color: var(--sage-canvas);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.02em;
+}
+
 .btn-upgrade-pill {
   background-color: var(--accent-mint);
   color: var(--primary-teal);
@@ -2363,22 +2438,28 @@ body.dashboard-body {
 }
 
 .btn-save-settings {
-  background-color: var(--ink);
+  background-color: var(--primary-teal);
   color: #FFFFFF;
-  border: none;
+  border: 1px solid transparent;
   font-family: var(--font-main);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.94rem;
+  font-weight: 700;
   padding: 12px 28px;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  margin-top: 12px;
+  margin-top: 14px;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 12px rgba(18, 59, 53, 0.18);
 }
 
 .btn-save-settings:hover {
-  background-color: #000000;
+  background-color: var(--primary-teal-hover);
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(18, 59, 53, 0.25);
 }
 
 /* ==========================================================================

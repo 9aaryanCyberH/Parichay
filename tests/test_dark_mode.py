@@ -81,6 +81,9 @@ class TestDarkModeAudit(unittest.TestCase):
         self.assertIn('[data-theme="dark"] .btn-history-load', style_css)
         self.assertIn('[data-theme="dark"] .btn-view-suggestion', style_css)
         self.assertIn('[data-theme="dark"] .score-progress-bar-wrap', style_css)
+        self.assertIn('[data-theme="dark"] .settings-card', style_css)
+        self.assertIn('[data-theme="dark"] .btn-save-settings', style_css)
+        self.assertIn('[data-theme="dark"] .settings-input', style_css)
 
         landing_path = os.path.join(base_dir, "static", "css", "landing.css")
         with open(landing_path, "r", encoding="utf-8") as f:
