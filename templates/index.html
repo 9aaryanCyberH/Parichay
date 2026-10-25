@@ -173,12 +173,15 @@
 
       <!-- Alert Notification Banner -->
       <div id="alertBanner" class="app-alert-banner" role="alert" style="display: none;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span id="alertMessage">Please provide the necessary inputs.</span>
+        <div class="alert-content-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="alertMessage">Please provide the necessary inputs.</span>
+        </div>
+        <button type="button" id="btnDismissAlert" class="btn-alert-dismiss" aria-label="Dismiss notification">&times;</button>
       </div>
 
       <!-- ====================================================================
@@ -511,16 +514,38 @@
           <p class="recommendations-subtitle">Use the findings from your analysis to decide which resume improvements and learning priorities deserve attention first.</p>
         </div>
 
-        <!-- Recommendation Tabs -->
+        <!-- Executive Summary Assessment -->
+        <div id="recExecutiveSummaryCard" class="rec-executive-card" style="display: none;">
+          <div class="rec-executive-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Executive assessment</span>
+          </div>
+          <p id="recExecutiveSummaryText" class="rec-executive-text"></p>
+        </div>
+
+        <!-- Recommendation Tabs (Section 11 Categories) -->
         <div class="recommendations-tabs-row">
-          <button type="button" class="btn-rec-tab active" data-rec-tab="improvements">Strengthen resume bullets</button>
-          <button type="button" class="btn-rec-tab" data-rec-tab="skills">Address important skill gaps</button>
+          <button type="button" class="btn-rec-tab active" data-rec-tab="bullets">Strengthen resume bullets</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="skills">Highlight relevant skills</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="gaps">Address important skill gaps</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="projects">Build evidence through projects</button>
           <button type="button" class="btn-rec-tab" data-rec-tab="interview">Prepare for interviews</button>
         </div>
 
         <!-- Numbered Recommendation Cards -->
         <div id="recCardsRow" class="recommendations-cards-grid">
           <!-- Dynamically populated -->
+        </div>
+
+        <!-- Connected AI Assistant Prompt -->
+        <div class="rec-ai-chat-prompt">
+          <div class="rec-ai-prompt-left">
+            <div class="rec-ai-prompt-title">Need personalized coaching on these suggestions?</div>
+            <div class="rec-ai-prompt-sub">Ask Parichay's AI assistant to draft bullet rewrites, simulate interview questions, or review your project plans.</div>
+          </div>
+          <button type="button" id="btnRecAskAi" class="btn-rec-ask-ai">Ask AI assistant &rarr;</button>
         </div>
       </div>
 

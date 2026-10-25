@@ -15,14 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFile = null;
   let latestAnalysisData = null;
   let activeMatrixFilter = "matched";
-  let activeRecTab = "improvements";
+  let activeRecTab = "bullets";
   let chatConversationHistory = [];
+  let alertTimeout = null;
 
   // DOM Elements - Navigation & Shell
   const navButtons = document.querySelectorAll(".sidebar-nav-item");
   const viewPanels = document.querySelectorAll(".view-panel");
   const alertBanner = document.getElementById("alertBanner");
   const alertMessage = document.getElementById("alertMessage");
+  const btnDismissAlert = document.getElementById("btnDismissAlert");
 
   // DOM Elements - Studio (Screen 4)
   const dropzone = document.getElementById("dropzone");
@@ -131,6 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function showView(viewName) {
+    // If an info completion alert is currently showing, dismiss it smoothly when navigating between views
+    if (alertBanner && alertBanner.style.display !== "none" && alertBanner.classList.contains("info")) {
+      hideAlert();
+    }
+
     // If user attempts to go to analysis views before analyzing, guide them gently
     const analysisViews = ["overview", "skills", "recommendations", "audit"];
     if (analysisViews.includes(viewName) && !latestAnalysisData) {
@@ -154,6 +161,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (targetPanel) {
       targetPanel.classList.add("active");
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    if (viewName === "recommendations" && latestAnalysisData) {
+      populateRecommendations(latestAnalysisData);
     }
 
     if (viewName === "history") {
@@ -599,9 +610,29 @@ document.addEventListener("DOMContentLoaded", () => {
         renderRecommendationCards();
       });
     });
+
+    const btnRecAskAi = document.getElementById("btnRecAskAi");
+    if (btnRecAskAi) {
+      btnRecAskAi.addEventListener("click", () => {
+        showView("chat");
+      });
+    }
   }
 
   function populateRecommendations(data) {
+    const recSummaryCard = document.getElementById("recExecutiveSummaryCard");
+    const recSummaryText = document.getElementById("recExecutiveSummaryText");
+    const execSummary = (data && data.recommendations && data.recommendations.executive_summary) || "";
+
+    if (recSummaryCard && recSummaryText) {
+      if (execSummary) {
+        recSummaryText.textContent = execSummary;
+        recSummaryCard.style.display = "block";
+      } else {
+        recSummaryCard.style.display = "none";
+      }
+    }
+
     renderRecommendationCards();
   }
 
@@ -610,73 +641,331 @@ document.addEventListener("DOMContentLoaded", () => {
 
     recCardsRow.innerHTML = "";
     const recs = latestAnalysisData.recommendations || {};
+    const matchedTech = (latestAnalysisData.skills && latestAnalysisData.skills.matched_technical) || [];
+    const missingTech = (latestAnalysisData.skills && latestAnalysisData.skills.missing_technical) || [];
 
-    if (activeRecTab === "improvements") {
+    if (activeRecTab === "bullets") {
       const bullets = recs.bullet_enhancements || [];
-      const defaultCards = [
-        {
-          num: 1,
-          title: "Strengthen Project Descriptions",
-          desc: "Add specific metrics and quantifiable outcomes to your project achievements using Google's X-Y-Z formula.",
-          fullContent: bullets[0] ? `<strong>Before:</strong> ${escapeHtml(bullets[0].original)}<br><br><strong>Google X-Y-Z Enhanced:</strong> ${escapeHtml(bullets[0].enhanced)}<br><br><strong>Why:</strong> ${escapeHtml(bullets[0].rationale)}` : "Quantify your impact with business metrics."
-        },
-        {
-          num: 2,
-          title: "Highlight Relevant Skills",
-          desc: "Move core matched technologies like Python, SQL, and Machine Learning to a prominent technical skills section.",
-          fullContent: "Organize your skills into categoric bands (Languages, Frameworks, Cloud, Databases) right near the top third of your resume for immediate recruiter visibility."
-        },
-        {
-          num: 3,
-          title: "Improve Action Verbs",
-          desc: "Replace passive or vague words like 'worked on' or 'helped with' with decisive verbs like 'Engineered', 'Architected', and 'Deployed'.",
-          fullContent: "Strong active verbs increase ATS readability and convey engineering leadership. Frame each accomplishment around what you built and the result."
-        }
-      ];
+      const b0 = bullets[0] || {};
+      const orig0 = b0.original || "Worked on backend service and fixed performance bugs.";
+      const enh0 = b0.enhanced || b0.recommended_action || "Engineered an asynchronous ingestion pipeline using Python and Redis buffering, reducing latency by 35% across 200K daily records.";
+      const rat0 = b0.rationale || b0.critique || "Google's X-Y-Z formula (Accomplished [X] as measured by [Y], by doing [Z]) proves tangible engineering impact and technical ownership.";
 
-      defaultCards.forEach(c => renderSingleRecCard(c));
-    } else if (activeRecTab === "skills") {
-      const gaps = recs.gap_mitigation_plan || [];
-      const cards = gaps.slice(0, 3).map((gap, i) => ({
-        num: i + 1,
-        title: `Bridge ${gap.missing_skill}`,
-        desc: gap.recommended_action || "Learn and prove proficiency with hands-on practice.",
-        fullContent: `<strong>Skill:</strong> ${escapeHtml(gap.missing_skill)}<br><br><strong>Action:</strong> ${escapeHtml(gap.recommended_action)}<br><br><strong>Recommended Project:</strong> ${escapeHtml(gap.proof_project)}`
-      }));
-
-      if (cards.length === 0) {
-        cards.push({
-          num: 1,
-          title: "Expand Cloud & Microservices",
-          desc: "Deploy a containerized application to AWS or GCP to demonstrate production deployment readiness.",
-          fullContent: "Build a Dockerized REST API and deploy it with CI/CD to AWS ECS or GCP Cloud Run."
-        });
-      }
-
-      cards.forEach(c => renderSingleRecCard(c));
-    } else {
-      const interview = recs.interview_prep_topics || [];
       const cards = [
         {
           num: 1,
-          title: "Technical Architecture Drill",
-          desc: interview[0] ? interview[0] : "Prepare for deep-dive questions on your core project architecture.",
-          fullContent: interview[0] ? `<strong>Focus Area:</strong> ${escapeHtml(interview[0])}` : "Review system design and data structures."
+          tag: "Google X-Y-Z",
+          title: "Quantify engineering outcomes with Google's X-Y-Z formula",
+          desc: "Structure achievements as: Accomplished [X] as measured by [Y], by doing [Z].",
+          fullContent: `
+            <p>Hiring teams and senior engineering screeners prioritize quantifiable achievements over passive duty lists.</p>
+            <div class="modal-diff-box">
+              <div class="modal-diff-item before">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--muted-slate); text-transform:uppercase; margin-bottom:4px;">Generic / Passive bullet</div>
+                <div>${escapeHtml(orig0)}</div>
+              </div>
+              <div class="modal-diff-item after">
+                <div style="font-size:0.75rem; font-weight:700; color:#1E7E45; text-transform:uppercase; margin-bottom:4px;">Google X-Y-Z enhanced rewrite</div>
+                <div><strong>${escapeHtml(enh0)}</strong></div>
+              </div>
+            </div>
+            <div class="modal-section-box">
+              <strong>Why this works:</strong> ${escapeHtml(rat0)}
+            </div>
+          `
         },
         {
           num: 2,
-          title: "Core Competency Coding",
-          desc: interview[1] ? interview[1] : "Review algorithms, API design, and asynchronous patterns in Python.",
-          fullContent: interview[1] ? `<strong>Focus Area:</strong> ${escapeHtml(interview[1])}` : "Practice coding exercises on data structures and algorithms."
+          tag: "Action verbs",
+          title: "Replace passive verbs with high-impact action verbs",
+          desc: "Eliminate weak phrasing like 'worked on' or 'helped with' in favor of decisive verbs.",
+          fullContent: `
+            <p>Replacing passive or vague verbs with decisive, technically descriptive verbs immediately improves candidate impression and automated semantic ranking.</p>
+            <div class="modal-section-box">
+              <strong>Recommended strong verbs:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li><strong>Architecture & Build:</strong> Engineered, Architected, Designed, Implemented</li>
+                <li><strong>Optimization & Scaling:</strong> Accelerated, Benchmarked, Streamlined, Refactored</li>
+                <li><strong>Operations & Delivery:</strong> Automated, Containerized, Deployed, Orchestrated</li>
+              </ul>
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px; background-color: #F8F9FA; border-left-color: var(--muted-slate);">
+              <strong>Phrases to eliminate:</strong> 'Helped with', 'Worked on', 'Responsible for', 'Assisted in', 'Participated in'.
+            </div>
+          `
         },
         {
           num: 3,
-          title: "Behavioral & Impact Review",
-          desc: interview[2] ? interview[2] : "Prepare STAR-method examples explaining technical challenges you overcame.",
-          fullContent: interview[2] ? `<strong>Focus Area:</strong> ${escapeHtml(interview[2])}` : "Be ready to explain trade-offs made during development."
+          tag: "Architecture",
+          title: "Highlight technical context and architectural trade-offs",
+          desc: "Explain why specific tools, databases, or patterns were chosen for your projects.",
+          fullContent: `
+            <p>Mid-level and senior interview screeners look for intentional engineering trade-offs. Detail the constraints, chosen databases, and latency goals.</p>
+            <div class="modal-diff-box">
+              <div class="modal-diff-item after">
+                <div style="font-size:0.75rem; font-weight:700; color:#1E7E45; text-transform:uppercase; margin-bottom:4px;">Example bullet with context & trade-offs</div>
+                <div>'Selected PostgreSQL over MongoDB to enforce ACID consistency for financial transactions, adding Redis caching to maintain sub-50ms query responses during traffic spikes.'</div>
+              </div>
+            </div>
+            <div class="modal-section-box">
+              <strong>Actionable takeaway:</strong> For every major project in your resume, add a 1-sentence note addressing <em>why</em> you chose that specific technology stack over alternatives.
+            </div>
+          `
         }
       ];
+      cards.forEach(c => renderSingleRecCard(c));
 
+    } else if (activeRecTab === "skills") {
+      const topMatched = matchedTech.slice(0, 6).join(", ") || "Python, SQL, REST APIs, Git";
+      const cards = [
+        {
+          num: 1,
+          tag: "Hierarchy",
+          title: "Elevate verified technologies to the top third",
+          desc: "Group matched competencies prominently under clean technical headings near the top.",
+          fullContent: `
+            <p>Technical recruiters spend an average of 6–10 seconds on their first scan. Placing a verified technical stack near the top ensures immediate alignment recognition.</p>
+            <div class="modal-section-box">
+              <strong>Verified matched competencies:</strong><br>
+              ${escapeHtml(topMatched)}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px;">
+              <strong>Recommended section organization:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li><strong>Languages:</strong> e.g., Python, SQL, JavaScript</li>
+                <li><strong>Frameworks & APIs:</strong> e.g., FastAPI, Flask, React</li>
+                <li><strong>Databases & Caching:</strong> e.g., PostgreSQL, Redis, MongoDB</li>
+                <li><strong>Cloud & DevOps:</strong> e.g., Docker, AWS/GCP, GitHub Actions</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          num: 2,
+          tag: "Keywords",
+          title: "Standardize target role terminology",
+          desc: "Match acronyms and tool names to standard conventions used in the job description.",
+          fullContent: `
+            <p>Different automated parsers and hiring managers search for specific standard keywords. Aligning your naming reduces ambiguity.</p>
+            <div class="modal-diff-box">
+              <div class="modal-diff-item before">
+                <div style="font-size:0.75rem; font-weight:700; color:var(--muted-slate); text-transform:uppercase; margin-bottom:4px;">Informal or ambiguous naming</div>
+                <div>'Python scripting, writing DB queries, AWS server, git'</div>
+              </div>
+              <div class="modal-diff-item after">
+                <div style="font-size:0.75rem; font-weight:700; color:#1E7E45; text-transform:uppercase; margin-bottom:4px;">Standardized industry terms</div>
+                <div>'Python 3.x, PostgreSQL / SQL Query Optimization, AWS EC2 & S3, Git / GitHub CI/CD'</div>
+              </div>
+            </div>
+          `
+        },
+        {
+          num: 3,
+          tag: "Evidence",
+          title: "Corroborate skills with bullet evidence",
+          desc: "Every skill in your skills inventory should be evidenced in at least one bullet point.",
+          fullContent: `
+            <p>Standalone skill tags carry little weight without contextual proof. Interviewers will interrogate any skill claimed on your resume.</p>
+            <div class="modal-section-box">
+              <strong>Verification rule:</strong> If a tool is listed under your Skills section (e.g. Docker, PostgreSQL, Redis), ensure it appears in at least one project bullet point describing how you used it to solve an engineering problem.
+            </div>
+          `
+        }
+      ];
+      cards.forEach(c => renderSingleRecCard(c));
+
+    } else if (activeRecTab === "gaps") {
+      const gaps = recs.gap_mitigation_plan || [];
+      const cards = gaps.slice(0, 3).map((gap, i) => {
+        const skill = gap.missing_skill || (missingTech[i] || "Cloud & Infrastructure");
+        const action = gap.concrete_action || gap.recommended_action || "Learn and prove proficiency through focused hands-on practice.";
+        const project = gap.proof_project || `Build a containerized proof-of-concept demonstrating ${skill} on GitHub.`;
+        return {
+          num: i + 1,
+          tag: "Skill gap",
+          title: `Bridge requirement: ${skill}`,
+          desc: action,
+          fullContent: `
+            <div class="modal-section-box" style="background-color: var(--missing-red-bg); border-left-color: var(--missing-red-border);">
+              <strong>Unmatched role requirement:</strong> ${escapeHtml(skill)}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px;">
+              <strong>Recommended mitigation action:</strong><br>${escapeHtml(action)}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px; background-color: #EBF8F1; border-left-color: #1E7E45;">
+              <strong>Proof project idea:</strong><br>${escapeHtml(project)}
+            </div>
+          `
+        };
+      });
+
+      if (cards.length === 0) {
+        cards.push(
+          {
+            num: 1,
+            tag: "DevOps gap",
+            title: "Demonstrate production containerization",
+            desc: "Containerize your existing projects with Docker and multi-stage builds.",
+            fullContent: `
+              <p>Containerization proves your software can deploy reliably across staging and production clusters.</p>
+              <div class="modal-section-box">
+                <strong>Recommended action:</strong> Create multi-stage Dockerfiles for your backend services, optimizing image size and security before pushing to Docker Hub.
+              </div>
+            `
+          },
+          {
+            num: 2,
+            tag: "CI/CD gap",
+            title: "Automate CI/CD testing workflows",
+            desc: "Set up GitHub Actions to run automated unit tests and linting on pull requests.",
+            fullContent: `
+              <p>Automated tests eliminate regression defects and prove software engineering hygiene.</p>
+              <div class="modal-section-box">
+                <strong>Recommended action:</strong> Write GitHub Actions workflow YAML files that run your test suite automatically and block merging when tests fail.
+              </div>
+            `
+          },
+          {
+            num: 3,
+            tag: "Cloud gap",
+            title: "Cloud hosting and observability",
+            desc: "Deploy a live project to AWS or GCP with logging and health metrics.",
+            fullContent: `
+              <p>Live applications demonstrate end-to-end delivery competency beyond local localhost development.</p>
+              <div class="modal-section-box">
+                <strong>Recommended action:</strong> Deploy an API service to GCP Cloud Run or AWS ECS, documenting environment variables, monitoring endpoints, and uptime logs.
+              </div>
+            `
+          }
+        );
+      }
+      cards.forEach(c => renderSingleRecCard(c));
+
+    } else if (activeRecTab === "projects") {
+      const cards = [
+        {
+          num: 1,
+          tag: "Architecture",
+          title: "Build a containerized microservice project",
+          desc: "Develop an end-to-end service with Docker, clean documentation, and public repository.",
+          fullContent: `
+            <p>Employers favor candidates who build software resembling real production systems rather than basic single-file scripts.</p>
+            <div class="modal-section-box">
+              <strong>Key architectural checklist:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li>Multi-stage Dockerfile for slim production image footprints</li>
+                <li>Clean REST or gRPC endpoint structure with input validation</li>
+                <li>Comprehensive test coverage (unit & integration tests with Pytest/Jest)</li>
+                <li>README with architectural diagram, setup instructions, and curl commands</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          num: 2,
+          tag: "DevOps & CI/CD",
+          title: "Automate CI/CD pipelines with GitHub Actions",
+          desc: "Deploy your project automatically on git push to prove continuous delivery rigor.",
+          fullContent: `
+            <p>Demonstrating automated workflow discipline proves you are ready to ship code on a real engineering team.</p>
+            <div class="modal-section-box">
+              <strong>Recommended GitHub Actions workflow:</strong>
+              <ol style="margin: 8px 0 0 18px; padding: 0;">
+                <li>Linting and code style verification (flake8/black/eslint)</li>
+                <li>Automated test execution with code coverage reporting</li>
+                <li>Docker container build and publish step</li>
+                <li>Automated deployment trigger to GCP Cloud Run, AWS, or Render</li>
+              </ol>
+            </div>
+          `
+        },
+        {
+          num: 3,
+          tag: "Benchmarking",
+          title: "Document performance benchmarks and latency metrics",
+          desc: "Include measurable throughput and latency metrics directly in your project README.",
+          fullContent: `
+            <p>Benchmarking sets your GitHub profile apart from thousands of generic tutorial clones.</p>
+            <div class="modal-section-box">
+              <strong>Measurable metrics to publish in your project README:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li>Requests per second (RPS) under simulated load (Locust / k6)</li>
+                <li>p50, p95, and p99 response latencies</li>
+                <li>Cache hit ratio with Redis vs baseline database queries</li>
+              </ul>
+            </div>
+          `
+        }
+      ];
+      cards.forEach(c => renderSingleRecCard(c));
+
+    } else {
+      const interview = (recs.interview_preparation_topics && recs.interview_preparation_topics.length > 0)
+        ? recs.interview_preparation_topics
+        : ((recs.interview_prep_topics && recs.interview_prep_topics.length > 0) ? recs.interview_prep_topics : []);
+      const cards = [
+        {
+          num: 1,
+          tag: "Core depth",
+          title: "Core technology deep dive and concurrency",
+          desc: interview[0] || "Prepare for deep-dive questions on memory management and async event loops.",
+          fullContent: `
+            <p>Interviewers probe whether you understand the underlying runtime mechanics of your chosen languages.</p>
+            <div class="modal-section-box">
+              <strong>Key focus topic:</strong><br>${escapeHtml(interview[0] || 'Deep dive on internals, concurrency models, and memory management.')}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px;">
+              <strong>Preparation questions:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li>How does your language handle concurrency (threads vs async I/O)?</li>
+                <li>What are common memory leaks or garbage collection bottlenecks?</li>
+                <li>How would you profile and identify an endpoint running slowly in production?</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          num: 2,
+          tag: "System design",
+          title: "System design and database trade-offs",
+          desc: interview[1] || "Practice database indexing strategies, Redis caching, and scaling endpoints.",
+          fullContent: `
+            <p>System design interviews assess architectural thinking and foresight regarding data integrity, traffic growth, and failures.</p>
+            <div class="modal-section-box">
+              <strong>Key focus topic:</strong><br>${escapeHtml(interview[1] || 'Conceptual trade-offs when choosing relational vs NoSQL databases and caching layers.')}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px;">
+              <strong>Preparation questions:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li>When do you choose PostgreSQL vs MongoDB for this workload?</li>
+                <li>How do you handle cache invalidation and stampedes with Redis?</li>
+                <li>How do you design database indices for complex multi-filter queries?</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          num: 3,
+          tag: "Behavioral STAR",
+          title: "Behavioral STAR stories with technical trade-offs",
+          desc: interview[2] || "Structure stories using Situation, Task, Action, and Result to explain engineering hurdles.",
+          fullContent: `
+            <p>Technical competency must be paired with communication agility. Use the STAR framework for behavioral questions.</p>
+            <div class="modal-section-box">
+              <strong>Key focus topic:</strong><br>${escapeHtml(interview[2] || 'Behavioral STAR methodology: Communicating technical challenges and trade-offs under deadlines.')}
+            </div>
+            <div class="modal-section-box" style="margin-top: 12px;">
+              <strong>STAR Framework structure:</strong>
+              <ul style="margin: 8px 0 0 18px; padding: 0;">
+                <li><strong>Situation:</strong> The project context, timeline, and stakes</li>
+                <li><strong>Task:</strong> The technical challenge you personally owned</li>
+                <li><strong>Action:</strong> The specific engineering choices and debugging steps you took</li>
+                <li><strong>Result:</strong> Quantifiable outcome, metrics, and key lessons learned</li>
+              </ul>
+            </div>
+          `
+        }
+      ];
       cards.forEach(c => renderSingleRecCard(c));
     }
   }
@@ -686,11 +975,14 @@ document.addEventListener("DOMContentLoaded", () => {
     cardEl.className = "recommendation-pill-card";
     cardEl.innerHTML = `
       <div>
-        <div class="rec-number-badge">${card.num}</div>
+        <div class="rec-card-top-row">
+          <div class="rec-number-badge">${card.num}</div>
+          ${card.tag ? `<span class="rec-category-tag">${escapeHtml(card.tag)}</span>` : ""}
+        </div>
         <h4 class="rec-card-title">${escapeHtml(card.title)}</h4>
         <p class="rec-card-desc">${escapeHtml(card.desc)}</p>
       </div>
-      <button type="button" class="btn-view-suggestion">View Suggestion</button>
+      <button type="button" class="btn-view-suggestion">View suggestion &rarr;</button>
     `;
 
     const btn = cardEl.querySelector(".btn-view-suggestion");
@@ -956,6 +1248,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === suggestionModal) closeModal();
       });
     }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    if (btnDismissAlert) {
+      btnDismissAlert.addEventListener("click", hideAlert);
+    }
   }
 
   function openModal(title, bodyHtml) {
@@ -974,10 +1273,18 @@ document.addEventListener("DOMContentLoaded", () => {
     alertMessage.textContent = msg;
     alertBanner.className = `app-alert-banner ${type}`;
     alertBanner.style.display = "flex";
+
+    if (alertTimeout) clearTimeout(alertTimeout);
+    if (type === "info") {
+      alertTimeout = setTimeout(() => {
+        hideAlert();
+      }, 6000);
+    }
   }
 
   function hideAlert() {
     if (alertBanner) alertBanner.style.display = "none";
+    if (alertTimeout) clearTimeout(alertTimeout);
   }
 
   function escapeHtml(text) {
