@@ -5,7 +5,7 @@ Provides web routes, file upload handling, and analysis pipeline endpoints.
 import os
 import json
 import logging
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -13,12 +13,22 @@ from services.pdf_parser import PDFParser, PDFParsingError
 from services.extractor import ResumeExtractor, JobDescriptionParser
 from services.matcher import ResumeJobMatcher
 from services.ai_advisor import AIAdvisor
+from services.database import AuthManager, HistoryManager
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Context processor to make current_user available in all templates
+@app.context_processor
+def inject_current_user():
+    user_id = session.get("user_id")
+    if user_id:
+        user = AuthManager.get_user_by_id(user_id)
+        return {"current_user": user}
+    return {"current_user": None}
 
 # Load sample JDs into memory for quick serving
 SAMPLE_JDS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sample_data", "sample_jds.json")
@@ -31,9 +41,12 @@ if os.path.exists(SAMPLE_JDS_PATH):
         logger.warning(f"Could not load sample JDs: {e}")
 
 
+# ============================================================================
+# PUBLIC & WORKSPACE ROUTES
+# ============================================================================
 @app.route("/")
 def landing():
-    """Renders the modern Parichay landing page and product showcase."""
+    """Renders the public Parichay landing page."""
     return render_template("landing.html")
 
 
@@ -42,6 +55,69 @@ def landing():
 def studio():
     """Renders the main Parichay resume intelligence studio and analysis tool."""
     return render_template("index.html")
+
+
+# ============================================================================
+# AUTHENTICATION ROUTES
+# ============================================================================
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Renders login page and handles user sign-in."""
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        auth_res = AuthManager.authenticate_user(email, password)
+
+        if auth_res["success"]:
+            user = auth_res["user"]
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+            session["user_email"] = user["email"]
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": True, "redirect": url_for("studio")})
+            return redirect(url_for("studio"))
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": auth_res["message"]}), 400
+            return render_template("login.html", error=auth_res["message"], email=email)
+
+    if session.get("user_id"):
+        return redirect(url_for("studio"))
+    return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Renders sign-up page and handles user account creation."""
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        reg_res = AuthManager.register_user(name, email, password)
+
+        if reg_res["success"]:
+            user = reg_res["user"]
+            session["user_id"] = user["id"]
+            session["user_name"] = user["name"]
+            session["user_email"] = user["email"]
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": True, "redirect": url_for("studio")})
+            return redirect(url_for("studio"))
+        else:
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
+                return jsonify({"success": False, "message": reg_res["message"]}), 400
+            return render_template("signup.html", error=reg_res["message"], name=name, email=email)
+
+    if session.get("user_id"):
+        return redirect(url_for("studio"))
+    return render_template("signup.html")
+
+
+@app.route("/logout")
+def logout():
+    """Clears user session and redirects to public landing page."""
+    session.clear()
+    return redirect(url_for("landing"))
 
 
 @app.route("/api/health", methods=["GET"])
@@ -262,7 +338,74 @@ def analyze_resume():
         "recommendations": recommendations
     }
 
+    # Automatically save analysis to history for authenticated users
+    user_id = session.get("user_id")
+    if user_id:
+        role_label = jd_data.get("role_title")
+        if not role_label or role_label == "Standard":
+            first_line = job_description.strip().split("\n")[0].strip()
+            role_label = first_line[:40] if len(first_line) > 5 else "Target Role"
+        analysis_id = HistoryManager.save_analysis(
+            user_id=user_id,
+            filename=filename,
+            candidate_name=contact_info.get("name") or "Candidate",
+            role_title=role_label,
+            score=match_data["score"],
+            fit_tier=match_data["fit_tier"],
+            analysis_data=response_payload
+        )
+        response_payload["saved_history_id"] = analysis_id
+
     return jsonify(response_payload)
+
+
+# ============================================================================
+# USER HISTORY & ACCOUNT ENDPOINTS
+# ============================================================================
+@app.route("/api/history", methods=["GET"])
+def get_history():
+    """Returns saved analysis history for the logged-in user."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "authenticated": False, "items": [], "analyses": []})
+    items = HistoryManager.get_user_analyses(user_id)
+    return jsonify({"success": True, "authenticated": True, "items": items, "analyses": items})
+
+
+@app.route("/api/history/<int:analysis_id>", methods=["GET", "DELETE"])
+def manage_history_item(analysis_id):
+    """Retrieves or deletes a specific analysis record."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "Authentication required."}), 401
+
+    if request.method == "DELETE":
+        deleted = HistoryManager.delete_analysis(analysis_id, user_id)
+        return jsonify({"success": deleted})
+
+    item = HistoryManager.get_analysis_by_id(analysis_id, user_id)
+    if not item:
+        return jsonify({"success": False, "message": "Record not found."}), 404
+    return jsonify({"success": True, "item": item, "analysis": item})
+
+
+@app.route("/api/settings", methods=["POST"])
+def update_settings():
+    """Updates profile information for the authenticated user."""
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"success": False, "message": "Authentication required."}), 401
+
+    data = request.get_json(silent=True) or request.form
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+    new_password = data.get("new_password", "").strip()
+
+    res = AuthManager.update_profile(user_id, name, email, new_password)
+    if res["success"]:
+        session["user_name"] = name
+        session["user_email"] = email
+    return jsonify(res)
 
 
 @app.route("/api/chat", methods=["POST"])

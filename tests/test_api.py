@@ -1,10 +1,12 @@
 """
-tests/test_api.py - Integration tests for Flask endpoints and HTTP error handling.
+tests/test_api.py - Integration tests for Flask endpoints, Authentication,
+History persistence, and Career Chatbot error handling.
 """
 import io
 import os
 import unittest
 from app import app
+from services.database import AuthManager, HistoryManager
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VALID_PDF_PATH = os.path.join(BASE_DIR, "sample_data", "sample_resume_swe.pdf")
@@ -15,6 +17,7 @@ class TestParichayAPI(unittest.TestCase):
 
     def setUp(self):
         app.config["TESTING"] = True
+        app.config["SECRET_KEY"] = "test-secret-key"
         self.client = app.test_client()
 
         with open(VALID_PDF_PATH, "rb") as f:
@@ -101,7 +104,7 @@ class TestParichayAPI(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn("Parichay", html)
         self.assertIn("Where Your Potential Meets Opportunity", html)
-        self.assertIn("LAUNCH RESUME STUDIO", html)
+        self.assertIn("Analyze My Resume", html)
 
     def test_studio_page_endpoint(self):
         """Test GET /studio returns the full workspace application."""
@@ -109,7 +112,7 @@ class TestParichayAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("Resume Studio", html)
-        self.assertIn("Candidate Resume", html)
+        self.assertIn("analyze your resume", html)
 
     def test_chatbot_endpoint(self):
         """Test POST /api/chat handles career inquiries with grounded responses."""
@@ -133,6 +136,58 @@ class TestParichayAPI(unittest.TestCase):
         self.assertIn("reply", data)
         self.assertGreater(len(data["reply"]), 20)
         self.assertIn("Google's X-Y-Z", data["reply"])
+
+    def test_auth_workflow(self):
+        """Test user registration, login, session, and logout flow."""
+        import uuid
+        test_email = f"test_{uuid.uuid4().hex[:8]}@example.com"
+        test_password = "SecurePassword123!"
+
+        # 1. Register
+        reg_resp = self.client.post("/signup", data={
+            "name": "Test Candidate",
+            "email": test_email,
+            "password": test_password
+        }, follow_redirects=True)
+        self.assertEqual(reg_resp.status_code, 200)
+
+        # 2. Logout
+        logout_resp = self.client.get("/logout", follow_redirects=True)
+        self.assertEqual(logout_resp.status_code, 200)
+
+        # 3. Login with invalid password fails
+        bad_login = self.client.post("/login", data={
+            "email": test_email,
+            "password": "WrongPassword"
+        })
+        self.assertEqual(bad_login.status_code, 200)
+        self.assertIn("Incorrect password", bad_login.get_data(as_text=True))
+
+        # 4. Login with correct password succeeds
+        good_login = self.client.post("/login", data={
+            "email": test_email,
+            "password": test_password
+        }, follow_redirects=True)
+        self.assertEqual(good_login.status_code, 200)
+
+    def test_history_endpoint(self):
+        """Test GET /api/history endpoint returns valid response for authenticated user."""
+        import uuid
+        test_email = f"hist_{uuid.uuid4().hex[:8]}@example.com"
+        test_password = "Password123!"
+
+        # Register and remain logged in in this test client session
+        self.client.post("/signup", data={
+            "name": "History User",
+            "email": test_email,
+            "password": test_password
+        })
+
+        response = self.client.get("/api/history")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIsInstance(data["analyses"], list)
 
 
 if __name__ == "__main__":

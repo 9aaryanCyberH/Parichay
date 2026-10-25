@@ -33,6 +33,9 @@ wheels/
 # Uploads & Temporary files
 uploads/
 scratch/
+*.db
+*.sqlite3
+*.sqlite
 .pytest_cache/
 .coverage
 htmlcov/

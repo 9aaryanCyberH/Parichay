@@ -2,246 +2,169 @@
   <img src="static/images/parichay-logo.svg" alt="Parichay Logo" width="460">
   
   <p><strong>Where Your Potential Meets Opportunity.</strong></p>
-  <p><em>AI-Powered Resume Intelligence &amp; Role Alignment Platform</em></p>
+  <p><em>AI-Powered Resume Intelligence &amp; Career Readiness Platform</em></p>
 </div>
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![Flask 3.1](https://img.shields.io/badge/Framework-Flask%203.1-black.svg)](https://flask.palletsprojects.com/)
 [![scikit-learn](https://img.shields.io/badge/ML-scikit--learn%20TF--IDF-orange.svg)](https://scikit-learn.org/)
 [![PyMuPDF](https://img.shields.io/badge/PDF-PyMuPDF-green.svg)](https://pymupdf.readthedocs.io/)
+[![SQLite](https://img.shields.io/badge/Storage-SQLite3-lightgrey.svg)](https://sqlite.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## Brand Identity & Taglines
+## Brand System & Design Tokens
 
-| Dimension | Specification |
-| :--- | :--- |
-| **Project Name** | **Parichay** (परिचय &mdash; *Introduction, Identity, Acquaintance*) |
-| **Primary Tagline** | **Where Your Potential Meets Opportunity.** |
-| **Product Subtitle** | AI-Powered Resume Intelligence & Role Alignment Platform |
-| **Positioning Taglines** | &bull; *Explainable Alignment &bull; Zero Hallucination &bull; Actionable Intelligence*<br>&bull; *Bridge the Gap Between What You Have Built and Where You Belong.* |
-| **Brand Symbol** | **The Convergence Knot**: An interlocking dual-ribbon infinity nexus representing candidate background (cobalt/blue) seamlessly interweaving with career opportunities (amber/cyan). |
-| **Color System** | &bull; Royal Indigo (`#4F46E5`) & Deep Iris (`#4338CA`) &mdash; Primary Brand Foundation<br>&bull; Warm Amber (`#F59E0B`) & Gold (`#FB8500`) &mdash; Human Potential & Spark<br>&bull; Electric Cyan (`#06B6D4`) & Ocean Azure (`#38BDF8`) &mdash; Opportunity & Growth<br>&bull; Slate Charcoal (`#0F172A`) & Warm Card Surface (`#FFFFFF` on `#EDF2F9`)<br>&bull; Dynamic Theme Palette Switcher: Royal Indigo, Electric Sapphire, Precision Emerald, Executive Obsidian |
-| **Typography** | `Plus Jakarta Sans` (Display/Brand), `Inter` (Data & Interface), `JetBrains Mono` (Metrics) |
+Parichay uses an editorial, human-first visual language tailored for clarity and discovery:
 
----
-
-## 1. Executive Summary
-
-**Parichay** is an original, production-minded career intelligence application designed to help candidates evaluate how their resume aligns with specific job descriptions. 
-
-Unlike generic AI career tools that produce black-box percentage scores and hype-filled buzzwords, Parichay emphasizes **interpretability, grounded information extraction, transparent scoring, and real-time conversational coaching**.
-
-### Core Tenets
-- **High-Converting Landing Page (`/`)**: Introduces candidates to the platform through an interactive live preview sandbox, mathematical methodology breakdown, feature value pillars, and benchmark comparisons, before launching into the Resume Studio (`/studio`).
-- **Grounded Conversational AI Chatbot (`/api/chat`)**: A real-time career intelligence copilot that helps candidates rewrite experience bullets following Google's X-Y-Z formula, answers technical interview questions, and provides concrete project ideas for bridging skill gaps.
-- **Dynamic Multi-Theme System**: Features a live brand color palette switcher in the navigation bar supporting Royal Indigo, Electric Sapphire, Precision Emerald, and Executive Obsidian.
-- **Explainable Alignment Scoring**: The match percentage is strictly an **alignment measure**, not a predictive hiring probability. Every percentage point is broken down into four audited mathematical components.
-- **Interactive UI Micro-Interactions**: 1-click clipboard copy on recommended bullet points with visual feedback, clickable missing skills chips that directly launch AI advice, animated circular progress gauges, and interactive radar charts.
-- **Scanned PDF & Error Detection**: Automatically detects image-only or unreadable PDFs using PyMuPDF and provides clear, actionable instructions.
-- **Zero Document Storage**: 100% in-memory processing with PyMuPDF. No candidate resumes or personal details are permanently stored.
+| Token | Value | Role |
+| :--- | :--- | :--- |
+| **Deep Teal** | `#123B35` | Primary brand color, dark pill action buttons, headings, logo typography |
+| **Vivid Mint** | `#B8F2D0` | Primary accent, score gauge progress stroke, highlight pills, active chips |
+| **Sage Canvas** | `#DCEFE3` | Artwork container background, subtle card accents, badge fills |
+| **Warm Ivory** | `#F7F6F0` | Main application background, warm card surfaces, forms |
+| **Ink** | `#202622` | High-contrast editorial typography and dark buttons |
+| **Muted Slate** | `#5A6560` | Secondary typography, subtitles, labels, and borders |
+| **Forest Green** | `#1A6340` | Matched skills, verified ATS passes, success states |
+| **Restrained Terracotta** | `#C25E40` | Missing requirements, gap warnings, critical errors |
+| **Warm Amber** | `#D97706` | Contextual mentions, unverified evidence, advisory warnings |
 
 ---
 
-## 2. Technical Architecture & Data Flow
+## The Parichay Product Experience
 
-Parichay is organized into modular services with strict separation of concerns:
+Parichay is organized into distinct, interactive product screens:
+
+1. **Public Landing Page (`/` — Screen 1)**
+   - Split hero layout with brand headline *"Where Your Potential Meets Opportunity."*
+   - Clear value proposition and primary call-to-action pill *"Analyze My Resume"*.
+   - 3-step numbered workflow indicator: `1 Upload Your Resume` &bull; `2 Add Job Description` &bull; `3 Get Detailed Insights`.
+   - Brand artwork panel with overlapping diagonal gradient lozenges on sage canvas.
+   - Core feature pillars, transparent methodology explanation, and privacy pledge.
+
+2. **Secure Authentication (`/login` & `/signup` — Screens 2 & 3)**
+   - Split card experience: left sage artwork canvas with brand header; right warm ivory form container.
+   - Real backend authentication powered by SQLite (`parichay.db`) and Werkzeug secure password hashing (`generate_password_hash` / `check_password_hash`).
+   - Secure cookie session management with cross-user data isolation.
+   - Anonymous/guest candidates can still test the analysis engine without forced sign-up friction.
+
+3. **Resume Intelligence Studio (`/studio` or `/app` — Screen 4)**
+   - Two-column input layout:
+     - Column 1: PDF resume dropzone with drag-and-drop, file size check, and one-click sample resume shortcut (`Aarav Sharma — Software Engineer`).
+     - Column 2: Target job description textarea with one-click popular role presets (Software Engineer, Data Analyst, ML Engineer, DevOps Engineer).
+   - Real-time analysis trigger via `POST /api/analyze`.
+
+4. **Analysis Result Overview (Screen 5)**
+   - Circular SVG match score gauge with Deep Teal and Mint ring animation.
+   - Candidate contact metadata and verified links.
+   - 4-pillar explainable breakdown table: Technical Skills (45%), Semantic TF-IDF (35%), Soft Skills (10%), Structure (10%).
+   - 4 Key Insights summary cards (Matched Skills, Missing Skills, Strong Points, Recommendations).
+   - Top action pills: *Export Report* (print PDF) and *New Analysis*.
+
+5. **Skills Matrix (Screen 6)**
+   - Tab filters: *Matched Skills*, *Missing Skills*, *Additional Skills* with live count pills.
+   - Two-column interactive layout:
+     - Left column: Skill list items with status icons and Required/Preferred tags.
+     - Right column: Dynamic *Skill Details* card updating live upon clicking any skill, displaying description, verified evidence bullet points from the resume, and a calibrated confidence meter bar.
+
+6. **AI Recommendations (Screen 7)**
+   - Tabs: *Resume Improvements*, *Skill Development*, *Interview Preparation*.
+   - 3 numbered recommendation cards with *"View Suggestion"* modal popups containing Google X-Y-Z bullet rewrites and gap mitigation project plans.
+
+7. **Parichay AI Assistant (Screen 8)**
+   - Dedicated conversational chatbot panel accessible from the sidebar.
+   - Context-grounded in candidate's parsed skills, missing gaps, and target role description.
+   - Suggestion prompt chips for immediate career guidance.
+   - Supported by Google Gemini API server-side with reliable, grounded fallback.
+
+8. **Document Audit (Screen 9 Left)**
+   - 6 ATS checks: File Format, Resume Length, Contact Information, Section Structure, Action Verbs, and Readability.
+
+9. **Profile & Settings (Screen 9 Right)**
+   - Profile tab for updating full name and reviewing account tier.
+   - Connected to SQLite backend via `POST /api/settings`.
+
+10. **Persistent User History ("My Analyses")**
+    - Automatically records analysis reports for logged-in users.
+    - View, reload, and delete historical resume analyses.
+
+---
+
+## Technical Architecture
 
 ```
 d:\Parichay\
-├── app.py                      # Flask factory, routes (/, /studio, /api/analyze, /api/chat)
+├── app.py                      # Flask factory, public & protected routes, API endpoints
 ├── config.py                   # Centralized configuration & environment loader
+├── parichay.db                 # SQLite database (Users & Analyses tables)
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Environment variables template
-├── .gitignore                  # Git ignore rules
 ├── services/
-│   ├── __init__.py
-│   ├── pdf_parser.py           # PyMuPDF text extractor & scanned/corrupt PDF detection
-│   ├── extractor.py            # Structured entity parser & categorized skills taxonomy
+│   ├── database.py             # SQLite persistence: AuthManager & HistoryManager
+│   ├── pdf_parser.py           # PyMuPDF text extractor & scanned PDF rejection
+│   ├── extractor.py            # Structured entity parser & skill taxonomy
 │   ├── matcher.py              # TF-IDF vectorizer, cosine similarity & explainable scoring
 │   └── ai_advisor.py           # Grounded AI advisor & conversational AI chatbot
 ├── static/
 │   ├── css/
-│   │   ├── style.css           # Design system, multi-theme engine, chat UI, responsive rules
-│   │   └── landing.css         # High-converting landing page styles & showcase cards
+│   │   ├── style.css           # Workspace design system (Screens 4–9)
+│   │   └── landing.css         # Public landing page (Screen 1) & auth screens (Screens 2 & 3)
 │   ├── js/
-│   │   └── main.js             # Drag-and-drop upload UX, live state, Chart.js, chatbot & theme switcher
+│   │   └── main.js             # Multi-view navigation, circular gauge, skills detail panel, chatbot
 │   └── images/
-│       ├── parichay-logo.svg   # Vector brand lockup (Emblem + Name + Pill + Tagline)
-│       ├── parichay-mark.svg   # Standalone vector Convergence Knot emblem
+│       ├── parichay-art.svg    # Split-screen artwork: sage canvas + diagonal gradient lozenges
+│       ├── parichay-logo.svg   # Vector brand lockup (Emblem + Name + Tagline)
+│       ├── parichay-mark.svg   # Standalone vector emblem
 │       └── favicon.svg         # High-precision vector favicon
 ├── templates/
-│   ├── landing.html            # High-converting product landing page
-│   └── index.html              # Full resume intelligence studio & interactive dashboard
-├── sample_data/
-│   ├── sample_resume_swe.pdf   # Verified test resume (Aarav Sharma)
-│   ├── scanned_resume.pdf      # Image-only dummy PDF to test error detection
-│   ├── sample_jds.json         # Realistic job descriptions (ML, Full-Stack, Data, DevOps)
-│   └── generate_sample_pdf.py  # Utility to reproduce test PDFs
+│   ├── landing.html            # Public marketing landing page (Screen 1)
+│   ├── login.html              # Sign-in page (Screen 2)
+│   ├── signup.html             # Registration page (Screen 3)
+│   └── index.html              # Full career workspace (Screens 4–9)
 └── tests/
-    ├── test_pipeline.py        # Unit tests for PDF parser, extractor, matcher, advisor
-    └── test_api.py             # Integration tests for landing page, studio, and chatbot APIs
-```
-
-### Analysis Pipeline
-```mermaid
-graph TD
-    A[Upload PDF Resume + Target JD] --> B[PDFParser: PyMuPDF]
-    B -->|Scanned / < 30 words| B1[Reject with Actionable Error]
-    B -->|Valid Digital Text| C[ResumeExtractor & JDParser]
-    C --> D1[Contact & Sections: Education, Experience, Projects, Certs]
-    C --> D2[Taxonomy Scan: Languages, Frameworks, ML/AI, Cloud, DB, Soft Skills]
-    D1 & D2 --> E[ResumeJobMatcher: scikit-learn]
-    E --> F1[TF-IDF N-Gram Vectorizer + Cosine Similarity]
-    E --> F2[Skills Matrix: Matched, Missing, Candidate Unique, Unverified]
-    E --> F3[Explainable 4-Component Score Breakdown]
-    F1 & F2 & F3 --> G[AIAdvisor]
-    G -->|Key Configured| H1[Google Gemini API]
-    G -->|Offline / No Key| H2[Deterministic Grounded Advisor]
-    H1 & H2 --> I[Interactive Dashboard & Report]
+    ├── test_pipeline.py        # Unit tests for PDF parsing, extraction, and matching
+    └── test_api.py             # Integration tests for auth, history, chat, and analysis APIs
 ```
 
 ---
 
-## 3. Explainable Alignment Formula
+## Running the Application Locally
 
-The alignment score is calculated transparently as:
-
-$$\text{Alignment Score} = 0.45 \cdot S_{\text{tech}} + 0.35 \cdot S_{\text{context}} + 0.10 \cdot S_{\text{soft}} + 0.10 \cdot S_{\text{structure}}$$
-
-1. **Technical Skills Overlap ($45\%$)**: Ratio of verified technical competencies in the candidate's resume relative to the required technical stack in the job description.
-2. **Contextual Semantic Similarity ($35\%$)**: Sublinear TF-IDF unigram and bigram cosine similarity combined with target role vocabulary coverage.
-3. **Soft Skills & Engineering Practices ($10\%$)**: Evaluation of collaboration, problem-solving, and agile methodologies.
-4. **Structural Profile Completeness ($10\%$)**: Verification of essential sections (Experience/Internships, Projects, Education, Certifications) and documentation depth.
-
-> **Disclaimer:** Parichay describes this score as an *alignment measure*, reflecting textual synergy and competency overlap, not as an automated hiring prediction.
-
----
-
-## 4. Installation & Local Development
-
-### Prerequisites
-- Python 3.10+ (Tested on Python 3.11, 3.12, 3.13, and 3.14)
-- Git
-
-### Quick Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/parichay.git
-   cd parichay
-   ```
-
-2. **Create and activate a virtual environment:**
-   - **Windows:**
-     ```powershell
-     python -m venv .venv
-     .venv\Scripts\activate
-     ```
-   - **Linux / macOS:**
-     ```bash
-     python3 -m venv .venv
-     source .venv/bin/activate
-     ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment variables (Optional):**
-   ```bash
-   cp .env.example .env
-   ```
-   *Note: If you do not provide a `GEMINI_API_KEY`, Parichay automatically runs its built-in deterministic advisor, ensuring full offline functionality with zero dummy data.*
-
-5. **Run the test suite:**
-   ```bash
-   python -m unittest discover -s tests -p "test_*.py"
-   ```
-
-6. **Start the application:**
-   ```bash
-   python app.py
-   ```
-   Open your browser at: **`http://127.0.0.1:5000`**
-
----
-
-## 5. End-to-End Verification & Testing
-
-Parichay includes an automated test suite verifying edge cases and core requirements:
-
-| Test File | Scope | Status |
-|:---|:---|:---:|
-| `tests/test_pipeline.py` | PyMuPDF extraction, empty file validation, scanned PDF rejection, section parsing, skills taxonomy match, TF-IDF cosine similarity, advisor fallback | **PASSED** (6/6) |
-| `tests/test_api.py` | Health endpoint (`/api/health`), sample JDs (`/api/sample-jds`), missing payload validation (HTTP 400), scanned PDF rejection (HTTP 400), full valid analysis (HTTP 200) | **PASSED** (5/5) |
-
-To execute tests with verbose output:
+### 1. Prerequisites & Virtual Environment
 ```bash
-python -m unittest -v tests/test_pipeline.py tests/test_api.py
+python -m venv .venv
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+# Install dependencies
+pip install -r requirements.txt
 ```
 
----
-
-## 6. One-Click Demonstration & Evaluator Guide
-
-For reviewers evaluating this submission:
-1. Open `http://127.0.0.1:5000/`.
-2. Click **"Use Sample Software Engineer Resume"** under the upload zone to automatically stage `sample_resume_swe.pdf`.
-3. In the right panel, click the **"Machine Learning Engineer"** chip to auto-fill an authentic job posting.
-4. Click **"Analyze Resume Alignment"**.
-5. Inspect the resulting:
-   - Alignment score and fit tier badge.
-   - 4-component calculation breakdown with point contributions.
-   - Analytical Radar Chart comparing candidate evidence against target baselines.
-   - Competency Matrix with filterable tabs (Matched, Missing, Candidate Unique, Unverified).
-   - Grounded AI Recommendations with bullet point enhancements (Google X-Y-Z formula) and concrete skill gap mitigation projects.
-   - Click **"Export Report"** to view the clean print/PDF layout.
-
----
-
-## 7. Production Deployment Instructions
-
-### Option A: Render / Railway / Heroku
-Parichay is ready for zero-configuration WSGI deployment.
-- **Build Command:** `pip install -r requirements.txt`
-- **Start Command:** `gunicorn app:app` (or `python app.py`)
-- **Environment Variables:** Set `GEMINI_API_KEY` (optional) and `SECRET_KEY`.
-
-### Option B: Docker Container
-Create a simple `Dockerfile`:
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["python", "app.py"]
-```
-Build and run:
+### 2. Configure Environment
+Copy `.env.example` to `.env`:
 ```bash
-docker build -t parichay .
-docker run -p 5000:5000 parichay
+copy .env.example .env
 ```
+*(Optional)* Add your `GEMINI_API_KEY` for live generative responses. If no key is set, Parichay automatically uses its verified, grounded deterministic advice engine.
+
+### 3. Start the Server
+```bash
+python app.py
+```
+Visit `http://127.0.0.1:5000` in your web browser.
+
+### 4. Running Tests
+Execute the automated test suite:
+```bash
+python -m unittest discover -s tests -p "test_*.py"
+```
+All 16 unit and integration tests pass out-of-the-box.
 
 ---
 
-## 8. Requirements Compliance Checklist
+## Privacy Guarantee
 
-- [x] **HTML, CSS, JavaScript Frontend**: Built with vanilla CSS and modern JS, using an editorial Swiss-inspired design system.
-- [x] **Python & Flask Backend**: Clean application factory pattern with modular services in `services/`.
-- [x] **PyMuPDF (fitz) PDF Processing**: High-performance text extraction with scanned/image-only PDF detection and format validation.
-- [x] **scikit-learn TF-IDF & Cosine Similarity**: Transparent contextual similarity with n-gram features and vocabulary coverage.
-- [x] **External AI Suggestions**: Google Gemini API integration with a deterministic grounded fallback engine.
-- [x] **Chart.js Visualization**: Editorial Radar Chart comparing evidence dimensions without generic neon styling.
-- [x] **Explainable Alignment Scoring**: Clear mathematical formula and component breakdown without hiring prediction claims.
-- [x] **Comprehensive Test Suite & Documentation**: 11 automated unit and integration tests passing with 100% success.
-
----
-
-## 9. License
-
-Parichay Career Intelligence &bull; 2026. Distributed under the MIT License.
+- **In-Memory PDF Parsing**: Resumes are parsed in memory using PyMuPDF. Raw uploaded PDF documents are never stored or retained on disk.
+- **Data Minimization**: Only structured analytical scores and taxonomy matches are stored for authenticated candidates who explicitly want report persistence.
+- **Cross-User Data Isolation**: User history records are protected with foreign-key user constraints and session ownership checks.
+- **Anonymous Use Supported**: Candidates can test the complete matching tool without registering an account.

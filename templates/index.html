@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parichay — Resume Intelligence & Role Alignment Dashboard</title>
-  <meta name="description" content="A modern dashboard application for AI-powered resume intelligence, candidate-role alignment analysis, and grounded skill gap audits.">
+  <title>Parichay — Resume Intelligence & Career Workspace</title>
+  <meta name="description" content="Parichay Resume Intelligence Studio. Comprehensive career-readiness, explainable alignment scoring, and grounded AI assistant.">
   
   <!-- Favicon SVG -->
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
@@ -12,145 +12,51 @@
   <!-- Google Fonts: Inter & Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Chart.js for Analytical Visualizations -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="dashboard-body">
 
-  <!-- Top App Navigation Bar (Matches Figma Top Header) -->
+  <!-- Top App Navigation Bar -->
   <header class="app-topbar">
     <div class="topbar-left">
-      <a href="/" class="brand-logo" aria-label="Parichay — Where Your Potential Meets Opportunity">
-        <!-- Custom Parichay Convergence Knot Emblem -->
-        <svg class="brand-glyph" width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="topbarGradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#0056B3" />
-              <stop offset="50%" stop-color="#007BFF" />
-              <stop offset="100%" stop-color="#38BDF8" />
-            </linearGradient>
-            <linearGradient id="topbarGradWarm" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#FFB703" />
-              <stop offset="45%" stop-color="#FB8500" />
-              <stop offset="70%" stop-color="#0284C7" />
-              <stop offset="100%" stop-color="#007BFF" />
-            </linearGradient>
-            <filter id="topbarKnotShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0.5" dy="1.2" stdDeviation="1.0" flood-opacity="0.25"/>
-            </filter>
-          </defs>
-          <!-- Capsule 1 (Rotated +45 deg: Warm Amber to Cyan) -->
-          <g transform="rotate(45 32 32)">
-            <rect x="20" y="8" width="24" height="48" rx="12" 
-                  stroke="url(#topbarGradWarm)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-          <!-- Capsule 2 (Rotated -45 deg: Cobalt to Electric Blue) -->
-          <g transform="rotate(-45 32 32)">
-            <rect x="20" y="8" width="24" height="48" rx="12" 
-                  stroke="url(#topbarGradBlue)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-          <!-- Celtic Weave Overlap Arc -->
-          <g transform="rotate(45 32 32)" filter="url(#topbarKnotShadow)">
-            <path d="M 20 20 L 20 15 C 20 10.5 24.5 8 32 8 C 39.5 8 44 10.5 44 15 L 44 20" 
-                  stroke="url(#topbarGradWarm)" stroke-width="6.5" stroke-linecap="round"/>
-          </g>
-        </svg>
-
-        <div class="brand-title-wrap">
-          <span class="brand-text">Parichay</span>
-          <span class="brand-tag">AI INTELLIGENCE</span>
-        </div>
+      <a href="/" class="brand-link" aria-label="Parichay Home">
+        <img src="{{ url_for('static', filename='images/parichay-logo.svg') }}" alt="Parichay — Where Your Potential Meets Opportunity" class="brand-logo-img">
       </a>
-
-      <div class="topbar-tagline-divider" aria-hidden="true"></div>
-      <span class="topbar-tagline">Where Your Potential Meets Opportunity</span>
     </div>
 
-    <!-- Center Status / Search Pill (Figma-inspired search box) -->
-    <div class="topbar-center">
-      <div class="search-status-bar">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span class="search-placeholder">In-memory analysis engine &bull; Client-side session</span>
-      </div>
-    </div>
-
-    <!-- Topbar Right Actions: Theme Switcher, Landing Page Link, Reset -->
     <div class="topbar-right">
-      <div class="theme-switcher-box" title="Change brand color palette">
-        <button type="button" class="theme-dot-btn theme-indigo" data-theme="indigo" title="Royal Indigo (Brand Default)"></button>
-        <button type="button" class="theme-dot-btn theme-sapphire" data-theme="sapphire" title="Electric Sapphire"></button>
-        <button type="button" class="theme-dot-btn theme-emerald" data-theme="emerald" title="Precision Emerald"></button>
-        <button type="button" class="theme-dot-btn theme-obsidian" data-theme="obsidian" title="Executive Obsidian"></button>
-      </div>
-
-      <a href="/" class="btn-topbar-action" style="text-decoration:none;" title="View Landing Page">
-        LANDING PAGE
+      <a href="/" class="btn-topbar-pill" title="Return to Landing Page">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Landing Page</span>
       </a>
 
-      <button type="button" id="btnResetWorkspace" class="btn-topbar-action" title="Reset workspace">
-        RESET
-      </button>
+      {% if current_user %}
+        <span class="btn-topbar-pill" style="cursor: default; font-weight: 500;">
+          {{ current_user.name }} ({{ current_user.account_type }})
+        </span>
+        <a href="/logout" class="btn-topbar-pill" style="color: var(--missing-red);">Sign out</a>
+      {% else %}
+        <a href="/login" class="btn-topbar-pill">Sign In</a>
+        <a href="/signup" class="btn-topbar-solid">Sign Up</a>
+      {% endif %}
     </div>
   </header>
 
-  <!-- App Shell: Sidebar Navigation + Main Content Stage -->
+  <!-- App Shell: Sidebar Navigation + Main Stage -->
   <div class="app-shell">
     
-    <!-- Left Sidebar (Figma Reference Navigation) -->
+    <!-- Left Sidebar (Screens 4–9 Navigation) -->
     <aside class="app-sidebar" aria-label="Primary Navigation">
       <nav class="sidebar-nav">
-        <a href="#workspaceSection" class="sidebar-nav-item active" id="navWorkspace">
-          <div class="nav-icon-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-          </div>
-          <span class="nav-label">Resume Studio</span>
-        </a>
-
-        <a href="#scoreSection" class="sidebar-nav-item" id="navScore">
-          <div class="nav-icon-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-          </div>
-          <span class="nav-label">Alignment Score</span>
-        </a>
-
-        <a href="#matrixSection" class="sidebar-nav-item" id="navMatrix">
-          <div class="nav-icon-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 11 12 14 22 4"></polyline>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
-          </div>
-          <span class="nav-label">Skills Matrix</span>
-        </a>
-
-        <a href="#recommendationsSection" class="sidebar-nav-item" id="navAdvisor">
-          <div class="nav-icon-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-          </div>
-          <span class="nav-label">AI Advisor</span>
-        </a>
-
-        <a href="#auditSection" class="sidebar-nav-item" id="navAudit">
-          <div class="nav-icon-box">
+        <!-- Resume Studio (Upload & JD) -->
+        <button type="button" class="sidebar-nav-item active" data-view="studio" id="navStudio">
+          <div class="nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
@@ -158,25 +64,116 @@
               <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
           </div>
-          <span class="nav-label">Document Audit</span>
-        </a>
+          <span>Resume Studio</span>
+        </button>
+
+        <!-- Overview (Analysis Result) -->
+        <button type="button" class="sidebar-nav-item" data-view="overview" id="navOverview">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+          </div>
+          <span>Overview</span>
+        </button>
+
+        <!-- Skills Matrix -->
+        <button type="button" class="sidebar-nav-item" data-view="skills" id="navSkills">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+          <span>Skills Matrix</span>
+        </button>
+
+        <!-- AI Recommendations -->
+        <button type="button" class="sidebar-nav-item" data-view="recommendations" id="navRecommendations">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <span>AI Recommendations</span>
+        </button>
+
+        <!-- Document Audit -->
+        <button type="button" class="sidebar-nav-item" data-view="audit" id="navAudit">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+          <span>Document Audit</span>
+        </button>
+
+        <!-- AI Assistant -->
+        <button type="button" class="sidebar-nav-item" data-view="assistant" id="navAssistant">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+              <circle cx="12" cy="5" r="2"></circle>
+              <path d="M12 7v4"></path>
+            </svg>
+          </div>
+          <span>AI Assistant</span>
+        </button>
+
+        <!-- My Analyses (History) -->
+        <button type="button" class="sidebar-nav-item" data-view="history" id="navHistory">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <span>My Analyses</span>
+        </button>
+
+        <!-- Settings -->
+        <button type="button" class="sidebar-nav-item" data-view="settings" id="navSettings">
+          <div class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <span>Settings</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer-box">
-        <div class="status-indicator-badge">
-          <span class="status-dot-pulse"></span>
-          <span id="systemStatusText">Ready</span>
-        </div>
-        <div class="sidebar-tagline">Where Your Potential Meets Opportunity.</div>
+        {% if current_user %}
+          <a href="/logout" class="btn-sidebar-signout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Sign out</span>
+          </a>
+        {% else %}
+          <a href="/login" class="btn-sidebar-signout" style="color: var(--primary-teal);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            <span>Sign in to save history</span>
+          </a>
+        {% endif %}
       </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace Area -->
     <main class="app-main-canvas">
 
-      <!-- Alert Banner -->
+      <!-- Alert Notification Banner -->
       <div id="alertBanner" class="app-alert-banner" role="alert" style="display: none;">
-        <svg class="alert-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -184,437 +181,537 @@
         <span id="alertMessage">Please provide the necessary inputs.</span>
       </div>
 
-      <!-- Main Stage White Container (Modeled after Figma White Canvas Card) -->
-      <div class="dashboard-stage-card" id="workspaceSection">
-        
-        <!-- Blue Hero Heading with Official Brand Identification & Tagline -->
-        <div class="stage-header">
-          <div class="stage-brand-kicker">
-            <span class="stage-kicker-pill">PARICHAY INTELLIGENCE ENGINE</span>
-            <span class="stage-kicker-dot">&bull;</span>
-            <span class="stage-kicker-tagline">Where Your Potential Meets Opportunity</span>
-          </div>
-          <h1 class="stage-primary-title">Resume Intelligence & Role Alignment</h1>
-          <p class="stage-subtitle">
-            Upload your candidate resume and specify target role criteria to generate an explainable, data-grounded alignment audit.
+      <!-- ====================================================================
+           VIEW 1: SCREEN 4 — RESUME STUDIO (UPLOAD & JOB DESCRIPTION)
+           ==================================================================== -->
+      <div id="viewStudio" class="view-panel active">
+        <div class="studio-header">
+          <h1 class="studio-title">Let's analyze your resume.</h1>
+          <p class="studio-subtitle">
+            Upload your resume and add a target job description to get personalized insights and recommendations.
           </p>
         </div>
 
-        <!-- Studio Input Area (Figma Form Screens & Upload Layout) -->
-        <div class="studio-two-col">
+        <!-- 2-Column Upload & JD Grid (Screen 4) -->
+        <div class="studio-two-col-grid">
           
-          <!-- Column 1: Document Upload Screen -->
-          <div class="studio-form-card">
-            <div class="form-card-title-row">
-              <h2 class="form-card-heading">Candidate Resume</h2>
-              <span class="form-card-badge">PDF &bull; Up to 5 MB</span>
+          <!-- Column 1: Upload Resume Box -->
+          <div class="studio-card">
+            <div class="studio-card-header">
+              <h2 class="studio-step-title">
+                <span>1</span> Upload Resume
+              </h2>
+              <span class="studio-badge-subtle">PDF &bull; Max 5 MB</span>
             </div>
 
-            <!-- Upload Area (Styled like Figma's "Upload a File" box) -->
-            <div id="dropzone" class="figma-upload-zone" tabindex="0" role="button" aria-label="Upload PDF Resume">
-              <div class="upload-accent-bar"></div>
-              <div class="upload-zone-content">
-                <div class="upload-icon-circle">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                </div>
-                <div class="upload-text-block">
-                  <span class="upload-primary-text">Drag & drop your PDF resume here</span>
-                  <span class="upload-secondary-text">or click to browse from your computer</span>
-                </div>
-                <button type="button" class="btn-figma-outlined-sm">CHOOSE FILE</button>
+            <!-- Drag & Drop Zone -->
+            <div id="dropzone" class="dropzone-box" tabindex="0" role="button" aria-label="Upload PDF Resume">
+              <div class="dropzone-icon-circle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
               </div>
-              <input type="file" id="resumeInput" class="hidden-file-input" accept=".pdf" aria-label="Select resume PDF file">
+              <div class="dropzone-main-text">Drag & drop your resume here</div>
+              <div class="dropzone-sub-text">or click to browse from your device</div>
+              <button type="button" class="btn-choose-file-pill">Choose File</button>
+              <input type="file" id="resumeInput" style="display: none;" accept=".pdf" aria-label="Select PDF resume">
             </div>
 
-            <!-- Selected File State Box -->
-            <div id="fileSelectedBox" class="figma-file-preview-card" style="display: none;">
-              <div class="file-preview-left">
-                <div class="file-doc-icon">PDF</div>
-                <div class="file-details">
-                  <div id="selectedFileName" class="file-title-text">resume.pdf</div>
-                  <div id="selectedFileSize" class="file-meta-text">0 KB</div>
+            <!-- Selected File State -->
+            <div id="fileSelectedBox" class="file-selected-card" style="display: none;">
+              <div class="file-selected-info">
+                <div class="file-doc-badge">PDF</div>
+                <div>
+                  <div id="selectedFileName" class="file-name-text">resume.pdf</div>
+                  <div id="selectedFileSize" class="file-size-text">0 KB</div>
                 </div>
               </div>
-              <div class="file-preview-actions">
-                <button type="button" id="btnReplaceFile" class="btn-figma-link">Replace</button>
-                <span class="action-pipe">|</span>
-                <button type="button" id="btnRemoveFile" class="btn-figma-link text-danger">Remove</button>
+              <div class="file-action-btns">
+                <button type="button" id="btnReplaceFile" class="btn-file-action">Replace</button>
+                <button type="button" id="btnRemoveFile" class="btn-file-action remove">Remove</button>
               </div>
             </div>
 
-            <!-- Sample Resume Shortcut Trigger -->
-            <div class="sample-loader-row">
-              <button type="button" id="btnSampleResume" class="btn-sample-trigger">
+            <!-- Sample Resume Shortcut Link -->
+            <div class="sample-shortcut-link">
+              <button type="button" id="btnSampleResume" class="btn-link-sample">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                 </svg>
-                Load sample profile (Aarav Sharma &mdash; Software Engineer)
+                <span>Use a sample resume (Aarav Sharma &mdash; Software Engineer)</span>
               </button>
             </div>
           </div>
 
-          <!-- Column 2: Job Description Screen -->
-          <div class="studio-form-card">
-            <div class="form-card-title-row">
-              <h2 class="form-card-heading">Target Role Description</h2>
-              <span class="form-card-badge">Paste JD or select preset</span>
+          <!-- Column 2: Target Job Description -->
+          <div class="studio-card">
+            <div class="studio-card-header">
+              <h2 class="studio-step-title">
+                <span>2</span> Target Job Description
+              </h2>
+              <span class="studio-badge-subtle">Requirements & Skills</span>
             </div>
 
-            <div class="textarea-container">
-              <textarea id="jdTextarea" class="figma-textarea" placeholder="Paste the job requirements, responsibilities, technical proficiencies, and qualifications here..." aria-label="Job description"></textarea>
-            </div>
+            <textarea id="jdTextarea" class="jd-textarea" placeholder="Paste the job description, required skills, responsibilities, and qualifications here..." aria-label="Job description"></textarea>
 
-            <div class="presets-toolbar">
-              <span class="presets-title">Role presets:</span>
-              <div id="sampleChipsRow" class="presets-chip-container">
-                <!-- Dynamically populated from /api/sample-jds -->
+            <div class="popular-roles-row">
+              <span class="popular-roles-label">Popular Roles:</span>
+              <div id="sampleChipsRow" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button type="button" class="role-preset-pill" data-role="Software Engineer">Software Engineer</button>
+                <button type="button" class="role-preset-pill" data-role="Data Analyst">Data Analyst</button>
+                <button type="button" class="role-preset-pill" data-role="ML Engineer">ML Engineer</button>
+                <button type="button" class="role-preset-pill" data-role="DevOps Engineer">DevOps Engineer</button>
               </div>
             </div>
           </div>
 
         </div>
 
-        <!-- Action Bar (Figma Primary Blue Solid Action Button) -->
-        <div class="stage-action-bar">
-          <div class="action-bar-left">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        <!-- Action Bar: Analyze Button -->
+        <div class="studio-action-bar">
+          <button type="button" id="btnAnalyze" class="btn-analyze-pill">
+            <span id="btnSpinner" style="display: none;">⏳</span>
+            <span id="btnText">Analyze Resume</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
-            <span>Safe in-memory document parsing. No candidate documents are permanently stored.</span>
-          </div>
-
-          <div class="action-bar-buttons">
-            <button type="button" id="btnAnalyze" class="btn-figma-primary">
-              <span id="btnSpinner" class="spinner" style="display: none;"></span>
-              <span id="btnText">ANALYZE ALIGNMENT</span>
-            </button>
-          </div>
+          </button>
         </div>
-
       </div>
 
       <!-- ====================================================================
-           ANALYSIS DASHBOARD SCREENS (Appears dynamically upon analysis completion)
-           Modeled after the Figma Applicant Screens with Circular Score Badge
+           VIEW 2: SCREEN 5 — ANALYSIS RESULT (OVERVIEW)
            ==================================================================== -->
-      <div id="dashboardSection" class="dashboard-stage-card results-stage" style="display: none;">
-
-        <!-- Applicant Summary Bar with Circular Badge (Figma "Not selected" circle adapted to Match Score) -->
-        <div class="applicant-hero-card" id="scoreSection">
-          <div class="applicant-info-block">
-            <div class="applicant-kicker">CANDIDATE PROFILE</div>
-            <h2 id="dashCandidateName" class="applicant-name">Candidate Name</h2>
-            <div id="dashCandidateLinks" class="applicant-links-row">
-              <!-- Dynamically populated with clean SVG icons -->
-            </div>
+      <div id="viewOverview" class="view-panel">
+        <div class="overview-topbar">
+          <div class="overview-title-group">
+            <h2 id="overviewTitleCandidate">Your Resume Analysis</h2>
+            <span id="overviewDateText" class="overview-date-subtext">Analyzed on 25-Oct 2026</span>
           </div>
 
-          <!-- Circular Score Badge (Modeled after the circular indicator in the Figma applicant header) -->
-          <div class="figma-circular-score-badge">
-            <div class="score-number-display">
-              <span id="dashScoreVal">0</span>%
-            </div>
-            <div id="dashTierBadge" class="score-tier-label">EVALUATION COMPLETE</div>
-          </div>
-        </div>
+          <div class="overview-actions-row">
+            <button type="button" id="btnPrintReport" class="btn-export-pill">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Export Report</span>
+            </button>
 
-        <!-- Methodology Interpretation Note -->
-        <div class="methodology-banner">
-          <div class="methodology-title">Alignment Interpretation</div>
-          <p id="dashScoreInterpretation" class="methodology-text">
-            This score reflects calculated lexical, semantic, and skill alignment with the target job posting. It provides an objective assessment of requirement coverage across technical competencies, domain vocabulary, and structural completeness.
-          </p>
-          <div class="methodology-notice">
-            <strong>Methodology Notice:</strong> Parichay describes this score as an <em>alignment measure</em>, not a predictive hiring probability or candidate competence ranking.
+            <button type="button" id="btnNewAnalysis" class="btn-new-analysis-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>New Analysis</span>
+            </button>
           </div>
         </div>
 
-        <!-- 4-Pillar Metric Breakdown (Matches the 3-column / 4-column cards in Figma screens) -->
-        <div class="figma-cards-grid">
-          <div class="section-title-stripe">
-            <h3>Score Calculation Breakdown</h3>
-            <span class="stripe-sub">Weighted Formula: 45% Tech + 35% TF-IDF + 10% Soft + 10% Structure</span>
-          </div>
-          <div id="breakdownCardsList" class="pillars-row">
-            <!-- Dynamically populated from data.alignment.score_breakdown.components -->
-          </div>
-        </div>
-
-        <!-- Split Section: Radar Visualization & Document Audit -->
-        <div class="figma-split-row" id="auditSection">
+        <!-- Gauge + Breakdown Grid (Screen 5) -->
+        <div class="overview-score-grid">
           
-          <!-- Column 1: Radar Footprint -->
-          <div class="split-col-card">
-            <div class="card-inner-header">
-              <h3 class="card-inner-title">Alignment Dimension Radar</h3>
-              <span class="card-inner-badge">Evidence vs Target Baseline</span>
+          <!-- Left: Circular Match Gauge -->
+          <div class="score-gauge-card">
+            <div class="circular-gauge-container">
+              <svg class="circular-gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg-circle" cx="80" cy="80" r="66"></circle>
+                <circle id="gaugeProgressCircle" class="gauge-progress-circle" cx="80" cy="80" r="66" stroke-dasharray="414.69" stroke-dashoffset="414.69"></circle>
+              </svg>
+              <div class="gauge-inner-text">
+                <div id="dashScoreVal" class="gauge-score-number">0%</div>
+                <div id="dashTierBadge" class="gauge-tier-label">CALCULATING</div>
+              </div>
             </div>
-            <div class="chart-box">
-              <canvas id="radarChart" aria-label="Alignment Radar Chart" role="img"></canvas>
-            </div>
+
+            <div id="dashCandidateName" style="font-weight: 700; font-size: 1.05rem; margin-top: 4px;">Candidate Name</div>
+            <div id="dashCandidateLinks" class="candidate-quick-meta">Contact details verified</div>
           </div>
 
-          <!-- Column 2: Document Structure Health -->
-          <div class="split-col-card">
-            <div class="card-inner-header">
-              <h3 class="card-inner-title">Document Structure & Evidence Audit</h3>
-              <span class="card-inner-badge">Verified Resume Sections</span>
-            </div>
-            <div id="resumeStrengthsList" class="audit-list-box">
-              <!-- Dynamically populated from data.audit.strengths -->
-            </div>
+          <!-- Right: Match Breakdown Table -->
+          <div class="match-breakdown-card">
+            <h3 class="breakdown-table-title">Match Breakdown</h3>
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Weight</th>
+                  <th class="col-right">Score</th>
+                </tr>
+              </thead>
+              <tbody id="breakdownTableBody">
+                <tr>
+                  <td>Technical Skills</td>
+                  <td>45%</td>
+                  <td class="col-right">
+                    <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 84%;"></span></span>
+                    38%
+                  </td>
+                </tr>
+                <tr>
+                  <td>Role Context</td>
+                  <td>35%</td>
+                  <td class="col-right">
+                    <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
+                    28%
+                  </td>
+                </tr>
+                <tr>
+                  <td>Soft Skills</td>
+                  <td>10%</td>
+                  <td class="col-right">
+                    <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
+                    8%
+                  </td>
+                </tr>
+                <tr>
+                  <td>Resume Structure</td>
+                  <td>10%</td>
+                  <td class="col-right">
+                    <span class="score-progress-bar-wrap"><span class="score-progress-bar-fill" style="width: 80%;"></span></span>
+                    8%
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
         </div>
 
-        <!-- Skills Matrix (Figma Tab Navigation & Pills) -->
-        <div class="skills-matrix-section" id="matrixSection">
-          <div class="card-inner-header">
-            <h3 class="card-inner-title">Competency & Skills Matrix</h3>
-            <span class="card-inner-badge">Standard Technical Taxonomy Engine</span>
+        <!-- Key Insights (4 Cards in Screen 5) -->
+        <h3 class="insights-row-header">Key Insights</h3>
+        <div class="key-insights-grid">
+          <div class="insight-card">
+            <div class="insight-icon-box matched">✓</div>
+            <div>
+              <div class="insight-title">Matched Skills</div>
+              <p id="insightMatchedText" class="insight-desc">12 skills align with the job requirements</p>
+            </div>
           </div>
 
-          <!-- Figma-style Tabs -->
-          <div class="figma-tabs-bar">
-            <button type="button" class="figma-tab-btn active" data-tab="all">
-              All Extracted
-            </button>
-            <button type="button" class="figma-tab-btn" data-tab="matched">
-              Matched In Role <span id="tabCountMatched" class="tab-count-pill">0</span>
-            </button>
-            <button type="button" class="figma-tab-btn" data-tab="missing">
-              Missing in Resume <span id="tabCountMissing" class="tab-count-pill">0</span>
-            </button>
-            <button type="button" class="figma-tab-btn" data-tab="unique">
-              Candidate Bonus Skills <span id="tabCountUnique" class="tab-count-pill">0</span>
-            </button>
-            <button type="button" class="figma-tab-btn" data-tab="unverified">
-              Contextual Mentions
-            </button>
+          <div class="insight-card">
+            <div class="insight-icon-box missing">!</div>
+            <div>
+              <div class="insight-title">Missing Skills</div>
+              <p id="insightMissingText" class="insight-desc">4 important skills to work on</p>
+            </div>
           </div>
 
-          <!-- Skills Badges Cluster -->
-          <div id="skillsClusterContainer" class="skills-pill-cluster">
-            <!-- Dynamically populated via main.js -->
+          <div class="insight-card">
+            <div class="insight-icon-box strong">★</div>
+            <div>
+              <div class="insight-title">Strong Points</div>
+              <p id="insightStrongText" class="insight-desc">Great project experience & clear structure</p>
+            </div>
+          </div>
+
+          <div class="insight-card">
+            <div class="insight-icon-box recommendation">💡</div>
+            <div>
+              <div class="insight-title">Recommendations</div>
+              <p id="insightRecText" class="insight-desc">5 personalized suggestions generated</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <!-- Prioritized Improvements Grid -->
-        <div class="priorities-section">
-          <div class="card-inner-header">
-            <h3 class="card-inner-title">Prioritized Improvement Opportunities</h3>
-            <span class="card-inner-badge">Ranked by Alignment Impact</span>
-          </div>
-          <div id="improvementPrioritiesList" class="priorities-cards-row">
-            <!-- Dynamically populated from data.audit.improvement_priorities -->
-          </div>
+      <!-- ====================================================================
+           VIEW 3: SCREEN 6 — SKILLS MATRIX
+           ==================================================================== -->
+      <div id="viewSkills" class="view-panel">
+        <div class="skills-matrix-header">
+          <h2 class="skills-matrix-title">Skills Matrix</h2>
+          <p class="skills-matrix-subtitle">Compare your skills with the job requirements.</p>
         </div>
 
-        <!-- Grounded AI Advisor & Interactive Career Chatbot (Dual-Tab Experience) -->
-        <div class="advisor-stage-section" id="recommendationsSection">
-          
-          <!-- Dual-Tab Navigation Header -->
-          <div class="advisor-tabs-header">
-            <div class="advisor-tabs-nav">
-              <button type="button" class="advisor-tab-btn active" id="tabBtnRecommendations" data-advisor-tab="recommendations">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-                <span>AI Recommendations</span>
-              </button>
-
-              <button type="button" class="advisor-tab-btn" id="tabBtnChatbot" data-advisor-tab="chatbot">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>AI Career Chatbot</span>
-                <span class="advisor-tab-badge">LIVE</span>
-              </button>
-            </div>
-
-            <span id="advisorEngineBadge" class="figma-source-badge">Parichay Advisor Engine</span>
-          </div>
-
-          <!-- Tab Panel 1: Static Grounded Recommendations -->
-          <div id="panelRecommendations" class="advisor-tab-panel active">
-            <!-- Executive Summary Box -->
-            <div class="executive-quote-box">
-              <p id="advisorExecutiveSummary" class="executive-quote-text">
-                “Evaluating alignment details...”
-              </p>
-            </div>
-
-            <!-- Bullet Point Enhancements (Google X-Y-Z formula) with 1-click Copy -->
-            <div class="advisor-block">
-              <div class="bullet-header-row">
-                <h4 class="block-title">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
-                <span class="card-inner-badge">1-Click Copy Enabled</span>
-              </div>
-              <div id="bulletEnhancementsList" class="enhancements-column">
-                <!-- Dynamically populated with copy buttons -->
-              </div>
-            </div>
-
-            <!-- Gap Mitigation Plan -->
-            <div class="advisor-block">
-              <h4 class="block-title">Targeted Skill Gap Mitigation Plan</h4>
-              <div id="gapMitigationGrid" class="gap-grid-box">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-
-            <!-- Interview Prep Topics -->
-            <div class="advisor-block">
-              <h4 class="block-title">Likely Technical Interview Focus Areas</h4>
-              <ul id="interviewPrepList" class="interview-list-box">
-                <!-- Dynamically populated -->
-              </ul>
-            </div>
-          </div>
-
-          <!-- Tab Panel 2: Interactive Conversational AI Chatbot -->
-          <div id="panelChatbot" class="advisor-tab-panel">
-            <div class="chat-interface-card">
-              <!-- Chat Card Topbar -->
-              <div class="chat-card-topbar">
-                <div class="chat-topbar-left">
-                  <div class="chat-avatar-robot">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                      <circle cx="12" cy="5" r="2"></circle>
-                      <path d="M12 7v4"></path>
-                      <line x1="8" y1="16" x2="8.01" y2="16"></line>
-                      <line x1="16" y1="16" x2="16.01" y2="16"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="chat-agent-title">Parichay AI Career Copilot</div>
-                    <div class="chat-agent-status">
-                      <span class="chat-status-dot"></span>
-                      <span>Connected &bull; Grounded in Candidate Data</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button type="button" id="btnClearChat" class="btn-figma-link" style="font-size: 0.76rem;">
-                  Clear Chat
-                </button>
-              </div>
-
-              <!-- Chat Message Scroll Window -->
-              <div id="chatMessagesFeed" class="chat-messages-container">
-                <!-- Assistant Welcome Message -->
-                <div class="chat-message-row assistant-msg">
-                  <div class="chat-avatar-robot" style="width:24px; height:24px; flex-shrink:0;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                      <circle cx="12" cy="5" r="2"></circle>
-                      <path d="M12 7v4"></path>
-                    </svg>
-                  </div>
-                  <div class="chat-bubble">
-                    <p><strong>Hello! I am your Parichay AI Career Copilot.</strong></p>
-                    <p>I have ingested your parsed resume and target job requirements. Ask me anything about tailoring your experience bullets, how to bridge specific technical gaps, or what questions you'll face in the interview!</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick Prompt Suggestion Chips -->
-              <div class="chat-suggestions-container">
-                <button type="button" class="chat-prompt-chip" data-prompt="Rewrite my experience bullets using Google's X-Y-Z formula.">
-                  📝 Google X-Y-Z Bullets
-                </button>
-                <button type="button" class="chat-prompt-chip" data-prompt="How can I quickly learn and prove competence in my missing skills?">
-                  🎯 Bridge Skill Gaps
-                </button>
-                <button type="button" class="chat-prompt-chip" data-prompt="What technical interview questions will they ask me for this role?">
-                  💼 Technical Interview Prep
-                </button>
-                <button type="button" class="chat-prompt-chip" data-prompt="How can I elevate my alignment score above 85%?">
-                  📈 Boost Match Score
-                </button>
-                <button type="button" class="chat-prompt-chip" data-prompt="What is my biggest competitive advantage for this position?">
-                  ⭐ My Competitive Edge
-                </button>
-              </div>
-
-              <!-- Chat Input Bar -->
-              <form id="chatForm" class="chat-input-bar">
-                <input type="text" id="chatInputField" class="chat-input-field" placeholder="Ask Parichay AI about your resume, gaps, or interview strategy..." autocomplete="off">
-                <button type="submit" id="btnChatSend" class="btn-chat-send" aria-label="Send message">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
-                </button>
-              </form>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Dashboard Footer Controls -->
-        <div class="results-action-row">
-          <button type="button" id="btnResetAnalysis" class="btn-figma-outlined">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="1 4 1 10 7 10"></polyline>
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-            </svg>
-            ANALYZE ANOTHER ROLE
+        <!-- Tabs: Matched Skills, Missing Skills, Additional Skills -->
+        <div class="matrix-filter-tabs">
+          <button type="button" class="btn-matrix-tab active" data-filter="matched">
+            <span>Matched Skills</span>
+            <span id="tabCountMatched" class="tab-badge-count">0</span>
           </button>
 
-          <button type="button" id="btnPrintReport" class="btn-figma-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            EXPORT REPORT
+          <button type="button" class="btn-matrix-tab" data-filter="missing">
+            <span>Missing Skills</span>
+            <span id="tabCountMissing" class="tab-badge-count">0</span>
+          </button>
+
+          <button type="button" class="btn-matrix-tab" data-filter="additional">
+            <span>Additional Skills</span>
+            <span id="tabCountUnique" class="tab-badge-count">0</span>
           </button>
         </div>
 
+        <!-- 2-Column Split: Skills List + Interactive Skill Details Card -->
+        <div class="skills-matrix-split">
+          
+          <!-- Left Column: List of Skills -->
+          <div id="skillsMatrixList" class="skills-list-card">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Right Column: Interactive Detail Panel (Matches Screen 6) -->
+          <div class="skill-detail-card" id="skillDetailPanel">
+            <div class="detail-header-row">
+              <h3 id="detailSkillTitle" class="detail-skill-title">Python</h3>
+              <span id="detailSkillBadge" class="skill-badge-type required">Required</span>
+            </div>
+
+            <p id="detailSkillDesc" class="detail-skill-desc">
+              Proficiency in Python for data analysis, machine learning, and backend development.
+            </p>
+
+            <div class="detail-section-label">Your Evidence</div>
+            <ul id="detailEvidenceList" class="detail-evidence-list">
+              <li class="detail-evidence-item">Extracted from technical skills section</li>
+              <li class="detail-evidence-item">Corroborated across project achievements</li>
+              <li class="detail-evidence-item">High relevance to core job requirements</li>
+            </ul>
+
+            <div class="detail-confidence-box">
+              <div class="confidence-label-row">
+                <span>Confidence</span>
+                <span id="detailConfidenceLabel">High</span>
+              </div>
+              <div class="confidence-bar-wrap">
+                <div id="detailConfidenceBar" class="confidence-bar-fill" style="width: 85%;"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 4: SCREEN 7 — AI RECOMMENDATIONS
+           ==================================================================== -->
+      <div id="viewRecommendations" class="view-panel">
+        <div class="recommendations-header">
+          <h2 class="recommendations-title">AI Recommendations</h2>
+          <p class="recommendations-subtitle">Personalized suggestions to improve your resume and career readiness.</p>
+        </div>
+
+        <!-- Recommendation Tabs -->
+        <div class="recommendations-tabs-row">
+          <button type="button" class="btn-rec-tab active" data-rec-tab="improvements">Resume Improvements</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="skills">Skill Development</button>
+          <button type="button" class="btn-rec-tab" data-rec-tab="interview">Interview Preparation</button>
+        </div>
+
+        <!-- 3 Numbered Recommendation Cards (Screen 7) -->
+        <div id="recCardsRow" class="recommendations-cards-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 5: SCREEN 9 LEFT — DOCUMENT AUDIT
+           ==================================================================== -->
+      <div id="viewAudit" class="view-panel">
+        <div class="audit-header">
+          <h2 class="audit-title">Document Audit</h2>
+          <p class="audit-subtitle">Check your resume for ATS compatibility and best practices.</p>
+        </div>
+
+        <div class="audit-card-container" id="auditChecklistContainer">
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">File Format</div>
+                <div id="auditFileFormatSub" class="audit-item-sub">PDF format (Good)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">Resume Length</div>
+                <div id="auditResumeLengthSub" class="audit-item-sub">1-2 pages (Good)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">Contact Information</div>
+                <div id="auditContactSub" class="audit-item-sub">All contact details found</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">Section Structure</div>
+                <div id="auditStructureSub" class="audit-item-sub">Well organized with standard headers</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div id="auditVerbsIcon" class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">Action Verbs</div>
+                <div id="auditVerbsSub" class="audit-item-sub">Strong action verbs identified</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audit-checklist-item">
+            <div class="audit-item-left">
+              <div class="audit-check-circle pass">✓</div>
+              <div>
+                <div class="audit-item-name">Readability</div>
+                <div id="auditReadabilitySub" class="audit-item-sub">Good (Grade 10-12 professional level)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 6: SCREEN 8 — PARICHAY AI ASSISTANT (CHAT)
+           ==================================================================== -->
+      <div id="viewAssistant" class="view-panel">
+        <div class="assistant-header">
+          <h2 class="assistant-title">Parichay AI Assistant</h2>
+          <p class="assistant-subtitle">Ask questions about your resume, get career advice, or explore your analysis.</p>
+        </div>
+
+        <div class="chat-wrapper-card">
+          <!-- Chat Feed -->
+          <div id="chatMessagesFeed" class="chat-history-box">
+            <div class="chat-bubble-row assistant">
+              <div class="chat-bubble">
+                <p><strong>Hello! I am your Parichay Career Assistant.</strong></p>
+                <p>I have access to your parsed resume and target job requirements. Ask me anything about tailoring your bullets, bridging technical gaps, or preparing for interviews!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggestion Chips Bar -->
+          <div class="chat-suggestions-bar">
+            <button type="button" class="btn-chat-chip" data-prompt="How can I improve my match score?">How can I improve my match score?</button>
+            <button type="button" class="btn-chat-chip" data-prompt="Rewrite my project bullets using Google's X-Y-Z formula.">Google X-Y-Z Bullets</button>
+            <button type="button" class="btn-chat-chip" data-prompt="How can I learn and prove competence in my missing skills?">Bridge Skill Gaps</button>
+            <button type="button" class="btn-chat-chip" data-prompt="What technical interview questions will they ask for this role?">Interview Prep</button>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <div class="chat-input-bar-container">
+            <form id="chatForm" class="chat-input-form">
+              <input type="text" id="chatInputField" class="chat-text-input" placeholder="Ask a question about your resume or career..." autocomplete="off">
+              <button type="submit" id="btnChatSend" class="btn-send-round" aria-label="Send Message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 7: MY ANALYSES (SAVED HISTORY)
+           ==================================================================== -->
+      <div id="viewHistory" class="view-panel">
+        <div class="history-header">
+          <h2 class="history-title">My Analyses</h2>
+          <p class="history-subtitle">Your saved resume analyses and historical report records.</p>
+        </div>
+
+        {% if not current_user %}
+          <div class="app-alert-banner info" style="display: flex;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>You are currently browsing as a guest. <a href="/login" style="color: var(--primary-teal); font-weight: 700; text-decoration: underline;">Sign in or create an account</a> to automatically save and retrieve your analysis history across sessions.</span>
+          </div>
+        {% endif %}
+
+        <div id="historyListContainer" class="history-card-container">
+          <!-- Loaded dynamically via /api/history -->
+          <div style="text-align: center; padding: 40px; color: var(--muted-slate);">
+            Loading analysis history...
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 8: SCREEN 9 RIGHT — PROFILE & SETTINGS
+           ==================================================================== -->
+      <div id="viewSettings" class="view-panel">
+        <div class="settings-header">
+          <h2 class="settings-title">Profile & Settings</h2>
+          <p class="settings-subtitle">Manage your account and preferences.</p>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-tabs-row">
+            <button type="button" class="btn-settings-tab active">Profile</button>
+            <button type="button" class="btn-settings-tab" onclick="alert('Security settings: Password updates are enabled.');">Security</button>
+          </div>
+
+          <form id="settingsForm">
+            <div class="settings-form-group">
+              <label for="settingsNameInput" class="settings-label">Full name</label>
+              <input type="text" id="settingsNameInput" class="settings-input" value="{{ current_user.name if current_user else 'Guest Candidate' }}">
+            </div>
+
+            <div class="settings-form-group">
+              <label for="settingsEmailInput" class="settings-label">Email</label>
+              <input type="email" id="settingsEmailInput" class="settings-input" value="{{ current_user.email if current_user else 'guest@example.com' }}" {% if not current_user %}disabled{% endif %}>
+            </div>
+
+            <div class="settings-form-group">
+              <label class="settings-label">Account type</label>
+              <div class="account-type-box">
+                <span class="plan-name-text">{{ current_user.account_type if current_user else 'Free Plan' }}</span>
+                <button type="button" class="btn-upgrade-pill" onclick="alert('You are already on the full Parichay feature tier.');">Upgrade</button>
+              </div>
+            </div>
+
+            <button type="submit" id="btnSaveSettings" class="btn-save-settings">Save Changes</button>
+          </form>
+        </div>
       </div>
 
     </main>
 
   </div>
 
-  <!-- Floating AI Career Copilot Quick Trigger -->
-  <button type="button" id="btnFloatingChat" class="floating-copilot-trigger" aria-label="Open AI Career Chatbot">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span>AI Career Copilot</span>
-  </button>
-
-  <!-- Deep Slate-Gray Footer Banner (Directly matches the footer in all Figma screens) -->
-  <footer class="figma-footer-banner">
-    <div class="footer-links-row">
-      <a href="#workspaceSection">Resume Studio</a>
-      <span class="footer-pipe">|</span>
-      <a href="#scoreSection">Alignment Overview</a>
-      <span class="footer-pipe">|</span>
-      <a href="#matrixSection">Skills Matrix</a>
-      <span class="footer-pipe">|</span>
-      <a href="#recommendationsSection">AI Recommendations</a>
-      <span class="footer-pipe">|</span>
-      <a href="#auditSection">Document Audit</a>
+  <!-- Suggestion Detail Modal -->
+  <div id="suggestionModal" class="modal-overlay">
+    <div class="modal-content-card">
+      <div class="modal-header-row">
+        <h3 id="modalTitle" class="modal-title">Recommendation Details</h3>
+        <button type="button" id="btnModalClose" class="btn-modal-close">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body-content">
+        Loading recommendation details...
+      </div>
+      <div style="text-align: right;">
+        <button type="button" id="btnModalAction" class="btn-topbar-solid" style="padding: 8px 24px;">Got It</button>
+      </div>
     </div>
-    <div class="footer-subtext-line">
-      Parichay &bull; Where Your Potential Meets Opportunity &bull; Independent AI-Powered Resume Intelligence Platform
-    </div>
-  </footer>
+  </div>
 
-  <!-- Application Script -->
+  <!-- Main JavaScript Application Logic -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
