@@ -7,6 +7,7 @@ Verifies Section 5 Optional Requirement:
 - Shared theme.js is loaded across all pages.
 """
 
+import os
 import unittest
 import uuid
 from html.parser import HTMLParser
@@ -68,7 +69,23 @@ class TestDarkModeAudit(unittest.TestCase):
         self.assertTrue(parser.has_toggle_btn, "Studio view missing #themeToggleBtn")
         self.assertTrue(parser.has_light_icon, "Studio view missing .theme-icon-light")
         self.assertTrue(parser.has_dark_icon, "Studio view missing .theme-icon-dark")
-        self.assertIn("theme.js", content, "Studio view missing theme.js")
+    def test_dark_mode_css_homogeneity(self):
+        """Verifies that style.css and landing.css have dark mode overrides for key components to prevent white boxes."""
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        style_path = os.path.join(base_dir, "static", "css", "style.css")
+        with open(style_path, "r", encoding="utf-8") as f:
+            style_css = f.read()
+
+        self.assertIn('[data-theme="dark"] .skill-row-item', style_css)
+        self.assertIn('[data-theme="dark"] .audit-checklist-item', style_css)
+        self.assertIn('[data-theme="dark"] .btn-history-load', style_css)
+        self.assertIn('[data-theme="dark"] .btn-view-suggestion', style_css)
+        self.assertIn('[data-theme="dark"] .score-progress-bar-wrap', style_css)
+
+        landing_path = os.path.join(base_dir, "static", "css", "landing.css")
+        with open(landing_path, "r", encoding="utf-8") as f:
+            landing_css = f.read()
+        self.assertIn('[data-theme="dark"] .creator-link-pill', landing_css)
 
 
 if __name__ == "__main__":

@@ -168,14 +168,65 @@
   background-color: #0C2824;
   color: #B8F2D0;
 }
-[data-theme="dark"] .skill-item {
+/* Skills Matrix Dark Theming */
+[data-theme="dark"] .skills-list-card,
+[data-theme="dark"] .skill-detail-card {
+  background-color: #101C19;
+  border-color: #203630;
+}
+[data-theme="dark"] .skill-row-item {
   background-color: #14221F;
   border-color: #203630;
 }
-[data-theme="dark"] .skill-item:hover,
-[data-theme="dark"] .skill-item.active {
+[data-theme="dark"] .skill-row-item:hover,
+[data-theme="dark"] .skill-row-item.selected {
   border-color: #B8F2D0;
+  background-color: #1C332C;
+}
+[data-theme="dark"] .skill-name-text {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .skill-badge-type.required {
+  background-color: #381A1A;
+  color: #FCA5A5;
+  border: 1px solid #7F1D1D;
+}
+[data-theme="dark"] .skill-badge-type.preferred {
   background-color: #172A25;
+  color: #94A3B8;
+  border: 1px solid #203630;
+}
+[data-theme="dark"] .skill-status-icon.additional {
+  background-color: #45220B;
+  color: #FCD34D;
+}
+
+/* Document Audit Dark Theming */
+[data-theme="dark"] .audit-card-container {
+  background-color: #101C19;
+  border-color: #203630;
+}
+[data-theme="dark"] .audit-checklist-item {
+  background-color: #14221F;
+  border-color: #203630;
+}
+[data-theme="dark"] .audit-checklist-item:hover {
+  background-color: #1A2E28;
+  border-color: #2C4B43;
+}
+[data-theme="dark"] .audit-item-name {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .audit-item-sub {
+  color: #94A3B8;
+}
+[data-theme="dark"] .audit-check-circle.pass {
+  background-color: #064E3B;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .audit-check-circle.warn {
+  background-color: #45220B;
+  color: #FCD34D;
 }
 
 /* Recommendations Dark Theming */
@@ -202,6 +253,89 @@
 [data-theme="dark"] .recommendation-pill-card {
   background-color: #14221F;
   border-color: #203630;
+}
+[data-theme="dark"] .btn-view-suggestion {
+  border-color: #203630;
+  color: #ECFDF5;
+  background-color: #101C19;
+}
+[data-theme="dark"] .btn-view-suggestion:hover {
+  border-color: #B8F2D0;
+  color: #0C2824;
+  background-color: #B8F2D0;
+}
+[data-theme="dark"] .rec-ai-chat-prompt {
+  background: linear-gradient(135deg, #14221F 0%, #101C19 100%);
+  border-color: #203630;
+}
+[data-theme="dark"] .btn-rec-ask-ai {
+  background-color: #B8F2D0;
+  color: #0C2824;
+  font-weight: 700;
+}
+[data-theme="dark"] .btn-rec-ask-ai:hover {
+  background-color: #DDF8E8;
+  color: #0C2824;
+}
+
+/* Overview Breakdown & Insights Dark Theming */
+[data-theme="dark"] .score-progress-bar-wrap {
+  background-color: #203630;
+}
+[data-theme="dark"] .score-progress-bar-fill {
+  background-color: #B8F2D0;
+}
+[data-theme="dark"] .insight-card {
+  background-color: #14221F;
+  border-color: #203630;
+}
+[data-theme="dark"] .insight-icon-box.strong {
+  background-color: #1A3129;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .insight-icon-box.recommendation {
+  background-color: #45220B;
+  color: #FCD34D;
+}
+
+/* History / My Analyses Dark Theming */
+[data-theme="dark"] .history-item-row {
+  background-color: #14221F;
+  border-color: #203630;
+}
+[data-theme="dark"] .history-item-row:hover {
+  border-color: #B8F2D0;
+}
+[data-theme="dark"] .btn-history-load {
+  background-color: #B8F2D0;
+  color: #0C2824;
+  font-weight: 700;
+}
+[data-theme="dark"] .btn-history-load:hover {
+  background-color: #DDF8E8;
+  color: #0C2824;
+}
+[data-theme="dark"] .btn-history-delete {
+  color: #FCA5A5;
+  border-color: #7F1D1D;
+  background-color: rgba(239, 68, 68, 0.08);
+}
+[data-theme="dark"] .btn-history-delete:hover {
+  background-color: #451A1A;
+  border-color: #EF4444;
+  color: #FFFFFF;
+}
+
+/* Modal Diff View Dark Theming */
+[data-theme="dark"] .modal-diff-item.before {
+  background-color: #1A2321;
+  border-left-color: #64748B;
+  color: #CBD5E1;
+}
+[data-theme="dark"] .modal-diff-item.after {
+  background-color: #0A3222;
+  border-left-color: #34D399;
+  color: #ECFDF5;
 }
 
 /* AI Assistant Chat Dark Theming */
