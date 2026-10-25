@@ -35,10 +35,22 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFile = null;
   let radarChartInstance = null;
   let fullSkillsData = null;
+  let latestAnalysisData = null;
+  let chatConversationHistory = [];
 
-  // Initialize Sample JDs from API
+  // Initialize Sample JDs from API & UI Managers
   fetchSampleJDs();
   initSidebarNav();
+  initThemeSwitcher();
+  initAdvisorTabs();
+  initChatbot();
+
+  // Check if directed from landing page with ?sample=true
+  if (window.location.search.includes("sample=true")) {
+    setTimeout(() => {
+      if (btnSampleResume) btnSampleResume.click();
+    }, 400);
+  }
 
   // 1. Drag & Drop and File Input Handling
   if (dropzone && resumeInput) {
@@ -249,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. Render Analysis Dashboard (Figma Template Applicant Screens)
   function renderDashboard(data) {
     if (!dashboardSection) return;
+    latestAnalysisData = data;
 
     dashboardSection.style.display = "block";
     dashboardSection.scrollIntoView({ behavior: "smooth" });
@@ -533,8 +546,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((item) => {
       const pill = document.createElement("span");
-      pill.className = `skill-tag-pill tag-${item.type}`;
-      pill.innerHTML = `<strong>${escapeHtml(item.name)}</strong> <span class="pill-subtext">(${escapeHtml(item.label)})</span>`;
+      const isMissing = item.type === "missing";
+      pill.className = `skill-tag-pill tag-${item.type} ${isMissing ? "missing-interactive" : ""}`;
+      pill.innerHTML = `<strong>${escapeHtml(item.name)}</strong> <span class="pill-subtext">(${escapeHtml(item.label)})</span>${isMissing ? ' <span style="font-size:0.75rem; margin-left:3px;" title="Ask AI Copilot">💬</span>' : ''}`;
+      if (isMissing) {
+        pill.title = `Click to ask AI Copilot how to learn and demonstrate ${item.name}`;
+        pill.addEventListener("click", () => {
+          askChatbotAboutSkill(item.name);
+        });
+      }
       container.appendChild(pill);
     });
   }
@@ -606,12 +626,40 @@ document.addEventListener("DOMContentLoaded", () => {
           const entry = document.createElement("div");
           entry.className = "enhancement-card-entry";
           entry.innerHTML = `
-            <div class="enhancement-head-text">${escapeHtml(enh.focus_area)}</div>
+            <div class="bullet-header-row">
+              <div class="enhancement-head-text">${escapeHtml(enh.focus_area)}</div>
+              <button type="button" class="btn-copy-bullet" title="Copy recommended formula action to clipboard">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy Bullet</span>
+              </button>
+            </div>
             <div class="enhancement-critique-text">${escapeHtml(enh.critique)}</div>
             <div class="enhancement-formula-box">
               <strong>Formula Action:</strong> ${escapeHtml(enh.recommended_action)}
             </div>
           `;
+          const copyBtn = entry.querySelector(".btn-copy-bullet");
+          if (copyBtn) {
+            copyBtn.addEventListener("click", () => {
+              navigator.clipboard.writeText(enh.recommended_action).then(() => {
+                copyBtn.classList.add("copied");
+                copyBtn.innerHTML = `<span>✓ Copied!</span>`;
+                setTimeout(() => {
+                  copyBtn.classList.remove("copied");
+                  copyBtn.innerHTML = `
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy Bullet</span>
+                  `;
+                }, 2000);
+              });
+            });
+          }
           bulletContainer.appendChild(entry);
         });
       }
@@ -714,5 +762,231 @@ document.addEventListener("DOMContentLoaded", () => {
     btnPrintReport.addEventListener("click", () => {
       window.print();
     });
+  }
+
+  // ==========================================================================
+  // THEME PALETTE SWITCHER
+  // ==========================================================================
+  function initThemeSwitcher() {
+    const themeBtns = document.querySelectorAll(".theme-dot-btn");
+    const savedTheme = localStorage.getItem("parichay_theme") || "indigo";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    themeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const theme = btn.dataset.theme;
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("parichay_theme", theme);
+      });
+    });
+  }
+
+  // ==========================================================================
+  // ADVISOR DUAL TABS (Recommendations vs Chatbot)
+  // ==========================================================================
+  function initAdvisorTabs() {
+    const tabBtns = document.querySelectorAll(".advisor-tab-btn");
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.advisorTab;
+        switchAdvisorTab(tab);
+      });
+    });
+  }
+
+  function switchAdvisorTab(tabName) {
+    const tabBtns = document.querySelectorAll(".advisor-tab-btn");
+    const panels = document.querySelectorAll(".advisor-tab-panel");
+
+    tabBtns.forEach((b) => {
+      if (b.dataset.advisorTab === tabName) {
+        b.classList.add("active");
+      } else {
+        b.classList.remove("active");
+      }
+    });
+
+    panels.forEach((p) => {
+      if ((tabName === "recommendations" && p.id === "panelRecommendations") ||
+          (tabName === "chatbot" && p.id === "panelChatbot")) {
+        p.classList.add("active");
+      } else {
+        p.classList.remove("active");
+      }
+    });
+  }
+
+  // ==========================================================================
+  // INTERACTIVE AI CAREER CHATBOT
+  // ==========================================================================
+  function initChatbot() {
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInputField");
+    const chatFeed = document.getElementById("chatMessagesFeed");
+    const btnClearChat = document.getElementById("btnClearChat");
+    const promptChips = document.querySelectorAll(".chat-prompt-chip");
+    const btnFloatingChat = document.getElementById("btnFloatingChat");
+
+    if (btnFloatingChat) {
+      btnFloatingChat.addEventListener("click", () => {
+        switchAdvisorTab("chatbot");
+        const recSection = document.getElementById("recommendationsSection");
+        if (recSection) recSection.scrollIntoView({ behavior: "smooth" });
+        if (chatInput) chatInput.focus();
+      });
+    }
+
+    if (btnClearChat && chatFeed) {
+      btnClearChat.addEventListener("click", () => {
+        chatConversationHistory = [];
+        chatFeed.innerHTML = `
+          <div class="chat-message-row assistant-msg">
+            <div class="chat-avatar-robot" style="width:24px; height:24px; flex-shrink:0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="M12 7v4"></path>
+              </svg>
+            </div>
+            <div class="chat-bubble">
+              <p><strong>Chat conversation reset.</strong></p>
+              <p>How else can I assist you in tailoring your resume or preparing for this role?</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    promptChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const prompt = chip.dataset.prompt;
+        if (prompt && chatInput) {
+          chatInput.value = prompt;
+          handleSendChatMessage();
+        }
+      });
+    });
+
+    if (chatForm) {
+      chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleSendChatMessage();
+      });
+    }
+
+    async function handleSendChatMessage() {
+      if (!chatInput) return;
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      chatInput.value = "";
+      appendMessageBubble("user", text);
+
+      chatConversationHistory.push({ role: "user", content: text });
+
+      // Show animated typing indicator
+      const typingEl = document.createElement("div");
+      typingEl.className = "chat-typing-indicator";
+      typingEl.id = "chatTypingIndicator";
+      typingEl.innerHTML = `
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      `;
+      chatFeed.appendChild(typingEl);
+      chatFeed.scrollTop = chatFeed.scrollHeight;
+
+      try {
+        const payload = {
+          message: text,
+          history: chatConversationHistory,
+          candidate: latestAnalysisData ? latestAnalysisData.candidate : {},
+          job_profile: latestAnalysisData ? latestAnalysisData.job_profile : {},
+          alignment: latestAnalysisData ? latestAnalysisData.alignment : {}
+        };
+
+        const resp = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const typingIndicator = document.getElementById("chatTypingIndicator");
+        if (typingIndicator) typingIndicator.remove();
+
+        const result = await resp.json();
+        if (result.success && result.reply) {
+          appendMessageBubble("assistant", result.reply);
+          chatConversationHistory.push({ role: "assistant", content: result.reply });
+        } else {
+          appendMessageBubble("assistant", result.message || "I encountered an error analyzing your request. Please try again.");
+        }
+      } catch (err) {
+        const typingIndicator = document.getElementById("chatTypingIndicator");
+        if (typingIndicator) typingIndicator.remove();
+        appendMessageBubble("assistant", "Network connection error while reaching the AI career advisor. Please ensure the server is active.");
+      }
+    }
+
+    function appendMessageBubble(role, content) {
+      if (!chatFeed) return;
+      const row = document.createElement("div");
+      row.className = `chat-message-row ${role === "user" ? "user-msg" : "assistant-msg"}`;
+
+      let avatarHtml = "";
+      if (role === "assistant") {
+        avatarHtml = `
+          <div class="chat-avatar-robot" style="width:24px; height:24px; flex-shrink:0;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+              <circle cx="12" cy="5" r="2"></circle>
+              <path d="M12 7v4"></path>
+            </svg>
+          </div>
+        `;
+      }
+
+      const formattedContent = renderMarkdown(content);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      row.innerHTML = `
+        ${avatarHtml}
+        <div class="chat-bubble">
+          ${formattedContent}
+          <div class="chat-meta-time">${timeStr}</div>
+        </div>
+      `;
+
+      chatFeed.appendChild(row);
+      chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+  }
+
+  function askChatbotAboutSkill(skillName) {
+    switchAdvisorTab("chatbot");
+    const chatInput = document.getElementById("chatInputField");
+    if (chatInput) {
+      chatInput.value = `How can I quickly learn and demonstrate competence in ${skillName} for this target role?`;
+      const form = document.getElementById("chatForm");
+      if (form) form.dispatchEvent(new Event("submit"));
+    }
+    const recSection = document.getElementById("recommendationsSection");
+    if (recSection) recSection.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function renderMarkdown(md) {
+    if (!md) return "";
+    let html = escapeHtml(md);
+    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+    html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+    html = html.replace(/^\* (.*$)/gim, "<li>$1</li>");
+    html = html.replace(/^- (.*$)/gim, "<li>$1</li>");
+    html = html.replace(/(<li>.*<\/li>)/gms, "<ul>$1</ul>");
+    html = html.split("\n\n").map(p => {
+      if (p.startsWith("<h3>") || p.startsWith("<ul>")) return p;
+      return `<p>${p.replace(/\n/g, "<br>")}</p>`;
+    }).join("");
+    return html;
   }
 });

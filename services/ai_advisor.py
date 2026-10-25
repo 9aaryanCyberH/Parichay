@@ -219,3 +219,240 @@ Respond ONLY with a valid JSON object matching this schema:
             "advisor_engine": "Parichay Grounded Advisor Engine",
             "is_ai_live": False
         }
+
+    @classmethod
+    def chat(
+        cls,
+        message: str,
+        history: List[Dict[str, str]] = None,
+        candidate_data: Dict[str, Any] = None,
+        job_data: Dict[str, Any] = None,
+        alignment_data: Dict[str, Any] = None,
+        api_key: str = "",
+        model: str = "gemini-1.5-flash"
+    ) -> Dict[str, Any]:
+        """
+        Interactive career chatbot endpoint.
+        Understands candidate resume context, target role description, and alignment metrics.
+        """
+        history = history or []
+        candidate_data = candidate_data or {}
+        job_data = job_data or {}
+        alignment_data = alignment_data or {}
+
+        api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+
+        # Try Google Gemini if configured
+        if api_key and api_key.strip() and not api_key.startswith("your_"):
+            try:
+                gemini_reply = cls._call_gemini_chat(message, history, candidate_data, job_data, alignment_data, api_key, model)
+                if gemini_reply:
+                    return {
+                        "success": True,
+                        "reply": gemini_reply,
+                        "engine": f"Google {model}",
+                        "is_ai_live": True
+                    }
+            except Exception as e:
+                logger.warning(f"Gemini chat request failed: {e}. Falling back to grounded conversational intelligence.")
+
+        # Grounded conversational fallback
+        fallback_reply = cls._generate_grounded_chat_fallback(message, history, candidate_data, job_data, alignment_data)
+        return {
+            "success": True,
+            "reply": fallback_reply,
+            "engine": "Parichay Grounded AI Copilot",
+            "is_ai_live": False
+        }
+
+    @classmethod
+    def _call_gemini_chat(
+        cls,
+        message: str,
+        history: List[Dict[str, str]],
+        candidate_data: Dict[str, Any],
+        job_data: Dict[str, Any],
+        alignment_data: Dict[str, Any],
+        api_key: str,
+        model: str
+    ) -> str:
+        """Invokes Gemini REST API with conversation history and candidate context."""
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+
+        candidate_name = candidate_data.get("name", "Candidate")
+        matched_tech = candidate_data.get("matched_skills", [])
+        missing_tech = candidate_data.get("missing_skills", [])
+        score = alignment_data.get("score", 0)
+        fit_tier = alignment_data.get("fit_tier", "Evaluation Complete")
+
+        system_instruction = f"""You are the Parichay AI Career Intelligence Copilot, an elite technical career advisor and resume strategist.
+Your mission is to help the candidate maximize their alignment with their target role, write impactful resume bullet points, prepare for technical interviews, and strategically close skill gaps.
+
+Candidate Context:
+- Name: {candidate_name}
+- Current Alignment Score: {score}% ({fit_tier})
+- Matched Competencies: {', '.join(matched_tech) if matched_tech else 'None verified yet'}
+- Missing JD Competencies: {', '.join(missing_tech) if missing_tech else 'None identified'}
+- Target Role Seniority: {job_data.get('role_level', 'Not specified')}
+
+Guidelines:
+- Provide actionable, technically accurate, grounded advice.
+- When recommending bullet rewrites, ALWAYS use Google's X-Y-Z formula: "Accomplished [X] as measured by [Y], by doing [Z]".
+- Format your response with clean Markdown (use bullet points, bold text for key skills, and brief code blocks where helpful).
+- Keep answers focused, encouraging, and free from corporate fluff.
+"""
+
+        # Build contents from history
+        contents = []
+        for turn in history[-8:]:  # keep last 8 turns for context window
+            role = "user" if turn.get("role") == "user" else "model"
+            contents.append({
+                "role": role,
+                "parts": [{"text": turn.get("content", "")}]
+            })
+
+        # Append current user prompt
+        contents.append({
+            "role": "user",
+            "parts": [{"text": f"Context: Candidate is {candidate_name}, score is {score}%, matched: {matched_tech}, missing: {missing_tech}.\n\nUser Question: {message}"}]
+        })
+
+        payload = {
+            "contents": contents,
+            "systemInstruction": {
+                "parts": [{"text": system_instruction}]
+            },
+            "generationConfig": {
+                "temperature": 0.4,
+                "maxOutputTokens": 800
+            }
+        }
+
+        headers = {"Content-Type": "application/json"}
+        resp = requests.post(url, headers=headers, json=payload, timeout=12)
+        if resp.status_code == 200:
+            res_json = resp.json()
+            candidates = res_json.get("candidates", [])
+            if candidates:
+                parts = candidates[0].get("content", {}).get("parts", [])
+                if parts:
+                    return parts[0].get("text", "").strip()
+
+        return ""
+
+    @classmethod
+    def _generate_grounded_chat_fallback(
+        cls,
+        message: str,
+        history: List[Dict[str, str]],
+        candidate_data: Dict[str, Any],
+        job_data: Dict[str, Any],
+        alignment_data: Dict[str, Any]
+    ) -> str:
+        """
+        Deep grounded deterministic response generator that answers questions
+        based on the candidate's exact parsed skills, gaps, score, and job requirements.
+        """
+        msg_lower = message.lower()
+        candidate_name = candidate_data.get("name", "Candidate")
+        matched_tech = candidate_data.get("matched_skills", [])
+        missing_tech = candidate_data.get("missing_skills", [])
+        score = alignment_data.get("score", 0)
+        fit_tier = alignment_data.get("fit_tier", "Evaluation Complete")
+
+        # 1. Check for specific skill inquiry (e.g. "how to learn Docker", "tell me about Kubernetes")
+        for skill in missing_tech + matched_tech:
+            if skill.lower() in msg_lower:
+                if skill in missing_tech:
+                    return (
+                        f"### Action Plan for **{skill}** (High-Priority Missing Requirement)\n\n"
+                        f"Because **{skill}** is explicitly required by this job description, adding proof of competence will directly elevate your alignment score.\n\n"
+                        f"**1. Recommended Hands-On Project:**\n"
+                        f"- Build a standalone micro-project or refactor an existing repository to incorporate **{skill}**.\n"
+                        f"- Commit the code to GitHub with a clean `README.md` and architecture diagram.\n\n"
+                        f"**2. Resume Bullet Point Template (Google X-Y-Z):**\n"
+                        f"- *\"Integrated **{skill}** into the deployment pipeline, accelerating delivery cycle by **28%** and reducing deployment errors by doing automated container validation.\"*\n\n"
+                        f"**3. Interview Question You Will Face:**\n"
+                        f"- *\"Why did you choose {skill} over alternatives in your project, and what trade-offs did you encounter in production?\"*"
+                    )
+                else:
+                    return (
+                        f"### Maximizing Your Verified Skill: **{skill}**\n\n"
+                        f"Great news: **{skill}** is already verified in your resume and matches the target job description requirements!\n\n"
+                        f"To make your experience stand out against other candidates with {skill}:\n"
+                        f"- **Quantify Throughput:** Don't just mention you used {skill}; specify request volumes, data sizes, or latency benchmarks.\n"
+                        f"- **Highlight Architecture:** Mention whether you used {skill} in a monolithic, microservices, or serverless design pattern.\n"
+                        f"- **Example Bullet Rewrite:** *\"Architected a high-concurrency service in **{skill}**, maintaining **99.9% uptime** across 50K+ daily active users by implementing asynchronous processing and connection pooling.\"*"
+                    )
+
+        # 2. X-Y-Z Formula / Bullet Point Rewriting
+        if any(w in msg_lower for w in ["bullet", "rewrite", "x-y-z", "xyz", "formula", "rephrase", "experience"]):
+            tech_sample = matched_tech[0] if matched_tech else "Python"
+            return (
+                f"### Google's X-Y-Z Formula for **{candidate_name}**\n\n"
+                f"Top tech recruiters look for: **\"Accomplished [X] as measured by [Y], by doing [Z]\"**.\n\n"
+                f"Here are 3 tailored bullet rewrites for your target role:\n\n"
+                f"1. **Core Engineering:**\n"
+                f"   * *\"Engineered a scalable data pipeline using **{tech_sample}**, reducing batch execution time by **42%** by parallelizing I/O bottlenecks and indexing query filters.\"*\n\n"
+                f"2. **Reliability & Testing:**\n"
+                f"   * *\"Increased test coverage from 55% to **92%**, eliminating production regression incidents over 6 release cycles by writing comprehensive integration tests.\"*\n\n"
+                f"3. **Bridging Gaps:**\n"
+                f"   * *\"Designed and deployed containerized services using **{missing_tech[0] if missing_tech else 'Docker'}**, slashing environment onboarding time for new developers from 2 days to **under 15 minutes**.\"*\n\n"
+                f"💡 *Tip: Click 'Copy Bullet' on any recommendation in the AI Recommendations tab to quickly use them.*"
+            )
+
+        # 3. Technical Interview Prep
+        if any(w in msg_lower for w in ["interview", "questions", "prep", "ask", "technical round"]):
+            return (
+                f"### High-Probability Technical Interview Questions\n\n"
+                f"Based on your current alignment (**{score}%**) and the target role criteria, technical interviewers will likely focus on:\n\n"
+                f"1. **Deep Dive on Matched Stack ({', '.join(matched_tech[:2]) if matched_tech else 'Core Languages'}):**\n"
+                f"   * *\"Explain how memory management and concurrency work under the hood in your primary language.\"*\n\n"
+                f"2. **Mitigating Gap Awareness ({', '.join(missing_tech[:2]) if missing_tech else 'System Tools'}):**\n"
+                f"   * *\"The role relies heavily on {missing_tech[0] if missing_tech else 'distributed systems'}. How would you design a fault-tolerant service using it?\"*\n\n"
+                f"3. **System Architecture Scenario:**\n"
+                f"   * *\"Walk me through how you would diagnose and debug a 500ms latency spike occurring intermittently in an API service under high traffic.\"*\n\n"
+                f"4. **Behavioral STAR Question:**\n"
+                f"   * *\"Tell me about a time you had to deliver a feature with incomplete specifications or unfamiliar tooling. How did you navigate the trade-offs?\"*"
+            )
+
+        # 4. Alignment Score / How to improve
+        if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align"]):
+            missing_str = ", ".join(f"**{m}**" for m in missing_tech[:3]) if missing_tech else "specialized tooling"
+            return (
+                f"### Strategy to Elevate Your Alignment Score (Currently **{score}%** &bull; {fit_tier})\n\n"
+                f"To transition your profile into the top candidate tier, follow this 3-step action roadmap:\n\n"
+                f"1. **Incorporate Missing Technical Keywords:**\n"
+                f"   * Target JD requires: {missing_str}.\n"
+                f"   * If you have used these in academic coursework, side projects, or internships, ensure they appear explicitly in your skills list and project descriptions.\n\n"
+                f"2. **Strengthen Contextual Keyword Density:**\n"
+                f"   * Mirror the terminology used in the job description (e.g. *\"CI/CD pipelines\"*, *\"RESTful API design\"*, *\"microservices\"*).\n\n"
+                f"3. **Add Measurable Impact to Bullets:**\n"
+                f"   * Every project should list at least one quantitative metric (% speedup, users served, data processed, test coverage).\n\n"
+                f"Would you like me to rewrite a specific project bullet point for you?"
+            )
+
+        # 5. Competitive Advantage
+        if any(w in msg_lower for w in ["advantage", "strength", "stand out", "edge"]):
+            return (
+                f"### Your Competitive Edge for this Target Role\n\n"
+                f"Here is what positions **{candidate_name}** strongly for this position:\n\n"
+                f"- **Verified Technical Foundation:** You have verified competency in {', '.join(matched_tech[:4]) if matched_tech else 'key software engineering skills'}.\n"
+                f"- **Structural Profile Integrity:** Your resume demonstrates clear section segmentation and solid engineering fundamentals.\n"
+                f"- **Next Step:** By addressing the {len(missing_tech)} missing competencies highlighted in your Skills Matrix, you will have a comprehensive application that passes both automated ATS screens and engineering manager evaluations."
+            )
+
+        # 6. General / Greeting / Fallback
+        return (
+            f"Hello **{candidate_name}**! I am your **Parichay AI Career Intelligence Copilot**.\n\n"
+            f"I have reviewed your resume against the target role:\n"
+            f"- **Alignment Score:** **{score}%** ({fit_tier})\n"
+            f"- **Matched Core Technologies:** {', '.join(matched_tech[:3]) if matched_tech else 'In progress'}\n"
+            f"- **Priority Skill Gaps:** {', '.join(missing_tech[:3]) if missing_tech else 'None'}\n\n"
+            f"**Here are a few things you can ask me:**\n"
+            f"1. *\"Rewrite my experience bullet points using Google's X-Y-Z formula.\"*\n"
+            f"2. *\"How do I learn and prove competence in {missing_tech[0] if missing_tech else 'Docker'}?\"*\n"
+            f"3. *\"What technical interview questions will they ask me for this role?\"*\n"
+            f"4. *\"How can I raise my match score above 85%?\"*"
+        )
+

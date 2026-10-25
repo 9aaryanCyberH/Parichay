@@ -10,19 +10,19 @@ def generate_assets():
     # 1. Full Horizontal Lockup (440 x 80)
     logo_svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 76" width="460" height="76" fill="none">
   <defs>
-    <!-- Blue/Cobalt Gradient (Potential & Foundation) -->
+    <!-- Royal Indigo to Electric Violet Gradient (Foundation & Intelligence) -->
     <linearGradient id="pGradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0056B3" />
-      <stop offset="50%" stop-color="#007BFF" />
-      <stop offset="100%" stop-color="#38BDF8" />
+      <stop offset="0%" stop-color="#4338CA" />
+      <stop offset="50%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#6366F1" />
     </linearGradient>
 
-    <!-- Warm Amber / Gold to Cyan Gradient (Opportunity & Ascent) -->
+    <!-- Warm Amber / Gold to Electric Cyan Gradient (Opportunity & Ascent) -->
     <linearGradient id="pGradWarm" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFB703" />
+      <stop offset="0%" stop-color="#F59E0B" />
       <stop offset="45%" stop-color="#FB8500" />
-      <stop offset="70%" stop-color="#0284C7" />
-      <stop offset="100%" stop-color="#007BFF" />
+      <stop offset="70%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#4F46E5" />
     </linearGradient>
 
     <!-- Subtle Weave Drop Shadow -->
@@ -89,15 +89,15 @@ def generate_assets():
     mark_svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
   <defs>
     <linearGradient id="pGradBlue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0056B3" />
-      <stop offset="50%" stop-color="#007BFF" />
-      <stop offset="100%" stop-color="#38BDF8" />
+      <stop offset="0%" stop-color="#4338CA" />
+      <stop offset="50%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#6366F1" />
     </linearGradient>
     <linearGradient id="pGradWarm" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFB703" />
+      <stop offset="0%" stop-color="#F59E0B" />
       <stop offset="45%" stop-color="#FB8500" />
-      <stop offset="70%" stop-color="#0284C7" />
-      <stop offset="100%" stop-color="#007BFF" />
+      <stop offset="70%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#4F46E5" />
     </linearGradient>
     <filter id="knotShadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0.5" dy="1.2" stdDeviation="1.0" flood-opacity="0.28"/>

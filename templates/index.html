@@ -82,12 +82,19 @@
       </div>
     </div>
 
-    <!-- Topbar Right Actions -->
+    <!-- Topbar Right Actions: Theme Switcher, Landing Page Link, Reset -->
     <div class="topbar-right">
-      <div class="user-profile-badge">
-        <div class="avatar-circle">P</div>
-        <span class="user-profile-name">Workspace Active</span>
+      <div class="theme-switcher-box" title="Change brand color palette">
+        <button type="button" class="theme-dot-btn theme-indigo" data-theme="indigo" title="Royal Indigo (Brand Default)"></button>
+        <button type="button" class="theme-dot-btn theme-sapphire" data-theme="sapphire" title="Electric Sapphire"></button>
+        <button type="button" class="theme-dot-btn theme-emerald" data-theme="emerald" title="Precision Emerald"></button>
+        <button type="button" class="theme-dot-btn theme-obsidian" data-theme="obsidian" title="Executive Obsidian"></button>
       </div>
+
+      <a href="/" class="btn-topbar-action" style="text-decoration:none;" title="View Landing Page">
+        LANDING PAGE
+      </a>
+
       <button type="button" id="btnResetWorkspace" class="btn-topbar-action" title="Reset workspace">
         RESET
       </button>
@@ -409,46 +416,150 @@
           </div>
         </div>
 
-        <!-- Grounded AI Advisor Recommendations (Figma Form/Dialog styled) -->
+        <!-- Grounded AI Advisor & Interactive Career Chatbot (Dual-Tab Experience) -->
         <div class="advisor-stage-section" id="recommendationsSection">
-          <div class="advisor-top-bar">
-            <div>
-              <h3 class="advisor-heading">Contextual Recommendations</h3>
-              <div class="advisor-subheading">Grounded strictly in candidate inputs and target role requirements</div>
+          
+          <!-- Dual-Tab Navigation Header -->
+          <div class="advisor-tabs-header">
+            <div class="advisor-tabs-nav">
+              <button type="button" class="advisor-tab-btn active" id="tabBtnRecommendations" data-advisor-tab="recommendations">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span>AI Recommendations</span>
+              </button>
+
+              <button type="button" class="advisor-tab-btn" id="tabBtnChatbot" data-advisor-tab="chatbot">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>AI Career Chatbot</span>
+                <span class="advisor-tab-badge">LIVE</span>
+              </button>
             </div>
+
             <span id="advisorEngineBadge" class="figma-source-badge">Parichay Advisor Engine</span>
           </div>
 
-          <!-- Executive Summary Box -->
-          <div class="executive-quote-box">
-            <p id="advisorExecutiveSummary" class="executive-quote-text">
-              “Evaluating alignment details...”
-            </p>
-          </div>
+          <!-- Tab Panel 1: Static Grounded Recommendations -->
+          <div id="panelRecommendations" class="advisor-tab-panel active">
+            <!-- Executive Summary Box -->
+            <div class="executive-quote-box">
+              <p id="advisorExecutiveSummary" class="executive-quote-text">
+                “Evaluating alignment details...”
+              </p>
+            </div>
 
-          <!-- Bullet Point Enhancements (Google X-Y-Z formula) -->
-          <div class="advisor-block">
-            <h4 class="block-title">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
-            <div id="bulletEnhancementsList" class="enhancements-column">
-              <!-- Dynamically populated -->
+            <!-- Bullet Point Enhancements (Google X-Y-Z formula) with 1-click Copy -->
+            <div class="advisor-block">
+              <div class="bullet-header-row">
+                <h4 class="block-title">High-Impact Bullet Point Enhancements (Google X-Y-Z Formula)</h4>
+                <span class="card-inner-badge">1-Click Copy Enabled</span>
+              </div>
+              <div id="bulletEnhancementsList" class="enhancements-column">
+                <!-- Dynamically populated with copy buttons -->
+              </div>
+            </div>
+
+            <!-- Gap Mitigation Plan -->
+            <div class="advisor-block">
+              <h4 class="block-title">Targeted Skill Gap Mitigation Plan</h4>
+              <div id="gapMitigationGrid" class="gap-grid-box">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Interview Prep Topics -->
+            <div class="advisor-block">
+              <h4 class="block-title">Likely Technical Interview Focus Areas</h4>
+              <ul id="interviewPrepList" class="interview-list-box">
+                <!-- Dynamically populated -->
+              </ul>
             </div>
           </div>
 
-          <!-- Gap Mitigation Plan -->
-          <div class="advisor-block">
-            <h4 class="block-title">Targeted Skill Gap Mitigation Plan</h4>
-            <div id="gapMitigationGrid" class="gap-grid-box">
-              <!-- Dynamically populated -->
+          <!-- Tab Panel 2: Interactive Conversational AI Chatbot -->
+          <div id="panelChatbot" class="advisor-tab-panel">
+            <div class="chat-interface-card">
+              <!-- Chat Card Topbar -->
+              <div class="chat-card-topbar">
+                <div class="chat-topbar-left">
+                  <div class="chat-avatar-robot">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <path d="M12 7v4"></path>
+                      <line x1="8" y1="16" x2="8.01" y2="16"></line>
+                      <line x1="16" y1="16" x2="16.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="chat-agent-title">Parichay AI Career Copilot</div>
+                    <div class="chat-agent-status">
+                      <span class="chat-status-dot"></span>
+                      <span>Connected &bull; Grounded in Candidate Data</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" id="btnClearChat" class="btn-figma-link" style="font-size: 0.76rem;">
+                  Clear Chat
+                </button>
+              </div>
+
+              <!-- Chat Message Scroll Window -->
+              <div id="chatMessagesFeed" class="chat-messages-container">
+                <!-- Assistant Welcome Message -->
+                <div class="chat-message-row assistant-msg">
+                  <div class="chat-avatar-robot" style="width:24px; height:24px; flex-shrink:0;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                      <circle cx="12" cy="5" r="2"></circle>
+                      <path d="M12 7v4"></path>
+                    </svg>
+                  </div>
+                  <div class="chat-bubble">
+                    <p><strong>Hello! I am your Parichay AI Career Copilot.</strong></p>
+                    <p>I have ingested your parsed resume and target job requirements. Ask me anything about tailoring your experience bullets, how to bridge specific technical gaps, or what questions you'll face in the interview!</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Prompt Suggestion Chips -->
+              <div class="chat-suggestions-container">
+                <button type="button" class="chat-prompt-chip" data-prompt="Rewrite my experience bullets using Google's X-Y-Z formula.">
+                  📝 Google X-Y-Z Bullets
+                </button>
+                <button type="button" class="chat-prompt-chip" data-prompt="How can I quickly learn and prove competence in my missing skills?">
+                  🎯 Bridge Skill Gaps
+                </button>
+                <button type="button" class="chat-prompt-chip" data-prompt="What technical interview questions will they ask me for this role?">
+                  💼 Technical Interview Prep
+                </button>
+                <button type="button" class="chat-prompt-chip" data-prompt="How can I elevate my alignment score above 85%?">
+                  📈 Boost Match Score
+                </button>
+                <button type="button" class="chat-prompt-chip" data-prompt="What is my biggest competitive advantage for this position?">
+                  ⭐ My Competitive Edge
+                </button>
+              </div>
+
+              <!-- Chat Input Bar -->
+              <form id="chatForm" class="chat-input-bar">
+                <input type="text" id="chatInputField" class="chat-input-field" placeholder="Ask Parichay AI about your resume, gaps, or interview strategy..." autocomplete="off">
+                <button type="submit" id="btnChatSend" class="btn-chat-send" aria-label="Send message">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </form>
             </div>
           </div>
 
-          <!-- Interview Prep Topics -->
-          <div class="advisor-block">
-            <h4 class="block-title">Likely Technical Interview Focus Areas</h4>
-            <ul id="interviewPrepList" class="interview-list-box">
-              <!-- Dynamically populated -->
-            </ul>
-          </div>
         </div>
 
         <!-- Dashboard Footer Controls -->
@@ -476,6 +587,14 @@
     </main>
 
   </div>
+
+  <!-- Floating AI Career Copilot Quick Trigger -->
+  <button type="button" id="btnFloatingChat" class="floating-copilot-trigger" aria-label="Open AI Career Chatbot">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span>AI Career Copilot</span>
+  </button>
 
   <!-- Deep Slate-Gray Footer Banner (Directly matches the footer in all Figma screens) -->
   <footer class="figma-footer-banner">

@@ -32,8 +32,15 @@ if os.path.exists(SAMPLE_JDS_PATH):
 
 
 @app.route("/")
-def index():
-    """Renders the main Parichay workspace and dashboard interface."""
+def landing():
+    """Renders the modern Parichay landing page and product showcase."""
+    return render_template("landing.html")
+
+
+@app.route("/studio")
+@app.route("/app")
+def studio():
+    """Renders the main Parichay resume intelligence studio and analysis tool."""
     return render_template("index.html")
 
 
@@ -256,6 +263,53 @@ def analyze_resume():
     }
 
     return jsonify(response_payload)
+
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    """
+    Conversational AI Career Chatbot endpoint.
+    Accepts JSON:
+        - message: str
+        - history: list of {"role": "user"|"assistant", "content": "..."}
+        - candidate: dict (name, matched_skills, missing_skills, etc.)
+        - job_profile: dict
+        - alignment: dict (score, fit_tier)
+    Returns:
+        JSON with {"success": True, "reply": "...", "engine": "...", "is_ai_live": bool}
+    """
+    data = request.get_json(silent=True) or {}
+    message = data.get("message", "").strip()
+    if not message:
+        return jsonify({
+            "success": False,
+            "error_type": "ValidationError",
+            "message": "Please enter a question or message for the AI Career Advisor."
+        }), 400
+
+    history = data.get("history", [])
+    candidate = data.get("candidate", {})
+    job_profile = data.get("job_profile", {})
+    alignment = data.get("alignment", {})
+
+    try:
+        chat_res = AIAdvisor.chat(
+            message=message,
+            history=history,
+            candidate_data=candidate,
+            job_data=job_profile,
+            alignment_data=alignment,
+            api_key=Config.GEMINI_API_KEY,
+            model=Config.GEMINI_MODEL
+        )
+        return jsonify(chat_res)
+    except Exception as e:
+        logger.exception("Chatbot request processing failed")
+        return jsonify({
+            "success": False,
+            "error_type": "ChatbotError",
+            "message": f"Unable to generate response: {str(e)}"
+        }), 500
 
 
 @app.errorhandler(413)

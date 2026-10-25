@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parichay — Where Your Potential Meets Opportunity</title>
+  <meta name="description" content="Parichay is an independent AI-powered resume intelligence platform. Audit role alignment with calibrated TF-IDF math, transparent skill taxonomies, and conversational AI career coaching.">
+  
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Base Style & Landing Page Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+
+  <!-- Top Sticky Navbar -->
+  <header class="landing-navbar">
+    <div class="landing-nav-left">
+      <a href="/" class="brand-logo" aria-label="Parichay — Where Your Potential Meets Opportunity">
+        <!-- Parichay Convergence Knot Emblem -->
+        <svg class="brand-glyph" width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="navGradIndigo" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4338CA" />
+              <stop offset="50%" stop-color="#4F46E5" />
+              <stop offset="100%" stop-color="#6366F1" />
+            </linearGradient>
+            <linearGradient id="navGradWarm" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#F59E0B" />
+              <stop offset="45%" stop-color="#FB8500" />
+              <stop offset="70%" stop-color="#06B6D4" />
+              <stop offset="100%" stop-color="#4F46E5" />
+            </linearGradient>
+            <filter id="navKnotShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0.5" dy="1.2" stdDeviation="1.0" flood-opacity="0.25"/>
+            </filter>
+          </defs>
+          <g transform="rotate(45 32 32)">
+            <rect x="20" y="8" width="24" height="48" rx="12" 
+                  stroke="url(#navGradWarm)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g transform="rotate(-45 32 32)">
+            <rect x="20" y="8" width="24" height="48" rx="12" 
+                  stroke="url(#navGradIndigo)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g transform="rotate(45 32 32)" filter="url(#navKnotShadow)">
+            <path d="M 20 20 L 20 15 C 20 10.5 24.5 8 32 8 C 39.5 8 44 10.5 44 15 L 44 20" 
+                  stroke="url(#navGradWarm)" stroke-width="6.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+
+        <div class="brand-title-wrap">
+          <span class="brand-text">Parichay</span>
+          <span class="brand-tag">AI INTELLIGENCE</span>
+        </div>
+      </a>
+
+      <nav class="landing-nav-links">
+        <a href="#features" class="landing-nav-link">Pillars & Architecture</a>
+        <a href="#demo" class="landing-nav-link">Interactive Sandbox</a>
+        <a href="#comparison" class="landing-nav-link">Why Parichay</a>
+      </nav>
+    </div>
+
+    <div class="landing-nav-right">
+      <!-- Theme Switcher -->
+      <div class="theme-switcher-box" title="Change brand color palette">
+        <button type="button" class="theme-dot-btn theme-indigo" data-theme="indigo" title="Royal Indigo (Brand Default)"></button>
+        <button type="button" class="theme-dot-btn theme-sapphire" data-theme="sapphire" title="Electric Sapphire"></button>
+        <button type="button" class="theme-dot-btn theme-emerald" data-theme="emerald" title="Precision Emerald"></button>
+        <button type="button" class="theme-dot-btn theme-obsidian" data-theme="obsidian" title="Executive Obsidian"></button>
+      </div>
+
+      <a href="/studio" class="btn-landing-primary">
+        <span>LAUNCH RESUME STUDIO</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-kicker-pill">
+      <span class="status-dot-pulse"></span>
+      <span>PARICHAY CAREER INTELLIGENCE PLATFORM &bull; v1.0 PRODUCTION</span>
+    </div>
+
+    <h1 class="hero-main-title">
+      Where Your Potential <br><span>Meets Opportunity.</span>
+    </h1>
+
+    <p class="hero-lead-text">
+      Stop submitting resumes into the dark. Parichay mathematically audits your resume against target job requirements using calibrated TF-IDF similarity, transparent skill taxonomy mapping, and a real-time conversational AI Career Copilot.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="/studio" class="btn-landing-primary" style="font-size:0.95rem; padding:13px 28px;">
+        <span>OPEN RESUME STUDIO</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+
+      <a href="/studio?sample=true" class="btn-landing-secondary" style="font-size:0.95rem; padding:12px 24px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <span>Test with Sample Profile (Aarav Sharma)</span>
+      </a>
+    </div>
+
+    <div class="hero-metrics-strip">
+      <div class="metric-strip-item">
+        <span class="metric-strip-num">0% Hallucination</span>
+        <span class="metric-strip-label">Deterministic NLP Math</span>
+      </div>
+      <div class="metric-strip-item">
+        <span class="metric-strip-num">7 Domains</span>
+        <span class="metric-strip-label">Categorized Taxonomy</span>
+      </div>
+      <div class="metric-strip-item">
+        <span class="metric-strip-num">100% In-Memory</span>
+        <span class="metric-strip-label">Zero Document Storage</span>
+      </div>
+      <div class="metric-strip-item">
+        <span class="metric-strip-num">Google X-Y-Z</span>
+        <span class="metric-strip-label">Actionable Rewrites</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live Showcase / Preview Sandbox -->
+  <section class="hero-preview-container" id="demo">
+    <div class="hero-preview-card">
+      <div class="preview-card-header">
+        <div class="browser-dots">
+          <span class="browser-dot" style="background:#EF4444;"></span>
+          <span class="browser-dot" style="background:#F59E0B;"></span>
+          <span class="browser-dot" style="background:#10B981;"></span>
+        </div>
+        <div class="preview-address-bar">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>parichay.ai/studio &bull; Live Intelligence Preview</span>
+        </div>
+        <a href="/studio" class="btn-figma-link" style="font-size:0.75rem; font-weight:700;">OPEN FULL TOOL &rarr;</a>
+      </div>
+
+      <div class="preview-card-body">
+        <!-- Left: Alignment Breakdown & Skills -->
+        <div class="preview-col-left">
+          <div class="preview-score-widget">
+            <div class="preview-score-circle">
+              <span class="preview-score-num">82%</span>
+              <span class="preview-score-tag">HIGH FIT</span>
+            </div>
+            <div class="preview-widget-meta">
+              <h4>Candidate: Aarav Sharma</h4>
+              <p>Target Role: Senior Full-Stack Engineer &bull; Calibrated Lexical &amp; Semantic Fit</p>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:0.78rem; font-weight:700; color:#334155; margin-bottom:6px; text-transform:uppercase;">
+              Verified Skill Breakdown
+            </div>
+            <div class="preview-skills-row">
+              <span class="preview-skill-tag matched">✓ Python</span>
+              <span class="preview-skill-tag matched">✓ PyTorch</span>
+              <span class="preview-skill-tag matched">✓ PostgreSQL</span>
+              <span class="preview-skill-tag matched">✓ Docker</span>
+              <span class="preview-skill-tag matched">✓ Scikit-Learn</span>
+              <span class="preview-skill-tag missing">✕ Kubernetes</span>
+              <span class="preview-skill-tag missing">✕ AWS Cloud</span>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1px solid #E2E6ED; border-radius:4px; padding:12px; font-size:0.8rem; color:#475569;">
+            <strong style="color:var(--figma-blue);">Google X-Y-Z Recommended Rewrite:</strong><br>
+            <em>"Containerized machine learning microservices with <strong>Docker</strong>, reducing deployment cycle from 4 hours to <strong>12 minutes</strong> by setting up automated integration checks."</em>
+          </div>
+        </div>
+
+        <!-- Right: AI Chatbot Live Interaction Preview -->
+        <div class="preview-col-right">
+          <div class="preview-chat-widget">
+            <div class="preview-chat-head">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="M12 7v4"></path>
+              </svg>
+              <span>Parichay AI Career Copilot &bull; Conversational Interaction</span>
+            </div>
+
+            <div class="preview-chat-msg" style="background:var(--figma-blue); color:#FFFFFF; align-self:flex-end;">
+              <strong>User:</strong> How should I prepare for technical questions on Kubernetes since it's a missing requirement?
+            </div>
+
+            <div class="preview-chat-msg" style="align-self:flex-start;">
+              <strong>AI Copilot:</strong> Interviewers will probe your understanding of container orchestration. Highlight that while you haven't deployed production K8s clusters, you've containerized multi-container apps with <strong>Docker Compose</strong>, understand Pod replication concepts, and are currently deploying test services to Minikube.
+            </div>
+
+            <a href="/studio" class="btn-figma-outlined" style="justify-content:center; padding:7px; font-size:0.78rem;">
+              CHAT WITH AI COPILOT IN STUDIO &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value Pillars Section -->
+  <section class="section-wrapper" id="features">
+    <div class="section-head">
+      <div class="section-kicker">ENGINEERED FOR RIGOR</div>
+      <h2 class="section-title">A Career Instrument Built on Proof, Not Promises</h2>
+      <p class="section-subtitle">
+        Unlike consumer AI tools that produce opaque scores and hallucinated advice, Parichay delivers audited mathematical alignment, deterministic taxonomy extraction, and conversational career strategy.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div class="feature-title">Calibrated TF-IDF Math</div>
+        <p class="feature-desc">
+          Evaluates unigram and bigram sublinear TF-IDF cosine similarity, calibrated with target job vocabulary coverage to eliminate document length bias.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <div class="feature-title">7-Domain Skills Taxonomy</div>
+        <p class="feature-desc">
+          Rigorous entity scanning classifies technical abilities across Languages, Frameworks, ML/AI, Cloud Infrastructure, Databases, and Soft Skills.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div class="feature-title">Conversational AI Chatbot</div>
+        <p class="feature-desc">
+          Engage in real-time career coaching. Ask the AI Copilot to roleplay interview questions, explain missing technologies, or critique project descriptions.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <div class="feature-title">Google X-Y-Z Action Plans</div>
+        <p class="feature-desc">
+          Transforms passive bullet points into high-impact metric statements: "Accomplished [X] as measured by [Y], by doing [Z]" with 1-click clipboard copy.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="feature-title">Zero-Persistence Privacy</div>
+        <p class="feature-desc">
+          All document processing occurs strictly in-memory using PyMuPDF. Resumes and candidate records are never stored in databases or permanent disks.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="feature-title">Scanned PDF & ATS Auditing</div>
+        <p class="feature-desc">
+          Detects unreadable image-only resumes and parsing traps before recruiters do, giving you concrete guidance on exporting accessible text PDFs.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Matrix Section -->
+  <section class="section-wrapper" id="comparison">
+    <div class="section-head">
+      <div class="section-kicker">OBJECTIVE BENCHMARK</div>
+      <h2 class="section-title">How Parichay Compares</h2>
+      <p class="section-subtitle">
+        See how transparent, grounded intelligence compares against legacy applicant tracking systems and black-box AI generators.
+      </p>
+    </div>
+
+    <div class="comparison-card">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Evaluation Dimension</th>
+            <th>Traditional ATS Screeners</th>
+            <th>Generic AI "Resume Checkers"</th>
+            <th class="parichay-th">Parichay Intelligence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Scoring Methodology</strong></td>
+            <td>Binary keyword counting</td>
+            <td>Opaque black-box AI number</td>
+            <td class="parichay-td">Calibrated TF-IDF (4 audited mathematical pillars)</td>
+          </tr>
+          <tr>
+            <td><strong>Explainability</strong></td>
+            <td>None (Pass / Fail)</td>
+            <td>Generic marketing buzzwords</td>
+            <td class="parichay-td">Line-item breakdown: Tech, Semantic, Soft, Structural</td>
+          </tr>
+          <tr>
+            <td><strong>Interactive Coaching</strong></td>
+            <td>No</td>
+            <td>Static canned paragraphs</td>
+            <td class="parichay-td">Conversational AI Career Copilot grounded in your data</td>
+          </tr>
+          <tr>
+            <td><strong>Bullet Point Optimization</strong></td>
+            <td>None</td>
+            <td>Generic adjective fluff</td>
+            <td class="parichay-td">Google X-Y-Z formula with 1-click clipboard copy</td>
+          </tr>
+          <tr>
+            <td><strong>Data Privacy</strong></td>
+            <td>Resumes saved permanently</td>
+            <td>Profile data monetized / trained on</td>
+            <td class="parichay-td">100% In-memory parsing; zero permanent storage</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Bottom Launch CTA Banner -->
+  <section class="cta-banner-card">
+    <h2 class="cta-banner-title">Ready to Benchmark Your Role Alignment?</h2>
+    <p class="cta-banner-text">
+      Launch the Parichay Resume Studio now. Upload your resume, select or paste your target role, and receive instant, explainable intelligence.
+    </p>
+    <a href="/studio" class="btn-cta-launch">
+      <span>LAUNCH RESUME STUDIO NOW</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </a>
+  </section>
+
+  <!-- Deep Slate-Gray Footer Banner -->
+  <footer class="figma-footer-banner">
+    <div class="footer-links-row">
+      <a href="/studio">Resume Studio</a>
+      <span class="footer-pipe">|</span>
+      <a href="/studio?sample=true">Sample Analysis</a>
+      <span class="footer-pipe">|</span>
+      <a href="/api/sample-jds">Sample Roles API</a>
+      <span class="footer-pipe">|</span>
+      <a href="/api/health">System Health</a>
+    </div>
+    <div class="footer-subtext-line">
+      <strong>Parichay</strong> &bull; Where Your Potential Meets Opportunity &bull; Independent AI-Powered Resume Intelligence Platform
+    </div>
+  </footer>
+
+  <!-- Theme Switcher Script on Landing Page -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const themeBtns = document.querySelectorAll(".theme-dot-btn");
+      const savedTheme = localStorage.getItem("parichay_theme") || "indigo";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+
+      themeBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const theme = btn.dataset.theme;
+          document.documentElement.setAttribute("data-theme", theme);
+          localStorage.setItem("parichay_theme", theme);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

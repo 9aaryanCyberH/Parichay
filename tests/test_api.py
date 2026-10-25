@@ -94,6 +94,46 @@ class TestParichayAPI(unittest.TestCase):
         self.assertIn("recommendations", res_data)
         self.assertIn("executive_summary", res_data["recommendations"])
 
+    def test_landing_page_endpoint(self):
+        """Test GET / returns landing page with 200 OK."""
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("Parichay", html)
+        self.assertIn("Where Your Potential Meets Opportunity", html)
+        self.assertIn("LAUNCH RESUME STUDIO", html)
+
+    def test_studio_page_endpoint(self):
+        """Test GET /studio returns the full workspace application."""
+        response = self.client.get("/studio")
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("Resume Studio", html)
+        self.assertIn("Candidate Resume", html)
+
+    def test_chatbot_endpoint(self):
+        """Test POST /api/chat handles career inquiries with grounded responses."""
+        payload = {
+            "message": "How do I rewrite my resume bullet points using Google's X-Y-Z formula?",
+            "history": [],
+            "candidate": {
+                "name": "Aarav Sharma",
+                "matched_skills": ["Python", "PyTorch"],
+                "missing_skills": ["Kubernetes", "AWS"]
+            },
+            "alignment": {
+                "score": 78,
+                "fit_tier": "High Fit"
+            }
+        }
+        response = self.client.post("/api/chat", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIn("reply", data)
+        self.assertGreater(len(data["reply"]), 20)
+        self.assertIn("Google's X-Y-Z", data["reply"])
+
 
 if __name__ == "__main__":
     unittest.main()

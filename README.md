@@ -22,22 +22,25 @@
 | **Product Subtitle** | AI-Powered Resume Intelligence & Role Alignment Platform |
 | **Positioning Taglines** | &bull; *Explainable Alignment &bull; Zero Hallucination &bull; Actionable Intelligence*<br>&bull; *Bridge the Gap Between What You Have Built and Where You Belong.* |
 | **Brand Symbol** | **The Convergence Knot**: An interlocking dual-ribbon infinity nexus representing candidate background (cobalt/blue) seamlessly interweaving with career opportunities (amber/cyan). |
-| **Color System** | &bull; Electric Blue (`#007BFF`) & Deep Cobalt (`#0056B3`) &mdash; Foundation & Machine Learning<br>&bull; Warm Amber (`#FFB703`) & Gold (`#FB8500`) &mdash; Human Potential & Drive<br>&bull; Sky Azure (`#38BDF8`) & Ocean Cyan (`#0284C7`) &mdash; Opportunity & Growth<br>&bull; Slate Charcoal (`#0F172A`) & Warm Card Surface (`#FFFFFF` on `#EDF2F9`) |
+| **Color System** | &bull; Royal Indigo (`#4F46E5`) & Deep Iris (`#4338CA`) &mdash; Primary Brand Foundation<br>&bull; Warm Amber (`#F59E0B`) & Gold (`#FB8500`) &mdash; Human Potential & Spark<br>&bull; Electric Cyan (`#06B6D4`) & Ocean Azure (`#38BDF8`) &mdash; Opportunity & Growth<br>&bull; Slate Charcoal (`#0F172A`) & Warm Card Surface (`#FFFFFF` on `#EDF2F9`)<br>&bull; Dynamic Theme Palette Switcher: Royal Indigo, Electric Sapphire, Precision Emerald, Executive Obsidian |
 | **Typography** | `Plus Jakarta Sans` (Display/Brand), `Inter` (Data & Interface), `JetBrains Mono` (Metrics) |
 
 ---
 
 ## 1. Executive Summary
 
-**Parichay** is an original, production-minded career intelligence application designed to help candidates rigorously evaluate how their resume aligns with specific job descriptions. 
+**Parichay** is an original, production-minded career intelligence application designed to help candidates evaluate how their resume aligns with specific job descriptions. 
 
-Unlike generic AI career tools that produce black-box percentage scores and hype-filled buzzwords, Parichay emphasizes **interpretability, grounded information extraction, and transparent scoring**.
+Unlike generic AI career tools that produce black-box percentage scores and hype-filled buzzwords, Parichay emphasizes **interpretability, grounded information extraction, transparent scoring, and real-time conversational coaching**.
 
 ### Core Tenets
-- **Figma-Grounded Dashboard Architecture**: Modeled after clean applicant management screen systems. Crisp white elevated cards (`#FFFFFF`) set against a cool background canvas (`#EDF2F9`), vibrant electric blue highlights (`#007BFF`), and a grounded slate-gray footer (`#636873`). Zero purple-pink glowing blobs, zero fake testimonials, and zero bloated card-in-card designs.
+- **High-Converting Landing Page (`/`)**: Introduces candidates to the platform through an interactive live preview sandbox, mathematical methodology breakdown, feature value pillars, and benchmark comparisons, before launching into the Resume Studio (`/studio`).
+- **Grounded Conversational AI Chatbot (`/api/chat`)**: A real-time career intelligence copilot that helps candidates rewrite experience bullets following Google's X-Y-Z formula, answers technical interview questions, and provides concrete project ideas for bridging skill gaps.
+- **Dynamic Multi-Theme System**: Features a live brand color palette switcher in the navigation bar supporting Royal Indigo, Electric Sapphire, Precision Emerald, and Executive Obsidian.
 - **Explainable Alignment Scoring**: The match percentage is strictly an **alignment measure**, not a predictive hiring probability. Every percentage point is broken down into four audited mathematical components.
+- **Interactive UI Micro-Interactions**: 1-click clipboard copy on recommended bullet points with visual feedback, clickable missing skills chips that directly launch AI advice, animated circular progress gauges, and interactive radar charts.
 - **Scanned PDF & Error Detection**: Automatically detects image-only or unreadable PDFs using PyMuPDF and provides clear, actionable instructions.
-- **Contextual AI Recommendations**: Leverages the Google Gemini API with a deep, deterministic grounded fallback that produces tangible, project-level action items using Google's X-Y-Z formula.
+- **Zero Document Storage**: 100% in-memory processing with PyMuPDF. No candidate resumes or personal details are permanently stored.
 
 ---
 
@@ -47,7 +50,7 @@ Parichay is organized into modular services with strict separation of concerns:
 
 ```
 d:\Parichay\
-├── app.py                      # Flask factory, routes, upload validation, error handlers
+├── app.py                      # Flask factory, routes (/, /studio, /api/analyze, /api/chat)
 ├── config.py                   # Centralized configuration & environment loader
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Environment variables template
@@ -57,14 +60,20 @@ d:\Parichay\
 │   ├── pdf_parser.py           # PyMuPDF text extractor & scanned/corrupt PDF detection
 │   ├── extractor.py            # Structured entity parser & categorized skills taxonomy
 │   ├── matcher.py              # TF-IDF vectorizer, cosine similarity & explainable scoring
-│   └── ai_advisor.py           # Grounded AI advisor (Google Gemini API + deterministic engine)
+│   └── ai_advisor.py           # Grounded AI advisor & conversational AI chatbot
 ├── static/
 │   ├── css/
-│   │   └── style.css           # Swiss editorial design system, responsive grid, semantic colors
-│   └── js/
-│       └── main.js             # Drag-and-drop upload UX, live state handling, Chart.js radar
+│   │   ├── style.css           # Design system, multi-theme engine, chat UI, responsive rules
+│   │   └── landing.css         # High-converting landing page styles & showcase cards
+│   ├── js/
+│   │   └── main.js             # Drag-and-drop upload UX, live state, Chart.js, chatbot & theme switcher
+│   └── images/
+│       ├── parichay-logo.svg   # Vector brand lockup (Emblem + Name + Pill + Tagline)
+│       ├── parichay-mark.svg   # Standalone vector Convergence Knot emblem
+│       └── favicon.svg         # High-precision vector favicon
 ├── templates/
-│   └── index.html              # Accessible, semantic editorial interface
+│   ├── landing.html            # High-converting product landing page
+│   └── index.html              # Full resume intelligence studio & interactive dashboard
 ├── sample_data/
 │   ├── sample_resume_swe.pdf   # Verified test resume (Aarav Sharma)
 │   ├── scanned_resume.pdf      # Image-only dummy PDF to test error detection
@@ -72,7 +81,7 @@ d:\Parichay\
 │   └── generate_sample_pdf.py  # Utility to reproduce test PDFs
 └── tests/
     ├── test_pipeline.py        # Unit tests for PDF parser, extractor, matcher, advisor
-    └── test_api.py             # Integration tests for Flask endpoints & error handling
+    └── test_api.py             # Integration tests for landing page, studio, and chatbot APIs
 ```
 
 ### Analysis Pipeline
