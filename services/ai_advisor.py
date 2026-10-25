@@ -82,7 +82,10 @@ Respond ONLY with a valid JSON object matching this schema:
     {{
       "focus_area": "Technology or project to highlight",
       "critique": "Why the current representation may lack impact",
-      "recommended_action": "Actionable rewrite following Google's X-Y-Z formula (Accomplished [X] as measured by [Y], by doing [Z])."
+      "recommended_action": "Actionable rewrite following Google's X-Y-Z formula (Accomplished [X] as measured by [Y], by doing [Z]).",
+      "original": "Example of generic before bullet",
+      "enhanced": "Google X-Y-Z enhanced rewrite",
+      "rationale": "Why this enhancement works"
     }}
   ],
   "gap_mitigation_plan": [
@@ -162,23 +165,34 @@ Respond ONLY with a valid JSON object matching this schema:
         bullet_enhancements = []
         if matched_tech:
             top_matched = matched_tech[0]
+            action_text = f"Engineered a {top_matched} service that reduced API latency by 35% across 10K+ daily requests using connection pooling and async handlers."
             bullet_enhancements.append({
                 "focus_area": f"Strengthen {top_matched} Project Impact",
                 "critique": f"Descriptions involving {top_matched} often list tasks rather than measurable engineering throughput.",
-                "recommended_action": f"Structure bullet points with metrics: 'Engineered a {top_matched} service that reduced API latency by 35% across 10K+ daily requests using connection pooling and async handlers.'"
+                "recommended_action": f"Structure bullet points with metrics: '{action_text}'",
+                "original": f"Worked on {top_matched} backend features and handled database queries.",
+                "enhanced": action_text,
+                "rationale": "Google's X-Y-Z formula (Accomplished [X] as measured by [Y], by doing [Z]) demonstrates quantifiable engineering impact and ownership."
             })
 
         if has_projects:
+            arch_action = "Designed a microservices architecture with decoupled background workers, integrating Redis caching to handle peak traffic without degradation."
             bullet_enhancements.append({
                 "focus_area": "Technical Architecture in Project Bullets",
                 "critique": "Project bullet points often omit the underlying architecture, data flow, or deployment details.",
-                "recommended_action": "Specify architectural choices: 'Designed a microservices architecture with decoupled background workers, integrating Redis caching to handle peak traffic without degradation.'"
+                "recommended_action": f"Specify architectural choices: '{arch_action}'",
+                "original": "Built a full stack project with web interface and backend API.",
+                "enhanced": arch_action,
+                "rationale": "Articulating architectural constraints and database choices signals senior engineering judgment."
             })
         else:
             bullet_enhancements.append({
                 "focus_area": "Add a Dedicated Projects Section",
                 "critique": "No dedicated Projects section was isolated by the parser. Independent projects are vital for evidencing practical skills.",
-                "recommended_action": "Include 2-3 production-grade personal or academic projects with GitHub repositories and live deployment URLs."
+                "recommended_action": "Include 2-3 production-grade personal or academic projects with GitHub repositories and live deployment URLs.",
+                "original": "Skills listed without repository links or live deployments.",
+                "enhanced": "Architected and published 2 open-source services with CI/CD automation, Dockerfiles, and comprehensive test suites.",
+                "rationale": "Verified public repositories provide direct proof of technical execution."
             })
 
         # 3. Gap Mitigation Plan grounded in real missing technologies
