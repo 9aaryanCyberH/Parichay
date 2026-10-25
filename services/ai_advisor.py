@@ -523,7 +523,7 @@ Core Persona & Rules:
         # 3. Score Calculation inquiry
         if any(w in msg_lower for w in ["calculate", "calculated", "formula", "how was my score", "score calculation"]):
             return (
-                f"### Alignment Score Methodology (**{score}%** &bull; {fit_tier})\n\n"
+                f"### Alignment Score Methodology (**{score}%** • {fit_tier})\n\n"
                 f"Your Parichay alignment score is calculated through a hybrid deterministic and semantic pipeline:\n\n"
                 f"1. **TF-IDF Vector Cosine Similarity (30% weight):** Measures vocabulary and conceptual overlap between your resume text and the job description.\n"
                 f"2. **Core Technical Skills Match (45% weight):** Ratio of verified required technical competencies present in your resume against the target role requirements.\n"
@@ -608,7 +608,7 @@ Core Persona & Rules:
         if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align"]):
             missing_str = ", ".join(f"**{m}**" for m in missing_tech[:3]) if missing_tech else "specialized tooling"
             return (
-                f"### Strategy to Elevate Your Alignment Score (Currently **{score}%** &bull; {fit_tier})\n\n"
+                f"### Strategy to Elevate Your Alignment Score (Currently **{score}%** • {fit_tier})\n\n"
                 f"To transition your profile into the top candidate tier, follow this 3-step action roadmap:\n\n"
                 f"1. **Incorporate Missing Technical Keywords:**\n"
                 f"   * Target JD requires: {missing_str}.\n"

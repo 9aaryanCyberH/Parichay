@@ -1476,20 +1476,31 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderMarkdown(text) {
     if (!text) return "";
     let html = escapeHtml(text);
+
+    // Replace literal HTML entity &bull; or escaped &amp;bull; with clean unicode bullet dot
+    html = html.replace(/(&amp;bull;|&bull;)/g, '•');
+
     // Headers
-    html = html.replace(/^### (.*$)/gm, '<h4 style="margin: 6px 0 8px 0; font-size: 1rem; color: inherit; font-weight: 700;">$1</h4>');
-    html = html.replace(/^## (.*$)/gm, '<h3 style="margin: 8px 0 10px 0; font-size: 1.08rem; color: inherit; font-weight: 700;">$1</h3>');
+    html = html.replace(/^###\s+(.*)$/gm, '<h4 style="margin: 6px 0 8px 0; font-size: 1.02rem; color: inherit; font-weight: 700;">$1</h4>');
+    html = html.replace(/^##\s+(.*)$/gm, '<h3 style="margin: 8px 0 10px 0; font-size: 1.12rem; color: inherit; font-weight: 700;">$1</h3>');
+    html = html.replace(/^#\s+(.*)$/gm, '<h2 style="margin: 10px 0 12px 0; font-size: 1.22rem; color: inherit; font-weight: 700;">$1</h2>');
+
     // Bold & italic
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
     // Blockquotes
     html = html.replace(/^>\s+(.*)$/gm, '<blockquote style="border-left: 3px solid var(--primary-teal); margin: 6px 0; padding-left: 10px; font-style: italic; opacity: 0.9;">$1</blockquote>');
+
     // Bullet points
     html = html.replace(/^[\*\-]\s+(.*)$/gm, '<li>$1</li>');
+
     // Numbered lists
     html = html.replace(/^(\d+\.)\s+(.*)$/gm, '<li>$2</li>');
+
     // Group consecutive list items into ul / ol
     html = html.replace(/(<li>.*<\/li>)/s, '<ul style="margin: 6px 0 8px 18px; padding-left: 0;">$1</ul>');
+
     // Paragraphs
     html = html.replace(/\n\n/g, '<br><br>');
     return html;

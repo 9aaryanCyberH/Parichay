@@ -2071,6 +2071,15 @@ body.dashboard-body {
   margin-bottom: 4px;
 }
 
+.chat-bubble h2,
+.chat-bubble h3,
+.chat-bubble h4 {
+  margin: 6px 0 10px 0;
+  font-weight: 700;
+  color: inherit;
+  line-height: 1.35;
+}
+
 .chat-time-tag {
   font-size: 0.72rem;
   color: var(--muted-light);
