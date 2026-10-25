@@ -385,6 +385,45 @@
   color: #0C2824;
 }
 
+[data-theme="dark"] .chat-header-status-strip {
+  background-color: #101C19;
+  border-bottom-color: #203630;
+}
+[data-theme="dark"] .chat-status-label {
+  color: #ECFDF5;
+}
+[data-theme="dark"] .chat-model-badge {
+  background: rgba(184, 242, 208, 0.15);
+  color: #B8F2D0;
+}
+[data-theme="dark"] .btn-api-key-pill {
+  background-color: #172A25;
+  border-color: #203630;
+  color: #B8F2D0;
+}
+[data-theme="dark"] .btn-api-key-pill:hover {
+  background-color: #203E36;
+  border-color: #B8F2D0;
+}
+[data-theme="dark"] .chat-engine-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: #A7F3D0;
+}
+[data-theme="dark"] #geminiKeyModal .modal-content-card {
+  background-color: #14221F;
+  border-color: #203630;
+  color: #ECFDF5;
+}
+[data-theme="dark"] #geminiApiKeyInput {
+  background-color: #101C19 !important;
+  border-color: #203630 !important;
+  color: #ECFDF5 !important;
+}
+[data-theme="dark"] #geminiCurrentStatusBox {
+  background-color: #101C19 !important;
+  border-color: #203630 !important;
+}
+
 /* Modal Dark Theming */
 [data-theme="dark"] .modal-content-box {
   background: #14221F;
@@ -1893,6 +1932,89 @@ body.dashboard-body {
   flex-direction: column;
   height: 600px;
   overflow: hidden;
+}
+
+/* Chat AI Connection Toolbar */
+.chat-header-status-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--warm-ivory);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.chat-status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-indicator-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.status-indicator-dot.live {
+  background-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.status-indicator-dot.offline {
+  background-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.chat-status-label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.chat-model-badge {
+  background: rgba(14, 116, 94, 0.1);
+  color: var(--primary-teal);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.btn-api-key-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: var(--surface-white);
+  border: 1px solid var(--border-neutral);
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary-teal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-api-key-pill:hover {
+  background-color: var(--accent-mint);
+  border-color: var(--primary-teal);
+  color: var(--ink);
+}
+
+.chat-engine-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--muted-slate);
 }
 
 .chat-history-box {

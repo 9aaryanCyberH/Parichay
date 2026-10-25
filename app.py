@@ -454,6 +454,9 @@ def analyze_resume():
         )
         response_payload["saved_history_id"] = analysis_id
 
+    # Store latest analysis in session for seamless chat hydration
+    session["last_analysis_data"] = response_payload
+
     return jsonify(response_payload)
 
 
@@ -481,6 +484,10 @@ def manage_history_item(analysis_id):
     item = HistoryManager.get_analysis_by_id(analysis_id, user_id)
     if not item:
         return jsonify({"success": False, "message": "Record not found."}), 404
+    
+    if item.get("analysis_data"):
+        session["last_analysis_data"] = item["analysis_data"]
+
     return jsonify({"success": True, "item": item, "analysis": item})
 
 
@@ -501,6 +508,95 @@ def update_settings():
     return jsonify(res)
 
 
+@app.route("/api/config/gemini-status", methods=["GET"])
+def gemini_status():
+    """Returns current live Gemini connection status and configured model."""
+    key = (
+        session.get("gemini_api_key") or
+        Config.GEMINI_API_KEY or
+        os.environ.get("GEMINI_API_KEY", "")
+    ).strip().strip('"').strip("'")
+    is_live = bool(key and not key.startswith("your_"))
+    masked = f"{key[:6]}...{key[-4:]}" if is_live and len(key) > 10 else ""
+    return jsonify({
+        "success": True,
+        "is_live": is_live,
+        "model": Config.GEMINI_MODEL,
+        "masked_key": masked
+    })
+
+
+@app.route("/api/config/gemini-key", methods=["POST"])
+def update_gemini_key():
+    """Validates and persists a user-provided Google Gemini API key."""
+    data = request.get_json(silent=True) or {}
+    new_key = data.get("api_key", "").strip().strip('"').strip("'")
+
+    if not new_key:
+        session.pop("gemini_api_key", None)
+        return jsonify({"success": True, "message": "Custom Gemini API key cleared.", "is_live": False})
+
+    # Test key against Gemini API with a minimal ping
+    target_model = Config.GEMINI_MODEL or "gemini-1.5-flash"
+    test_url = f"https://generativelanguage.googleapis.com/v1beta/models/{target_model}:generateContent?key={new_key}"
+    try:
+        import requests
+        test_payload = {
+            "contents": [{"role": "user", "parts": [{"text": "Hello"}]}]
+        }
+        resp = requests.post(
+            test_url,
+            headers={"Content-Type": "application/json"},
+            json=test_payload,
+            timeout=8
+        )
+        if resp.status_code == 200:
+            session["gemini_api_key"] = new_key
+            Config.GEMINI_API_KEY = new_key
+            os.environ["GEMINI_API_KEY"] = new_key
+
+            # Persist to local .env if it exists
+            env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+            if os.path.exists(env_file):
+                try:
+                    with open(env_file, "r", encoding="utf-8") as f:
+                        lines = f.readlines()
+                    updated = False
+                    for idx, line in enumerate(lines):
+                        if line.startswith("GEMINI_API_KEY="):
+                            lines[idx] = f"GEMINI_API_KEY={new_key}\n"
+                            updated = True
+                            break
+                    if not updated:
+                        lines.append(f"GEMINI_API_KEY={new_key}\n")
+                    with open(env_file, "w", encoding="utf-8") as f:
+                        f.writelines(lines)
+                except Exception as env_err:
+                    logger.warning(f"Could not update .env on disk: {env_err}")
+
+            return jsonify({
+                "success": True,
+                "message": "Google Gemini API key verified and connected successfully!",
+                "is_live": True,
+                "model": target_model
+            })
+        else:
+            err_text = ""
+            try:
+                err_text = resp.json().get("error", {}).get("message", "")
+            except Exception:
+                err_text = resp.text[:120]
+            return jsonify({
+                "success": False,
+                "message": f"Gemini verification failed (HTTP {resp.status_code}): {err_text}"
+            }), 400
+    except Exception as ex:
+        return jsonify({
+            "success": False,
+            "message": f"Connection check failed: {str(ex)}"
+        }), 400
+
+
 @app.route("/api/chat", methods=["POST"])
 @login_required
 def chat():
@@ -509,9 +605,11 @@ def chat():
     Accepts JSON:
         - message: str
         - history: list of {"role": "user"|"assistant", "content": "..."}
-        - candidate: dict (name, matched_skills, missing_skills, etc.)
+        - candidate: dict
+        - skills: dict
         - job_profile: dict
-        - alignment: dict (score, fit_tier)
+        - alignment: dict
+        - api_key: optional client override key
     Returns:
         JSON with {"success": True, "reply": "...", "engine": "...", "is_ai_live": bool}
     """
@@ -525,10 +623,37 @@ def chat():
         }), 400
 
     history = data.get("history", [])
-    candidate = data.get("candidate", {})
-    skills = data.get("skills", {})
-    job_profile = data.get("job_profile", {})
-    alignment = data.get("alignment", {})
+    candidate = dict(data.get("candidate", {}))
+    skills = dict(data.get("skills", {}))
+    job_profile = dict(data.get("job_profile", {}))
+    alignment = dict(data.get("alignment", {}))
+
+    # Auto-hydrate missing session context if available
+    last_analysis = session.get("last_analysis_data", {})
+    if last_analysis:
+        if not skills and last_analysis.get("skills"):
+            skills = last_analysis.get("skills", {})
+        if not candidate.get("matched_skills") and skills.get("matched_technical"):
+            candidate["matched_skills"] = skills.get("matched_technical", [])
+        if not candidate.get("missing_skills") and skills.get("missing_technical"):
+            candidate["missing_skills"] = skills.get("missing_technical", [])
+        if not candidate.get("unique_skills") and skills.get("candidate_unique"):
+            candidate["unique_skills"] = skills.get("candidate_unique", [])
+        if not candidate.get("name") and last_analysis.get("candidate", {}).get("name"):
+            candidate["name"] = last_analysis["candidate"]["name"]
+        if not alignment and last_analysis.get("alignment"):
+            alignment = last_analysis.get("alignment", {})
+        if not job_profile and last_analysis.get("job_profile"):
+            job_profile = last_analysis.get("job_profile", {})
+
+    # Resolve effective API key
+    effective_api_key = (
+        data.get("api_key") or
+        session.get("gemini_api_key") or
+        Config.GEMINI_API_KEY or
+        os.environ.get("GEMINI_API_KEY", "")
+    ).strip().strip('"').strip("'")
+    effective_model = data.get("model") or Config.GEMINI_MODEL or "gemini-1.5-flash"
 
     try:
         chat_res = AIAdvisor.chat(
@@ -538,8 +663,8 @@ def chat():
             skills_data=skills,
             job_data=job_profile,
             alignment_data=alignment,
-            api_key=Config.GEMINI_API_KEY,
-            model=Config.GEMINI_MODEL
+            api_key=effective_api_key,
+            model=effective_model
         )
         return jsonify(chat_res)
     except Exception as e:

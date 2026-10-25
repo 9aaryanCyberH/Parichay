@@ -387,7 +387,8 @@ Core Persona & Rules:
 
         # 2. Ordered list of models to try
         models_to_try = []
-        for m in [model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]:
+        preferred_models = [model, "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-2.0-flash", "gemini-1.5-pro", "gemini-2.5-flash"]
+        for m in preferred_models:
             if m and m not in models_to_try:
                 models_to_try.append(m)
 
@@ -473,7 +474,7 @@ Core Persona & Rules:
         if any(w in msg_lower for w in ["gap", "gaps", "three most important", "missing"]):
             if missing_tech:
                 top_gaps = missing_tech[:3]
-                gap_items = "\n".join([f"{i+1}. **{g}** — Build a demonstrable feature or micro-service showcasing {g} to directly address this role requirement." for i, g in enumerate(top_gaps)])
+                gap_items = "\n".join([f"{i+1}. **{g}** — Demonstrating hands-on project implementations with {g} will directly close this requirement." for i, g in enumerate(top_gaps)])
                 return (
                     f"### Priority Skill Gaps for **{candidate_name}**\n\n"
                     f"Based on your target job description, here are the top competencies required that were not verified in your resume:\n\n"
@@ -482,16 +483,44 @@ Core Persona & Rules:
                     f"- Add these keywords to your projects or coursework if you have prior exposure.\n"
                     f"- Review the tailored learning roadmap in the **Gap Mitigation** tab for step-by-step project architectures."
                 )
+            elif score < 75:
+                return (
+                    f"### Skill Gap Analysis for **{candidate_name}** (Alignment Score: **{score}%**)\n\n"
+                    f"While your resume matches core technical keywords, your alignment score (**{score}%**) indicates opportunities in **depth, system design, and architectural evidence**:\n\n"
+                    f"1. **Production Infrastructure & CI/CD:** Add evidence of containerization (Docker), deployment automation, and cloud hosting (AWS/GCP).\n"
+                    f"2. **Quantified Engineering Impact:** The target role expects demonstrable throughput metrics (e.g. latency reduction, request scale, uptime) rather than generic task lists.\n"
+                    f"3. **Testing & Code Quality:** Explicitly cite test frameworks (e.g. PyTest, Jest, JUnit) and CI pipeline testing.\n\n"
+                    f"**Recommended Action:** Use Google's X-Y-Z formula to rewrite your experience bullets to showcase end-to-end engineering ownership."
+                )
             else:
                 return (
                     f"### Skill Gap Analysis for **{candidate_name}**\n\n"
-                    f"Exceptional news: No major technical gaps were detected against this target role! You cover all primary technical requirements.\n\n"
-                    f"To strengthen your application further, focus on:\n"
+                    f"Strong alignment detected (**{score}%**)! You cover all primary technical requirements.\n\n"
+                    f"To make your profile stand out against other qualified candidates:\n"
                     f"1. **Quantifying Engineering Outcomes:** Use Google's X-Y-Z formula on your project bullets.\n"
-                    f"2. **Highlighting Unique Strengths:** Emphasize bonus skills like {', '.join(unique_tech[:3]) if unique_tech else 'system design'}."
+                    f"2. **Highlighting Unique Strengths:** Emphasize bonus skills like {', '.join(unique_tech[:3]) if unique_tech else 'system design & cloud architecture'}."
                 )
 
-        # 2. Score Calculation inquiry
+        # 2. Priority Skills to Learn inquiry
+        if any(w in msg_lower for w in ["prioritize learning", "skills to learn", "which skills", "what should i learn", "priority skills"]):
+            if missing_tech:
+                skill_list = "\n".join([f"{i+1}. **{s}** (Target Requirement): Build a targeted project feature or microservice using {s} and commit it to GitHub with a clean README." for i, s in enumerate(missing_tech[:3])])
+                return (
+                    f"### High-Priority Skills Roadmap for **{candidate_name}**\n\n"
+                    f"To maximize your hiring probability for this role, prioritize learning in this exact sequence:\n\n"
+                    f"{skill_list}\n\n"
+                    f"**Suggested Strategy:** Rather than spending months on theoretical courses, build one cohesive full-stack application that integrates these missing competencies with your existing strengths ({', '.join(matched_tech[:2]) if matched_tech else 'core stack'})."
+                )
+            else:
+                return (
+                    f"### High-Priority Skills Roadmap for **{candidate_name}**\n\n"
+                    f"Your core technical coverage matches the primary job requirements! To maximize your competitive advantage over other applicants, prioritize learning:\n\n"
+                    f"1. **Cloud & DevOps (Docker, Kubernetes, AWS/GCP):** Demonstrating containerized production deployments sets you apart from entry/mid candidates.\n"
+                    f"2. **System Design & High Concurrency (Redis, Kafka, PostgreSQL):** Emphasize caching layers, asynchronous task queues, and DB indexing.\n"
+                    f"3. **Automated Testing & CI/CD (GitHub Actions, PyTest):** Highlighting automated test suites proves production-ready engineering hygiene."
+                )
+
+        # 3. Score Calculation inquiry
         if any(w in msg_lower for w in ["calculate", "calculated", "formula", "how was my score", "score calculation"]):
             return (
                 f"### Alignment Score Methodology (**{score}%** &bull; {fit_tier})\n\n"
@@ -503,7 +532,7 @@ Core Persona & Rules:
                 f"Closing the missing skills in your Skills Matrix will provide the largest direct increase to your score."
             )
 
-        # 3. Project description improvement
+        # 4. Project description improvement
         if any(w in msg_lower for w in ["improve project", "project description", "project bullet", "help me improve"]):
             sample_skill = matched_tech[0] if matched_tech else "Python"
             return (
@@ -519,7 +548,7 @@ Core Persona & Rules:
                 f"- [ ] Did you link to a public GitHub repository or live deployment?"
             )
 
-        # 4. Check for specific skill inquiry
+        # 5. Check for specific skill inquiry
         for skill in missing_tech + matched_tech:
             if skill.lower() in msg_lower:
                 if skill in missing_tech:
@@ -544,7 +573,7 @@ Core Persona & Rules:
                         f"- **Example Bullet Rewrite:** *\"Architected a high-concurrency service in **{skill}**, maintaining **99.9% uptime** across 50K+ daily active users by implementing asynchronous processing and connection pooling.\"*"
                     )
 
-        # 5. X-Y-Z Formula / Bullet Point Rewriting
+        # 6. X-Y-Z Formula / Bullet Point Rewriting
         if any(w in msg_lower for w in ["bullet", "rewrite", "x-y-z", "xyz", "rephrase", "experience"]):
             tech_sample = matched_tech[0] if matched_tech else "Python"
             return (
@@ -560,7 +589,7 @@ Core Persona & Rules:
                 f"💡 *Tip: Click 'Copy Bullet' on any recommendation in the AI Recommendations tab to quickly use them.*"
             )
 
-        # 6. Technical Interview Prep
+        # 7. Technical Interview Prep
         if any(w in msg_lower for w in ["interview", "questions", "prep", "ask", "technical round", "practice"]):
             return (
                 f"### High-Probability Technical Interview Questions\n\n"
@@ -575,8 +604,8 @@ Core Persona & Rules:
                 f"   * *\"Tell me about a time you had to deliver a feature with incomplete specifications or unfamiliar tooling. How did you navigate the trade-offs?\"*"
             )
 
-        # 7. Alignment Score / How to improve / Prioritize
-        if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align", "prioritize", "learn"]):
+        # 8. Alignment Score / How to improve / Boost
+        if any(w in msg_lower for w in ["score", "improve", "increase", "boost", "match", "align"]):
             missing_str = ", ".join(f"**{m}**" for m in missing_tech[:3]) if missing_tech else "specialized tooling"
             return (
                 f"### Strategy to Elevate Your Alignment Score (Currently **{score}%** &bull; {fit_tier})\n\n"
@@ -591,7 +620,7 @@ Core Persona & Rules:
                 f"Would you like me to rewrite a specific project bullet point for you?"
             )
 
-        # 8. Competitive Advantage
+        # 9. Competitive Advantage
         if any(w in msg_lower for w in ["advantage", "strength", "stand out", "edge"]):
             return (
                 f"### Your Competitive Edge for this Target Role\n\n"
@@ -601,17 +630,20 @@ Core Persona & Rules:
                 f"- **Next Step:** By addressing the {len(missing_tech)} missing competencies highlighted in your Skills Matrix, you will have a comprehensive application that passes both automated ATS screens and engineering manager evaluations."
             )
 
-        # 9. General / Greeting / Fallback
+        # 10. General / Greeting / Fallback
+        matched_str = ', '.join(matched_tech[:3]) if matched_tech else ('Verified from Resume' if score >= 60 else 'Under Evaluation')
+        gaps_str = ', '.join(missing_tech[:3]) if missing_tech else ('Infrastructure & Quantified Impact' if score < 75 else 'None identified')
         return (
             f"Hello **{candidate_name}**! I am your **Parichay AI Career Intelligence Copilot**.\n\n"
             f"I have reviewed your resume against the target role:\n"
             f"- **Alignment Score:** **{score}%** ({fit_tier})\n"
-            f"- **Matched Core Technologies:** {', '.join(matched_tech[:3]) if matched_tech else 'In progress'}\n"
-            f"- **Priority Skill Gaps:** {', '.join(missing_tech[:3]) if missing_tech else 'None'}\n\n"
+            f"- **Matched Core Technologies:** {matched_str}\n"
+            f"- **Priority Skill Gaps:** {gaps_str}\n\n"
             f"**Here are a few things you can ask me:**\n"
             f"1. *\"What are the three most important gaps in my resume?\"*\n"
-            f"2. *\"Explain how my alignment score was calculated.\"*\n"
-            f"3. *\"Rewrite my experience bullet points using Google's X-Y-Z formula.\"*\n"
-            f"4. *\"What technical interview questions will they ask me for this role?\"*"
+            f"2. *\"Which skills should I prioritize learning?\"*\n"
+            f"3. *\"Explain how my alignment score was calculated.\"*\n"
+            f"4. *\"Rewrite my experience bullet points using Google's X-Y-Z formula.\"*\n"
+            f"5. *\"What technical interview questions will they ask me for this role?\"*"
         )
 

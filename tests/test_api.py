@@ -449,6 +449,43 @@ class TestParichayAPI(unittest.TestCase):
                 self.assertNotEqual(contents[i]["role"], contents[i+1]["role"],
                                     "Adjacent turns in contents MUST NOT share the same role")
 
+    def test_gemini_status_endpoint(self):
+        """Test GET /api/config/gemini-status returns status object with model."""
+        response = self.client.get("/api/config/gemini-status")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIn("is_live", data)
+        self.assertIn("model", data)
+
+    @patch("requests.post")
+    def test_gemini_key_validation_endpoint(self, mock_post):
+        """Test POST /api/config/gemini-key validates key and responds with success."""
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"candidates": [{"content": {"parts": [{"text": "Hello"}]}}]}
+        mock_post.return_value = mock_resp
+
+        response = self.client.post("/api/config/gemini-key", json={"api_key": "AIzaSyTestValidKey123456789"})
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertTrue(data["is_live"])
+
+    def test_chatbot_prioritize_learning_grounded_response(self):
+        """Test POST /api/chat handles 'Which skills should I prioritize learning?' with concrete plan."""
+        self.login_test_user()
+        response = self.client.post("/api/chat", json={
+            "message": "Which skills should I prioritize learning?",
+            "candidate": {"name": "Aarav Sharma", "matched_skills": ["Python", "Flask"], "missing_skills": ["Docker", "Kubernetes"]},
+            "alignment": {"score": 66, "fit_tier": "Moderate Alignment"}
+        })
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        self.assertIn("High-Priority Skills Roadmap", data["reply"])
+        self.assertIn("Docker", data["reply"])
+
     def test_history_endpoint_authenticated(self):
         """Test GET /api/history endpoint returns valid response for authenticated user."""
         self.login_test_user()
