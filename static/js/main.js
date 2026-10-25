@@ -124,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. VIEW SWITCHER NAVIGATION
   // ==========================================================================
   function initViewSwitcher() {
+    window.showView = showView;
     navButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         const view = btn.dataset.view;
@@ -614,7 +615,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnRecAskAi = document.getElementById("btnRecAskAi");
     if (btnRecAskAi) {
       btnRecAskAi.addEventListener("click", () => {
-        showView("chat");
+        showView("assistant");
+        setTimeout(() => {
+          const chatInput = document.getElementById("chatInputField");
+          if (chatInput) {
+            chatInput.focus();
+            chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 150);
       });
     }
   }

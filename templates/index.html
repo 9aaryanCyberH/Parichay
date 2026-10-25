@@ -545,7 +545,7 @@
             <div class="rec-ai-prompt-title">Need personalized coaching on these suggestions?</div>
             <div class="rec-ai-prompt-sub">Ask Parichay's AI assistant to draft bullet rewrites, simulate interview questions, or review your project plans.</div>
           </div>
-          <button type="button" id="btnRecAskAi" class="btn-rec-ask-ai">Ask AI assistant &rarr;</button>
+          <button type="button" id="btnRecAskAi" class="btn-rec-ask-ai" onclick="if(window.showView) window.showView('assistant');">Ask AI assistant &rarr;</button>
         </div>
       </div>
 
@@ -764,6 +764,6 @@
   </div>
 
   <!-- Main JavaScript Application Logic -->
-  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_xyz"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=20261025_askai"></script>
 </body>
 </html>
